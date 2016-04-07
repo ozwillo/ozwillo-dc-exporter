@@ -44,6 +44,16 @@ dependencies {
 	testCompile('org.springframework.boot:spring-boot-starter-test') 
 }
 
+bootRun {
+    // needed for hot reload of thymeleaf templates
+    addResources = true
+}
+
+springBoot {
+    // exclude Spring Boot Devtools from the fat jar
+    excludeDevtools = true
+}
+
 task wrapper(type: Wrapper) {
 	gradleVersion = '2.9'
 }
