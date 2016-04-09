@@ -10,6 +10,10 @@ buildscript {
 	}
 }
 
+plugins {
+	id "com.moowork.node" version "0.11"
+}
+
 apply plugin: 'java'
 apply plugin: 'spring-boot'
 
@@ -20,6 +24,12 @@ jar {
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
+node {
+	version = '5.6.0'
+	npmVersion = '3.3.12'
+	download = true
+}
 
 repositories {
 	mavenCentral()
@@ -57,3 +67,15 @@ springBoot {
 task wrapper(type: Wrapper) {
 	gradleVersion = '2.9'
 }
+
+configure(tasks.processResources) {
+	// we don't want source JSX in the jar, we only need their transpiled, bundled version in build/
+	exclude 'public/jsx/'
+	exclude 'public/css/'
+}
+
+task frontBundle(type: NpmTask) {
+	args = ['run', 'build']
+}
+
+processResources.dependsOn(frontBundle)
