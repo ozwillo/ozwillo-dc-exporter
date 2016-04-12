@@ -1,10 +1,28 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react'
+import { render } from 'react-dom'
 
-export default class App extends React.Component {
+import { Router, Route, IndexRoute, Link, hashHistory } from 'react-router'
+
+import Navbar from './Navbar'
+import Dashboard from './Dashboard'
+import DatasetAdder from './DatasetAdder'
+
+const App = React.createClass({
     render() {
-        return <h1>Hello</h1>
+        return (
+            <div>
+                <Navbar />
+                {this.props.children}
+            </div>
+        )
     }
-}
+})
 
-ReactDOM.render(<App/>, document.getElementById('app'));
+render((
+    <Router history={hashHistory}>
+        <Route path="/" component={App}>
+            <IndexRoute component={Dashboard} />
+            <Route path="create-dataset" component={DatasetAdder} />
+        </Route>
+    </Router>
+), document.getElementById('app'))
