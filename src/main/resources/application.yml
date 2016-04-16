@@ -1,3 +1,9 @@
+spring:
+  output.ansi.enabled: DETECT
+
+server:
+  compression.enabled: true
+
 application:
   url: http://localhost:3000
 
