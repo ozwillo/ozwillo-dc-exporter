@@ -44,10 +44,6 @@ kernel:
   client_secret: secret
   # NB. once Datacore cache is in place, move datacore scope to its dedicated system user
   scopes_to_require: openid profile email address phone datacore
-  portal_endpoints:
-    subscriptions: ${kernel.base_uri}/apps/subscriptions
-    catalog: ${kernel.base_uri}/m
-    apps: ${kernel.base_uri}/apps
 
 datacore:
   #url: http://localhost:8080
