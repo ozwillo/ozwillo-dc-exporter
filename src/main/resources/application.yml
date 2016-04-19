@@ -12,6 +12,15 @@ application:
   security:
     fetchUserInfo: true
 
+logging:
+  # file: dcexporter.log
+  level:
+    org.ozwillo.dcexporter: DEBUG
+    org.oasis_eu.spring: DEBUG
+    org.oasis_eu.spring.util.KernelLoggingInterceptor: INFO
+    kernelLogging.logFullErrorResponses: INFO
+    kernelLogging.logRequestTimings: INFO
+
 # TODO : Copied pasted from portal configuration, check if we really need all of them
 kernel:
   base_uri: https://kernel.ozwillo-dev.eu
