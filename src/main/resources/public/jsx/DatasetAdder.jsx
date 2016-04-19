@@ -1,19 +1,43 @@
 import React from 'react'
 
-import { Form, FormGroup } from './Form'
+import renderIf from 'render-if'
+
+import { Form, FormGroup, Label, SelectField, InputText, SubmitButton } from './Form'
 
 export default React.createClass({
+    contextTypes: {
+        csrfToken: React.PropTypes.string,
+        csrfTokenHeaderName: React.PropTypes.string
+    },
+    getInitialState() {
+        return {
+            dcId: ""
+        }
+    },
+    onDatasetSelected(dcId) {
+        this.setState({ dcId: dcId })
+    },
+    registerDataset(fields) {
+        fields['dcId'] = this.state.dcId
+        fetch('/api/dc-model-mapping', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                "Content-Type": "application/json",
+                [this.context.csrfTokenHeaderName] : this.context.csrfToken
+            },
+            body: JSON.stringify(fields)
+        })
+            .catch(error => console.log(error.message))
+    },
     render() {
         return (
-            <div className="container">
-                <div className="row">
-                    <div className="col-md-12">
-                        <h1>Add Dataset</h1>
-                    </div>
-                    <div className="col-md-12">
-                        <DatasetChooser />
-                    </div>
-                </div>
+            <div>
+                <h1>Dataset registration</h1>
+                <DatasetChooser dcId={this.state.dcId} onDatasetSelected={this.onDatasetSelected} />
+                {renderIf(this.state.dcId)(
+                    <DatasetConfigurer onSubmit={this.registerDataset} />
+                )}
             </div>
         )
     }
@@ -32,16 +56,42 @@ const DatasetChooser = React.createClass({
     },
     render() {
         const options = this.state.datasets.map(dataset =>
-            <option key={dataset['@id']} name="dataset" value={dataset['@id']}>{dataset['dcmo:name']}</option>
+            <option key={dataset['@id']} value={dataset['@id']}>{dataset['dcmo:name']}</option>
         )
         return (
             <Form>
                 <FormGroup>
-                    <label htmlFor="dataset" className="control-label">Choose a dataset</label>
-                    <select name="dataset" id="dataset" className="form-control">
-                        {options}
-                    </select>
-                </FormGroup>    
+                    <Label htmlFor="dcId" value="Choose a dataset" />
+                    <SelectField id="dcId" options={options} value={this.props.dcId}
+                                 onChange={(event) => this.props.onDatasetSelected(event.target.value)} />
+                </FormGroup>
+            </Form>
+        )
+    }
+})
+
+const DatasetConfigurer = React.createClass({
+    getInitialState() {
+        return {
+            fields: {
+                name: ''
+            }
+        }
+    },
+    onFieldChange(id, value) {
+        const fields = this.state.fields
+        fields[id] = value
+        this.setState({ fields: fields })
+    },
+    render() {
+        return (
+            <Form>
+                <FormGroup>
+                    <Label htmlFor="name" value="Name" />
+                    <InputText id="name" value={this.state.fields[name]}
+                        onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
+                </FormGroup>
+                <SubmitButton label="Create" onClick={(event) => this.props.onSubmit(this.state.fields)} />
             </Form>
         )
     }

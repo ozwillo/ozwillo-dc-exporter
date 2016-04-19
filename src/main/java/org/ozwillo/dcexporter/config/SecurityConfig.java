@@ -3,12 +3,14 @@ package org.ozwillo.dcexporter.config;
 import org.oasis_eu.spring.config.OasisSecurityConfiguration;
 import org.oasis_eu.spring.kernel.security.OpenIdCConfiguration;
 import org.oasis_eu.spring.kernel.security.StaticOpenIdCConfiguration;
+import org.ozwillo.dcexporter.config.filter.CsrfTokenGeneratorFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
+import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.Arrays;
@@ -35,7 +37,9 @@ public class SecurityConfig extends OasisSecurityConfiguration {
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessHandler(logoutHandler())
                 .and()
             .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint()).and()
+                .authenticationEntryPoint(authenticationEntryPoint())
+                .and()
+            .addFilterAfter(new CsrfTokenGeneratorFilter(), CsrfFilter.class)
             .addFilterAfter(oasisExceptionTranslationFilter(authenticationEntryPoint()), ExceptionTranslationFilter.class);
     }
 }
