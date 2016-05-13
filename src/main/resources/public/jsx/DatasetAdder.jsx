@@ -11,11 +11,11 @@ export default React.createClass({
     },
     getInitialState() {
         return {
-            dcId: ""
+            dcId: ''
         }
     },
     onDatasetSelected(dcId) {
-        this.setState({ dcId: dcId })
+        this.setState({ dcId })
     },
     registerDataset(fields) {
         fields['dcId'] = this.state.dcId
@@ -23,7 +23,7 @@ export default React.createClass({
             method: 'POST',
             credentials: 'same-origin',
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
                 [this.context.csrfTokenHeaderName] : this.context.csrfToken
             },
             body: JSON.stringify(fields)
@@ -74,25 +74,64 @@ const DatasetConfigurer = React.createClass({
     getInitialState() {
         return {
             fields: {
-                name: ''
+                name: '',
+                licence: '',
+                frequency: ''
             }
         }
     },
     onFieldChange(id, value) {
         const fields = this.state.fields
         fields[id] = value
-        this.setState({ fields: fields })
+        this.setState({ fields })
     },
     render() {
+        const frequencyOptions = ['Daily', 'Weekly', 'Monthly'].map(frequency =>
+            <option key={frequency} value={frequency}>{frequency}</option>
+        )
         return (
             <Form>
                 <FormGroup>
                     <Label htmlFor="name" value="Name" />
-                    <InputText id="name" value={this.state.fields[name]}
-                        onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
+                    <InputText id="name" value={this.state.fields['name']}
+                               onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
+                </FormGroup>
+                <LicenceChooser currentLicence={this.state.fields['licence']}
+                                onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
+                <FormGroup>
+                    <Label htmlFor="frequency" value="Frequency" />
+                    <SelectField id="frequency" value={this.state.fields['frequency']}
+                                 options={frequencyOptions}
+                                 onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
                 </FormGroup>
                 <SubmitButton label="Create" onClick={(event) => this.props.onSubmit(this.state.fields)} />
             </Form>
+        )
+    }
+})
+
+const LicenceChooser = React.createClass({
+    getInitialState() {
+        return {
+            licences: {}
+        }
+    },
+    componentDidMount() {
+        fetch('/api/ckan/licences', { credentials: 'same-origin' })
+            .then(response => response.json())
+            .then(json => this.setState({ licences: json }))
+
+    },
+    render() {
+        const options = Object.keys(this.state.licences).map(key =>
+            <option key={key} value={key}>{this.state.licences[key]}</option>
+        )
+        return (
+            <FormGroup>
+                <Label htmlForm="licence" value="Licence"/>
+                <SelectField id="licence" value={this.props.currentLicence}
+                    options={options} onChange={this.props.onChange} />
+            </FormGroup>
         )
     }
 })

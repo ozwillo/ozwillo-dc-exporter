@@ -58,3 +58,8 @@ datacore:
   systemAdminUser:  # Get it using Node.js lib / with portal clientId
     refreshToken: refreshToken
     nonce: changeit      #Set it when getting the refreshToken
+
+ckan:
+  url: https://opendata.ozwillo.com
+  apikey: your-ckan-api-key
+
