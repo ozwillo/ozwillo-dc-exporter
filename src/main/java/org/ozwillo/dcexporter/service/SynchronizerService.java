@@ -3,6 +3,7 @@ package org.ozwillo.dcexporter.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -19,10 +20,18 @@ public class SynchronizerService {
     @Autowired
     private CkanService ckanService;
 
+    @Autowired
+    private SystemUserService systemUserService;
+
     public enum SyncType {
         POI,
         ORG
     };
+
+    @Scheduled(fixedDelayString = "${application.syncDelay}")
+    public void synchronizeOrgs() {
+        systemUserService.runAs(() -> this.sync(SynchronizerService.SyncType.ORG));
+    }
 
     public String sync(SyncType syncType) {
         Optional<File> optionalResourceCsvFile = syncType.equals(SyncType.ORG) ?

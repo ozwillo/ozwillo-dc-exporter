@@ -11,6 +11,7 @@ application:
   url: http://localhost:3000
   security:
     fetchUserInfo: true
+  syncDelay: 10000
 
 logging:
   # file: dcexporter.log
