@@ -21,4 +21,9 @@ public class DatacoreController {
     public List<DCModel> getModels() {
         return datacoreService.getModels();
     }
+
+    @RequestMapping(value = "/sync-poi", method = RequestMethod.GET)
+    public String syncPoi() {
+        return datacoreService.syncPoi();
+    }
 }
