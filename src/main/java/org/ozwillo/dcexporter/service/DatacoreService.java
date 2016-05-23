@@ -29,21 +29,20 @@ public class DatacoreService {
         return datacore.findModels(50);
     }
 
-    public String syncPoi() {
+    public Optional<File> exportPoiToCsv() {
         List<DCResource> pois = datacore.findResources("poi_0", "poi:Geoloc_0", null, 0, 100);
-        LOGGER.debug("Got {} pois", pois.size());
+        LOGGER.debug("Got {} pois to export", pois.size());
 
         // TODO : this can be quite non exhaustive as we can't guarantee the first field has all the possible fields
-        // TODO : get the model instead
+        // TODO : work from the model instead
         DCResource firstPoi = pois.get(0);
         List<String> poiKeys = firstPoi.getValues().keySet().stream()
             .filter(key -> !"@type".equals(key))
             .collect(Collectors.toList());
 
-        FileWriter poiFileWriter;
         try {
             File poiFile = File.createTempFile("poi", ".csv");
-            poiFileWriter = new FileWriter(poiFile);
+            FileWriter poiFileWriter = new FileWriter(poiFile);
 
             Optional<String> header = poiKeys.stream().reduce((result, key) -> result + "," + key);
             if (header.isPresent()) {
@@ -58,14 +57,14 @@ public class DatacoreService {
                     poiKeys.stream().map(key -> {
                         LOGGER.debug("Searching for key {}", key);
                         DCResource.Value poiValue = poi.getValues().get(key);
+
                         if (poiValue == null) {
                             LOGGER.debug("No value for this key, skipping");
                             return "";
-                        }
-
-                        if (poiValue.isString())
+                        } else if (poiValue.isString()) {
                             return poi.getAsString(key);
-                        else if (poiValue.isMap()) {
+                        } else if (poiValue.isMap()) {
+                            // TODO it seems like we neither get a map
                             return getI18nFieldValue(poi.getAsStringMap(key), "fr");
                         } else if (poiValue.isArray()) {
                             List<DCResource.Value> poiRowInnerValues = poiValue.asArray();
@@ -75,7 +74,7 @@ public class DatacoreService {
                             if (poiRowInnerValues.get(0).isString()) {
                                 Optional<String> reducedValue =
                                     poi.getAsStringList(key).stream().reduce((result, value) -> result + "," + value);
-                                return reducedValue.isPresent() ? reducedValue.get() : "";
+                                return reducedValue.orElse("");
                             } else if (poiRowInnerValues.get(0).isMap()) {
                                 // Ugliest code ever to handle structures like that :
                                 // poi:name=[{@value=Test Ozwillo, @language=en}, {@value=Test Ozwillo, @language=fr}, ...]
@@ -92,7 +91,7 @@ public class DatacoreService {
                                 Optional<DCResource.Value> frenchValue = poiRowInnerValues.stream().filter(value ->
                                     value.asMap().values().toArray()[1].toString().equals("en")
                                 ).findFirst();
-                                LOGGER.debug("Got value : {}", frenchValue.isPresent());
+                                LOGGER.debug("Got a value ? {}", frenchValue.isPresent());
                                 return frenchValue.isPresent() ? frenchValue.get().asMap().values().toArray()[0].toString() : "";
                             } else {
                                 LOGGER.warn("Inner row value not managed for {}", poiRowInnerValues);
@@ -115,12 +114,11 @@ public class DatacoreService {
             poiFileWriter.flush();
             poiFileWriter.close();
             LOGGER.info("Wrote temp data in file {}", poiFile.getAbsolutePath());
+            return Optional.of(poiFile);
         } catch (IOException e) {
             LOGGER.error("Unable to create temp file : {}", e.getMessage());
-            return "KO";
+            return Optional.empty();
         }
-
-        return "Ok";
     }
 
     private String getI18nFieldValue(Map<String, String> field, String lang) {
