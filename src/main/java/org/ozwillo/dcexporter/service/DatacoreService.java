@@ -6,17 +6,20 @@ import org.oasis_eu.spring.datacore.model.DCResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@ConfigurationProperties(prefix = "datacore")
 public class DatacoreService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatacoreService.class);
@@ -24,60 +27,77 @@ public class DatacoreService {
     @Autowired
     private DatacoreClient datacore;
 
+    // Binded through @ConfigurationProperties on the class
+    // Do not use @Value since it will broke the binding into a list
+    // (because we need to use the DataBinder, which @ConfigurationProperties does, but not @Value)
+    private List<String> exportExcludedFields = new ArrayList<>();
+
     public List<DCModel> getModels() {
         // TODO : iterate until we have all
         return datacore.findModels(50);
     }
 
-    public Optional<File> exportPoiToCsv() {
-        List<DCResource> pois = datacore.findResources("poi_0", "poi:Geoloc_0", null, 0, 100);
-        LOGGER.debug("Got {} pois to export", pois.size());
+    public Optional<File> exportResourceToCsv(String project, String type) {
+        int start = 0;
+        List<DCResource> resources = new ArrayList<>();
+        while (true) {
+            List<DCResource> intermediateResult = datacore.findResources(project, type, null, start, 100);
+            resources.addAll(intermediateResult);
+            start += 100;
+            if (intermediateResult.size() < 100)
+                break;
+        }
+        LOGGER.debug("Got {} resources to export", resources.size());
 
         // TODO : this can be quite non exhaustive as we can't guarantee the first field has all the possible fields
         // TODO : work from the model instead
-        DCResource firstPoi = pois.get(0);
-        List<String> poiKeys = firstPoi.getValues().keySet().stream()
-            .filter(key -> !"@type".equals(key))
+        DCResource firstResource = resources.get(0);
+        List<String> resourceKeys = firstResource.getValues().keySet().stream()
+            .filter(key -> !exportExcludedFields.contains(key))
             .collect(Collectors.toList());
 
         try {
-            File poiFile = File.createTempFile("poi", ".csv");
-            FileWriter poiFileWriter = new FileWriter(poiFile);
+            File resourceFile = File.createTempFile("export-", ".csv");
+            FileWriter resourceFileWriter = new FileWriter(resourceFile);
 
-            Optional<String> header = poiKeys.stream().reduce((result, key) -> result + "," + key);
+            Optional<String> header = resourceKeys.stream().reduce((result, key) -> result + "," + key);
             if (header.isPresent()) {
-                poiFileWriter.write(header.get());
-                poiFileWriter.write("\n");
+                resourceFileWriter.write(header.get());
+                resourceFileWriter.write("\n");
             }
 
-            pois.forEach(poi -> {
-                LOGGER.debug("Looking at poi {}", poi.getIri());
-                LOGGER.debug("POI : {}", poi);
-                Optional<String> poiRow =
-                    poiKeys.stream().map(key -> {
-                        LOGGER.debug("Searching for key {}", key);
-                        DCResource.Value poiValue = poi.getValues().get(key);
+            resources.forEach(resource -> {
+                LOGGER.debug("Looking at resource {}", resource.getIri());
+                LOGGER.debug("Resource : {}", resource);
 
-                        if (poiValue == null) {
+                Optional<String> resourceRow =
+                    resourceKeys.stream().map(key -> {
+                        LOGGER.debug("Searching for key {}", key);
+                        DCResource.Value resourceValue = resource.getValues().get(key);
+
+                        if (resourceValue == null) {
                             LOGGER.debug("No value for this key, skipping");
                             return "";
-                        } else if (poiValue.isString()) {
-                            return poi.getAsString(key);
-                        } else if (poiValue.isMap()) {
+                        } else if (resourceValue.isString()) {
+                            if ("org:email".equals(key))
+                                return "xxx@xxx.com";
+                            else
+                                return resource.getAsString(key);
+                        } else if (resourceValue.isMap()) {
                             // TODO it seems like we neither get a map
-                            return getI18nFieldValue(poi.getAsStringMap(key), "fr");
-                        } else if (poiValue.isArray()) {
-                            List<DCResource.Value> poiRowInnerValues = poiValue.asArray();
-                            if (poiRowInnerValues.isEmpty())
+                            return getI18nFieldValue(resource.getAsStringMap(key), "fr");
+                        } else if (resourceValue.isArray()) {
+                            List<DCResource.Value> resourceRowInnerValues = resourceValue.asArray();
+                            if (resourceRowInnerValues.isEmpty())
                                 return "";
 
-                            if (poiRowInnerValues.get(0).isString()) {
+                            if (resourceRowInnerValues.get(0).isString()) {
                                 Optional<String> reducedValue =
-                                    poi.getAsStringList(key).stream().reduce((result, value) -> result + "," + value);
+                                    resource.getAsStringList(key).stream().reduce((result, value) -> result + "," + value);
                                 return reducedValue.orElse("");
-                            } else if (poiRowInnerValues.get(0).isMap()) {
+                            } else if (resourceRowInnerValues.get(0).isMap()) {
                                 // Ugliest code ever to handle structures like that :
-                                // poi:name=[{@value=Test Ozwillo, @language=en}, {@value=Test Ozwillo, @language=fr}, ...]
+                                // resource:name=[{@value=Test Ozwillo, @language=en}, {@value=Test Ozwillo, @language=fr}, ...]
                                 // which are lists of two entries maps, second entry having the language for value !
                                 /*
                                 LOGGER.debug("Size of the list : {}", poiRowInnerValues.size());
@@ -88,13 +108,13 @@ public class DatacoreService {
                                     );
                                 });
                                 */
-                                Optional<DCResource.Value> frenchValue = poiRowInnerValues.stream().filter(value ->
+                                Optional<DCResource.Value> frenchValue = resourceRowInnerValues.stream().filter(value ->
                                     value.asMap().values().toArray()[1].toString().equals("en")
                                 ).findFirst();
                                 LOGGER.debug("Got a value ? {}", frenchValue.isPresent());
                                 return frenchValue.isPresent() ? frenchValue.get().asMap().values().toArray()[0].toString() : "";
                             } else {
-                                LOGGER.warn("Inner row value not managed for {}", poiRowInnerValues);
+                                LOGGER.warn("Inner row value not managed for {}", resourceRowInnerValues);
                                 return "";
                             }
                         }
@@ -102,19 +122,19 @@ public class DatacoreService {
                             return "";
                     }).reduce((result, value) -> result + ",\"" + value + "\"");
 
-                if (poiRow.isPresent())
+                if (resourceRow.isPresent())
                     try {
-                        poiFileWriter.write(poiRow.get());
-                        poiFileWriter.write("\n");
+                        resourceFileWriter.write(resourceRow.get());
+                        resourceFileWriter.write("\n");
                     } catch (IOException e) {
                         LOGGER.error("Error while writing row : {}", e.getMessage());
                     }
             });
 
-            poiFileWriter.flush();
-            poiFileWriter.close();
-            LOGGER.info("Wrote temp data in file {}", poiFile.getAbsolutePath());
-            return Optional.of(poiFile);
+            resourceFileWriter.flush();
+            resourceFileWriter.close();
+            LOGGER.info("Wrote temp data in file {}", resourceFile.getAbsolutePath());
+            return Optional.of(resourceFile);
         } catch (IOException e) {
             LOGGER.error("Unable to create temp file : {}", e.getMessage());
             return Optional.empty();
@@ -125,5 +145,10 @@ public class DatacoreService {
         Optional<Map.Entry<String,String>> frenchValue = field.entrySet().stream()
             .filter(entry -> lang.equals(entry.getValue())).findFirst();
         return frenchValue.isPresent() ? frenchValue.get().getKey() : "";
+    }
+
+    // needed for field binding into a list
+    public List<String> getExportExcludedFields() {
+        return exportExcludedFields;
     }
 }

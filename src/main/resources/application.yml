@@ -58,6 +58,9 @@ datacore:
   systemAdminUser:  # Get it using Node.js lib / with portal clientId
     refreshToken: refreshToken
     nonce: changeit      #Set it when getting the refreshToken
+  exportExcludedFields:
+    - "@type"
+    - org:email
 
 ckan:
   url: https://opendata.ozwillo.com

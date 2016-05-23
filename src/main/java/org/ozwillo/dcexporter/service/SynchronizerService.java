@@ -19,16 +19,27 @@ public class SynchronizerService {
     @Autowired
     private CkanService ckanService;
 
-    public String syncPoi() {
-        Optional<File> optionalPoiCsvFile = datacoreService.exportPoiToCsv();
-        if (!optionalPoiCsvFile.isPresent()) {
-            LOGGER.error("Did not get the POI's CSV file, stopping");
+    public enum SyncType {
+        POI,
+        ORG
+    };
+
+    public String sync(SyncType syncType) {
+        Optional<File> optionalResourceCsvFile = syncType.equals(SyncType.ORG) ?
+            datacoreService.exportResourceToCsv("org_1", "org:Organization_0") :
+            datacoreService.exportResourceToCsv("poi_0", "poi:Geoloc_0");
+
+        if (!optionalResourceCsvFile.isPresent()) {
+            LOGGER.error("Did not get the resource's CSV file, stopping");
             return "KO";
         }
 
-        File poiCvsFile = optionalPoiCsvFile.get();
+        File csvFile = optionalResourceCsvFile.get();
 
-        ckanService.updatePoi(poiCvsFile);
+        if (syncType.equals(SyncType.ORG))
+            ckanService.updateResourceData("organisations", "f7d1d5dc-45c3-48fc-bca4-d9d98ba50d3a", csvFile);
+        else
+            ckanService.updateResourceData("points-interet-poi", "b4fca7f7-773a-4bca-87f0-f54437082817", csvFile);
 
         return "OK";
     }

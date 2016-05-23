@@ -28,6 +28,11 @@ public class DatacoreController {
 
     @RequestMapping(value = "/sync-poi", method = RequestMethod.GET)
     public String syncPoi() {
-        return synchronizerService.syncPoi();
+        return synchronizerService.sync(SynchronizerService.SyncType.POI);
+    }
+
+    @RequestMapping(value = "/sync-org", method = RequestMethod.GET)
+    public String syncOrg() {
+        return synchronizerService.sync(SynchronizerService.SyncType.ORG);
     }
 }

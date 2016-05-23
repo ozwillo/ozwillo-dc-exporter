@@ -28,16 +28,14 @@ public class CkanService {
         return licenses.stream().collect(Collectors.toMap(CkanLicense::getId, CkanLicense::getTitle));
     }
 
-    public void updatePoi(File poiCsvFile) {
+    public void updateResourceData(String packageId, String id, File poiCsvFile) {
         CkanClient ckanClient = new CheckedCkanClient(ckanUrl, ckanApiKey);
 
         CkanResourceBase ckanResourceBase = new CkanResourceBase();
-        ckanResourceBase.setPackageId("points-interet-poi");
+        ckanResourceBase.setPackageId(packageId);
         ckanResourceBase.setUrl("upload");
-        ckanResourceBase.setId("b4fca7f7-773a-4bca-87f0-f54437082817");
-        ckanResourceBase.setName("POIs exportés automatiquement");
+        ckanResourceBase.setId(id);
         ckanResourceBase.setFormat("CSV");
-        ckanResourceBase.setDescription("Bientôt un long texte ici !");
 
         CkanResource result = ckanClient.updateResourceData(ckanResourceBase, poiCsvFile);
     }
