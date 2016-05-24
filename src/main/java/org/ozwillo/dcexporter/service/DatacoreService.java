@@ -106,7 +106,7 @@ public class DatacoreService {
                                 });
                                 */
                                 Optional<DCResource.Value> frenchValue = resourceRowInnerValues.stream().filter(value ->
-                                    value.asMap().values().toArray()[1].toString().equals("en")
+                                    value.asMap().values().toArray()[1].toString().equals("fr")
                                 ).findFirst();
                                 LOGGER.debug("Got a value ? {}", frenchValue.isPresent());
                                 return frenchValue.isPresent() ? frenchValue.get().asMap().values().toArray()[0].toString() : "";
