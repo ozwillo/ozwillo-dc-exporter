@@ -1,7 +1,12 @@
 package org.ozwillo.dcexporter.service;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.oasis_eu.spring.datacore.DatacoreClient;
 import org.oasis_eu.spring.datacore.model.DCModel;
+import org.oasis_eu.spring.datacore.model.DCOperator;
+import org.oasis_eu.spring.datacore.model.DCQueryParameters;
 import org.oasis_eu.spring.datacore.model.DCResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,10 +17,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +37,15 @@ public class DatacoreService {
     public List<DCModel> getModels() {
         // TODO : iterate until we have all
         return datacore.findModels(50);
+    }
+
+    public boolean hasMoreRecentResources(String project, String type, DateTime fromDate) {
+        DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateTime();
+        DCQueryParameters parameters = new DCQueryParameters("dc:modified", DCOperator.GTE, dateTimeFormatter.print(fromDate));
+
+        List<DCResource> newResources = datacore.findResources(project, type, parameters, 0, 1);
+        LOGGER.debug("Retrieved {} resources newer than {}", newResources.size(), dateTimeFormatter.print(fromDate));
+        return !newResources.isEmpty();
     }
 
     public Optional<File> exportResourceToCsv(String project, String type) {

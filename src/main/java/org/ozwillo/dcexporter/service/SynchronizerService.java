@@ -1,5 +1,8 @@
 package org.ozwillo.dcexporter.service;
 
+import org.joda.time.DateTime;
+import org.ozwillo.dcexporter.dao.SynchronizerAuditLogRepository;
+import org.ozwillo.dcexporter.model.SynchronizerAuditLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,6 +27,9 @@ public class SynchronizerService {
     @Autowired
     private SystemUserService systemUserService;
 
+    @Autowired
+    private SynchronizerAuditLogRepository synchronizerAuditLogRepository;
+
     public enum SyncType {
         POI,
         ORG
@@ -30,7 +37,22 @@ public class SynchronizerService {
 
     @Scheduled(fixedDelayString = "${application.syncDelay}")
     public void synchronizeOrgs() {
-        systemUserService.runAs(() -> this.sync(SynchronizerService.SyncType.ORG));
+        systemUserService.runAs(() -> {
+            List<SynchronizerAuditLog> auditLogs =
+                synchronizerAuditLogRepository.findByTypeOrderByDateDesc("org:Organization_0");
+
+            if (!auditLogs.isEmpty() &&
+                !datacoreService.hasMoreRecentResources("org_1", "org:Organization_0", auditLogs.get(0).getDate())) {
+                LOGGER.info("No more recent resources for {}, returning", "org:Organization_0");
+                return;
+            }
+
+            LOGGER.info("Got some recent organizations, synchronizing them");
+            this.sync(SynchronizerService.SyncType.ORG);
+
+            SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog("org:Organization_0", DateTime.now());
+            synchronizerAuditLogRepository.save(newAuditLog);
+        });
     }
 
     public String sync(SyncType syncType) {

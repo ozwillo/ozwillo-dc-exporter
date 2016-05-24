@@ -5,6 +5,9 @@ import eu.trentorise.opendata.jackan.CkanClient;
 import eu.trentorise.opendata.jackan.model.CkanLicense;
 import eu.trentorise.opendata.jackan.model.CkanResource;
 import eu.trentorise.opendata.jackan.model.CkanResourceBase;
+import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +39,9 @@ public class CkanService {
         ckanResourceBase.setUrl("upload");
         ckanResourceBase.setId(id);
         ckanResourceBase.setFormat("CSV");
+
+        DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateHourMinuteSecondMillis();
+        ckanResourceBase.setLastModified(dateTimeFormatter.print(LocalDateTime.now()));
 
         CkanResource result = ckanClient.updateResourceData(ckanResourceBase, poiCsvFile);
     }
