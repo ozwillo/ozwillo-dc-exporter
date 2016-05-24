@@ -104,23 +104,11 @@ public class DatacoreService {
                                     resource.getAsStringList(key).stream().reduce((result, value) -> result + "," + value);
                                 return reducedValue.orElse("");
                             } else if (resourceRowInnerValues.get(0).isMap()) {
-                                // Ugliest code ever to handle structures like that :
-                                // resource:name=[{@value=Test Ozwillo, @language=en}, {@value=Test Ozwillo, @language=fr}, ...]
-                                // which are lists of two entries maps, second entry having the language for value !
-                                /*
-                                LOGGER.debug("Size of the list : {}", poiRowInnerValues.size());
-                                LOGGER.debug("Size of the map in the list : {}", poiRowInnerValues.get(0).asMap().size());
-                                poiRowInnerValues.stream().forEach(value -> {
-                                    value.asMap().entrySet().stream().forEach(stringValueEntry ->
-                                        LOGGER.debug("{} - {}", stringValueEntry.getKey(), stringValueEntry.getValue())
-                                    );
-                                });
-                                */
-                                Optional<DCResource.Value> frenchValue = resourceRowInnerValues.stream().filter(value ->
-                                    value.asMap().values().toArray()[1].toString().equals("fr")
-                                ).findFirst();
-                                LOGGER.debug("Got a value ? {}", frenchValue.isPresent());
-                                return frenchValue.isPresent() ? frenchValue.get().asMap().values().toArray()[0].toString() : "";
+                                String frenchValue = getI18nFieldValueFromList(resourceRowInnerValues, "fr");
+                                if (!frenchValue.isEmpty())
+                                    return frenchValue;
+                                else
+                                    return getI18nFieldValueFromList(resourceRowInnerValues, "en");
                             } else {
                                 LOGGER.warn("Inner row value not managed for {}", resourceRowInnerValues);
                                 return "";
@@ -150,9 +138,22 @@ public class DatacoreService {
     }
 
     private String getI18nFieldValue(Map<String, String> field, String lang) {
-        Optional<Map.Entry<String,String>> frenchValue = field.entrySet().stream()
+        Optional<Map.Entry<String,String>> value = field.entrySet().stream()
             .filter(entry -> lang.equals(entry.getValue())).findFirst();
-        return frenchValue.isPresent() ? frenchValue.get().getKey() : "";
+
+        return value.isPresent() ? value.get().getKey() : "";
+    }
+
+    private String getI18nFieldValueFromList(List<DCResource.Value> valueList, String lang) {
+        // Trying to handle structures like that :
+        // resource:name=[{@value=Test Ozwillo, @language=en}, {@value=Test Ozwillo, @language=fr}, ...]
+        // which are lists of two entries maps, second entry having the language for value !
+
+        Optional<DCResource.Value> result = valueList.stream().filter(value ->
+            value.asMap().values().toArray()[1].toString().equals(lang)
+        ).findFirst();
+
+        return result.isPresent() ? result.get().asMap().values().toArray()[0].toString() : "";
     }
 
     // needed for field binding into a list
