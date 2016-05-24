@@ -117,7 +117,7 @@ public class DatacoreService {
                         }
                         else
                             return "";
-                    }).reduce((result, value) -> result + ",\"" + value + "\"");
+                    }).map(value -> "\"" + value + "\"").reduce((result, value) -> result + "," + value);
 
                 if (resourceRow.isPresent())
                     try {
