@@ -79,10 +79,7 @@ public class DatacoreService {
                             LOGGER.debug("No value for this key, skipping");
                             return "";
                         } else if (resourceValue.isString()) {
-                            if ("org:email".equals(key))
-                                return "xxx@xxx.com";
-                            else
-                                return resource.getAsString(key);
+                            return resource.getAsString(key);
                         } else if (resourceValue.isMap()) {
                             // TODO it seems like we neither get a map
                             return getI18nFieldValue(resource.getAsStringMap(key), "fr");
