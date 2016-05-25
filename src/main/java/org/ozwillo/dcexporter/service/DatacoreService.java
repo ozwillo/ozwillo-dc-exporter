@@ -29,6 +29,8 @@ public class DatacoreService {
     @Autowired
     private DatacoreClient datacore;
 
+    private String modifiedField;
+
     // Binded through @ConfigurationProperties on the class
     // Do not use @Value since it will broke the binding into a list
     // (because we need to use the DataBinder, which @ConfigurationProperties does, but not @Value)
@@ -41,7 +43,7 @@ public class DatacoreService {
 
     public boolean hasMoreRecentResources(String project, String type, DateTime fromDate) {
         DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateTime();
-        DCQueryParameters parameters = new DCQueryParameters("dc:modified", DCOperator.GTE, dateTimeFormatter.print(fromDate));
+        DCQueryParameters parameters = new DCQueryParameters(modifiedField, DCOperator.GTE, dateTimeFormatter.print(fromDate));
 
         List<DCResource> newResources = datacore.findResources(project, type, parameters, 0, 1);
         LOGGER.debug("Retrieved {} resources newer than {}", newResources.size(), dateTimeFormatter.print(fromDate));
@@ -78,7 +80,6 @@ public class DatacoreService {
             }
 
             resources.forEach(resource -> {
-                LOGGER.debug("Looking at resource {}", resource.getIri());
                 LOGGER.debug("Resource : {}", resource);
 
                 Optional<String> resourceRow =
@@ -159,5 +160,9 @@ public class DatacoreService {
     // needed for field binding into a list
     public List<String> getExportExcludedFields() {
         return exportExcludedFields;
+    }
+
+    public void setModifiedField(String modifiedField) {
+        this.modifiedField = modifiedField;
     }
 }

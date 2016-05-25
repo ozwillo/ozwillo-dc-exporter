@@ -16,12 +16,37 @@ public class DcModelMapping {
     @NotEmpty
     private String dcId;
 
+    /**
+     * aka pointOfViewAbsoluteName in model definition
+     */
+    @NotNull
+    @NotEmpty
+    private String project;
+
+    /**
+     * Could be retrieved from dcId but it makes it clearer
+     */
+    @NotNull
+    @NotEmpty
+    private String type;
+
     @JsonProperty
     @NotNull
     @NotEmpty
     private String name;
 
+    private String ckanPackageId;
+
+    private String ckanResourceId;
+
     public DcModelMapping() {
+    }
+
+    public DcModelMapping(String dcId, String project, String type, String name) {
+        this.dcId = dcId;
+        this.project = project;
+        this.type = type;
+        this.name = name;
     }
 
     public String getId() {
@@ -40,12 +65,44 @@ public class DcModelMapping {
         this.dcId = dcId;
     }
 
+    public String getProject() {
+        return project;
+    }
+
+    public void setProject(String project) {
+        this.project = project;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCkanPackageId() {
+        return ckanPackageId;
+    }
+
+    public void setCkanPackageId(String ckanPackageId) {
+        this.ckanPackageId = ckanPackageId;
+    }
+
+    public String getCkanResourceId() {
+        return ckanResourceId;
+    }
+
+    public void setCkanResourceId(String ckanResourceId) {
+        this.ckanResourceId = ckanResourceId;
     }
 
     @Override

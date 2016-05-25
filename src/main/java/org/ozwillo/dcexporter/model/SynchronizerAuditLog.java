@@ -5,7 +5,6 @@ import org.joda.time.DateTime;
 import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
 
 public class SynchronizerAuditLog {
 

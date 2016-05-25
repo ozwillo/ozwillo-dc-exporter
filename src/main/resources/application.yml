@@ -62,6 +62,7 @@ datacore:
   exportExcludedFields:
     - "@type"
     - org:email
+  modifiedField: "dc:modified"
 
 ckan:
   url: https://opendata.ozwillo.com

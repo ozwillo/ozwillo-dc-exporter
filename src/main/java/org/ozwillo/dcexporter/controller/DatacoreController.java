@@ -25,14 +25,4 @@ public class DatacoreController {
     public List<DCModel> getModels() {
         return datacoreService.getModels();
     }
-
-    @RequestMapping(value = "/sync-poi", method = RequestMethod.GET)
-    public String syncPoi() {
-        return synchronizerService.sync(SynchronizerService.SyncType.POI);
-    }
-
-    @RequestMapping(value = "/sync-org", method = RequestMethod.GET)
-    public String syncOrg() {
-        return synchronizerService.sync(SynchronizerService.SyncType.ORG);
-    }
 }

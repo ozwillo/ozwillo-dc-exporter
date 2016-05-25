@@ -1,7 +1,9 @@
 package org.ozwillo.dcexporter.service;
 
 import org.joda.time.DateTime;
+import org.ozwillo.dcexporter.dao.DcModelMappingRepository;
 import org.ozwillo.dcexporter.dao.SynchronizerAuditLogRepository;
+import org.ozwillo.dcexporter.model.DcModelMapping;
 import org.ozwillo.dcexporter.model.SynchronizerAuditLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,38 +29,40 @@ public class SynchronizerService {
     @Autowired
     private SystemUserService systemUserService;
 
+    @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private SynchronizerAuditLogRepository synchronizerAuditLogRepository;
 
-    public enum SyncType {
-        POI,
-        ORG
-    };
+    @SuppressWarnings("SpringJavaAutowiringInspection")
+    @Autowired
+    private DcModelMappingRepository dcModelMappingRepository;
 
     @Scheduled(fixedDelayString = "${application.syncDelay}")
     public void synchronizeOrgs() {
         systemUserService.runAs(() -> {
-            List<SynchronizerAuditLog> auditLogs =
-                synchronizerAuditLogRepository.findByTypeOrderByDateDesc("org:Organization_0");
 
-            if (!auditLogs.isEmpty() &&
-                !datacoreService.hasMoreRecentResources("org_1", "org:Organization_0", auditLogs.get(0).getDate())) {
-                LOGGER.info("No more recent resources for {}, returning", "org:Organization_0");
-                return;
-            }
+            dcModelMappingRepository.findAll().forEach(dcModelMapping -> {
+                List<SynchronizerAuditLog> auditLogs =
+                    synchronizerAuditLogRepository.findByTypeOrderByDateDesc(dcModelMapping.getType());
 
-            LOGGER.info("Got some recent organizations, synchronizing them");
-            this.sync(SynchronizerService.SyncType.ORG);
+                if (!auditLogs.isEmpty() &&
+                    !datacoreService.hasMoreRecentResources(dcModelMapping.getProject(), dcModelMapping.getType(), auditLogs.get(0).getDate())) {
+                    LOGGER.info("No more recent resources for {}, returning", dcModelMapping.getType());
+                    return;
+                }
 
-            SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog("org:Organization_0", DateTime.now());
-            synchronizerAuditLogRepository.save(newAuditLog);
+                LOGGER.info("Got some recent data for {}, synchronizing them", dcModelMapping.getType());
+                this.sync(dcModelMapping);
+
+                SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), DateTime.now());
+                synchronizerAuditLogRepository.save(newAuditLog);
+            });
         });
     }
 
-    public String sync(SyncType syncType) {
-        Optional<File> optionalResourceCsvFile = syncType.equals(SyncType.ORG) ?
-            datacoreService.exportResourceToCsv("org_1", "org:Organization_0") :
-            datacoreService.exportResourceToCsv("poi_0", "poi:Geoloc_0");
+    public String sync(DcModelMapping dcModelMapping) {
+        Optional<File> optionalResourceCsvFile =
+            datacoreService.exportResourceToCsv(dcModelMapping.getProject(), dcModelMapping.getType());
 
         if (!optionalResourceCsvFile.isPresent()) {
             LOGGER.error("Did not get the resource's CSV file, stopping");
@@ -67,10 +71,7 @@ public class SynchronizerService {
 
         File csvFile = optionalResourceCsvFile.get();
 
-        if (syncType.equals(SyncType.ORG))
-            ckanService.updateResourceData("organisations", "f7d1d5dc-45c3-48fc-bca4-d9d98ba50d3a", csvFile);
-        else
-            ckanService.updateResourceData("points-interet-poi", "b4fca7f7-773a-4bca-87f0-f54437082817", csvFile);
+        ckanService.updateResourceData(dcModelMapping.getCkanPackageId(), dcModelMapping.getCkanResourceId(), csvFile);
 
         return "OK";
     }
