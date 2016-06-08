@@ -56,7 +56,9 @@ public class DatacoreService {
             if (intermediateResult.size() < 100) {
                 break;
             } else {
-                String lastResultId = intermediateResult.get(99).getAsString("@id");
+                // TODO : why DCResource does not have the @id field in its data ?
+                //        (it is present in the data returned from the DC)
+                String lastResultId = intermediateResult.get(99).getUri();
                 parameters = new DCQueryParameters("@id", DCOrdering.DESCENDING, DCOperator.LT, lastResultId);
             }
         }
