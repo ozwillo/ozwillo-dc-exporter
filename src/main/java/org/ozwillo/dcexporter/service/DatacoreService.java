@@ -64,11 +64,10 @@ public class DatacoreService {
         }
         LOGGER.debug("Got {} resources to export", resources.size());
 
-        // TODO : this can be quite non exhaustive as we can't guarantee the first field has all the possible fields
-        // TODO : work from the model instead
-        DCResource firstResource = resources.get(0);
-        List<String> resourceKeys = firstResource.getValues().keySet().stream()
-            .filter(key -> !exportExcludedFields.contains(key))
+        DCModel model = datacore.findModel(type);
+        List<String> resourceKeys = model.getFields().stream()
+            .filter(field -> !exportExcludedFields.contains(field.getName()))
+            .map(DCModel.DcModelField::getName)
             .collect(Collectors.toList());
 
         try {
