@@ -4,10 +4,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.oasis_eu.spring.datacore.DatacoreClient;
-import org.oasis_eu.spring.datacore.model.DCModel;
-import org.oasis_eu.spring.datacore.model.DCOperator;
-import org.oasis_eu.spring.datacore.model.DCQueryParameters;
-import org.oasis_eu.spring.datacore.model.DCResource;
+import org.oasis_eu.spring.datacore.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,14 +48,17 @@ public class DatacoreService {
     }
 
     public Optional<File> exportResourceToCsv(String project, String type) {
-        int start = 0;
         List<DCResource> resources = new ArrayList<>();
+        DCQueryParameters parameters = new DCQueryParameters("@id", DCOrdering.DESCENDING);
         while (true) {
-            List<DCResource> intermediateResult = datacore.findResources(project, type, null, start, 100);
+            List<DCResource> intermediateResult = datacore.findResources(project, type, parameters, 0, 100);
             resources.addAll(intermediateResult);
-            start += 100;
-            if (intermediateResult.size() < 100)
+            if (intermediateResult.size() < 100) {
                 break;
+            } else {
+                String lastResultId = intermediateResult.get(99).getAsString("@id");
+                parameters = new DCQueryParameters("@id", DCOrdering.DESCENDING, DCOperator.LT, lastResultId);
+            }
         }
         LOGGER.debug("Got {} resources to export", resources.size());
 
