@@ -62,6 +62,7 @@ datacore:
   exportExcludedFields:
     - "@type"
     - org:email
+    - poi:author
   modifiedField: "dc:modified"
 
 ckan:
