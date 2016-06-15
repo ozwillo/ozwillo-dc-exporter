@@ -38,11 +38,11 @@ public class CkanService {
         ckanResourceBase.setPackageId(packageId);
         ckanResourceBase.setUrl("upload");
         ckanResourceBase.setId(id);
-        ckanResourceBase.setFormat("CSV");
+        ckanResourceBase.setUpload(poiCsvFile, true);
 
         DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateHourMinuteSecondMillis();
         ckanResourceBase.setLastModified(dateTimeFormatter.print(LocalDateTime.now()));
 
-        CkanResource result = ckanClient.updateResourceData(ckanResourceBase, poiCsvFile);
+        CkanResource result = ckanClient.updateResourceData(ckanResourceBase);
     }
 }
