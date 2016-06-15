@@ -48,11 +48,41 @@ public class DatacoreService {
     }
 
     public Optional<File> exportResourceToCsv(String project, String type) {
-        List<DCResource> resources = new ArrayList<>();
+
+        DCModel model = datacore.findModel(type);
+        List<String> resourceKeys = model.getFields().stream()
+            .filter(field -> !exportExcludedFields.contains(field.getName()))
+            .map(DCModel.DcModelField::getName)
+            .collect(Collectors.toList());
+
+        File resourceFile = null;
+        try {
+            resourceFile = File.createTempFile("export-", ".csv");
+            LOGGER.info("Writing data in temp file {}", resourceFile.getAbsolutePath());
+        } catch (IOException e) {
+            LOGGER.error("Error while creating temp file", e);
+            return Optional.empty();
+        }
+
+        try {
+            writeCsvFileHeader(resourceFile, resourceKeys);
+        } catch (IOException e) {
+            LOGGER.error("Error while writing CSV file header", e);
+            return Optional.empty();
+        }
+
         DCQueryParameters parameters = new DCQueryParameters("@id", DCOrdering.DESCENDING);
+        int count = 0;
         while (true) {
             List<DCResource> intermediateResult = datacore.findResources(project, type, parameters, 0, 100);
-            resources.addAll(intermediateResult);
+            try {
+                writeCsvFileLines(resourceFile, resourceKeys, intermediateResult);
+            } catch (IOException e) {
+                LOGGER.error("Error while writing data to temp file", e);
+                return Optional.empty();
+            }
+            count += intermediateResult.size();
+
             if (intermediateResult.size() < 100) {
                 break;
             } else {
@@ -62,80 +92,79 @@ public class DatacoreService {
                 parameters = new DCQueryParameters("@id", DCOrdering.DESCENDING, DCOperator.LT, lastResultId);
             }
         }
-        LOGGER.debug("Got {} resources to export", resources.size());
 
-        DCModel model = datacore.findModel(type);
-        List<String> resourceKeys = model.getFields().stream()
-            .filter(field -> !exportExcludedFields.contains(field.getName()))
-            .map(DCModel.DcModelField::getName)
-            .collect(Collectors.toList());
+        LOGGER.debug("Got {} resources to export", count);
 
-        try {
-            File resourceFile = File.createTempFile("export-", ".csv");
-            FileWriter resourceFileWriter = new FileWriter(resourceFile);
+        return Optional.of(resourceFile);
+    }
 
-            Optional<String> header = resourceKeys.stream().reduce((result, key) -> result + "," + key);
-            if (header.isPresent()) {
-                resourceFileWriter.write(header.get());
-                resourceFileWriter.write("\n");
-            }
+    private void writeCsvFileLines(File resourceFile, List<String> resourceKeys, List<DCResource> resources) throws IOException {
+        FileWriter resourceFileWriter = new FileWriter(resourceFile, true);
 
-            resources.forEach(resource -> {
-                LOGGER.debug("Resource : {}", resource);
+        Optional<String> header = resourceKeys.stream().reduce((result, key) -> result + "," + key);
+        if (header.isPresent()) {
+            resourceFileWriter.write(header.get());
+            resourceFileWriter.write("\n");
+        }
 
-                Optional<String> resourceRow =
-                    resourceKeys.stream().map(key -> {
-                        LOGGER.debug("Searching for key {}", key);
-                        DCResource.Value resourceValue = resource.getValues().get(key);
+        resources.forEach(resource -> {
+            LOGGER.debug("Resource : {}", resource);
 
-                        if (resourceValue == null) {
-                            LOGGER.debug("No value for this key, skipping");
+            Optional<String> resourceRow =
+                resourceKeys.stream().map(key -> {
+                    LOGGER.debug("Searching for key {}", key);
+                    DCResource.Value resourceValue = resource.getValues().get(key);
+
+                    if (resourceValue == null) {
+                        LOGGER.debug("No value for this key, skipping");
+                        return "";
+                    } else if (resourceValue.isString()) {
+                        return resource.getAsString(key);
+                    } else if (resourceValue.isMap()) {
+                        // TODO it seems like we neither get a map
+                        return getI18nFieldValue(resource.getAsStringMap(key), "fr");
+                    } else if (resourceValue.isArray()) {
+                        List<DCResource.Value> resourceRowInnerValues = resourceValue.asArray();
+                        if (resourceRowInnerValues.isEmpty())
                             return "";
-                        } else if (resourceValue.isString()) {
-                            return resource.getAsString(key);
-                        } else if (resourceValue.isMap()) {
-                            // TODO it seems like we neither get a map
-                            return getI18nFieldValue(resource.getAsStringMap(key), "fr");
-                        } else if (resourceValue.isArray()) {
-                            List<DCResource.Value> resourceRowInnerValues = resourceValue.asArray();
-                            if (resourceRowInnerValues.isEmpty())
-                                return "";
 
-                            if (resourceRowInnerValues.get(0).isString()) {
-                                Optional<String> reducedValue =
-                                    resource.getAsStringList(key).stream().reduce((result, value) -> result + "," + value);
-                                return reducedValue.orElse("");
-                            } else if (resourceRowInnerValues.get(0).isMap()) {
-                                String frenchValue = getI18nFieldValueFromList(resourceRowInnerValues, "fr");
-                                if (!frenchValue.isEmpty())
-                                    return frenchValue;
-                                else
-                                    return getI18nFieldValueFromList(resourceRowInnerValues, "en");
-                            } else {
-                                LOGGER.warn("Inner row value not managed for {}", resourceRowInnerValues);
-                                return "";
-                            }
+                        if (resourceRowInnerValues.get(0).isString()) {
+                            Optional<String> reducedValue =
+                                resource.getAsStringList(key).stream().reduce((result, value) -> result + "," + value);
+                            return reducedValue.orElse("");
+                        } else if (resourceRowInnerValues.get(0).isMap()) {
+                            String frenchValue = getI18nFieldValueFromList(resourceRowInnerValues, "fr");
+                            if (!frenchValue.isEmpty())
+                                return frenchValue;
+                            else
+                                return getI18nFieldValueFromList(resourceRowInnerValues, "en");
+                        } else {
+                            LOGGER.warn("Inner row value not managed for {}", resourceRowInnerValues);
+                            return "";
                         }
-                        else
-                            return "";
-                    }).map(value -> "\"" + value + "\"").reduce((result, value) -> result + "," + value);
+                    } else
+                        return "";
+                }).map(value -> "\"" + value + "\"").reduce((result, value) -> result + "," + value);
 
-                if (resourceRow.isPresent())
-                    try {
-                        resourceFileWriter.write(resourceRow.get());
-                        resourceFileWriter.write("\n");
-                    } catch (IOException e) {
-                        LOGGER.error("Error while writing row : {}", e.getMessage());
-                    }
-            });
+            if (resourceRow.isPresent())
+                try {
+                    resourceFileWriter.write(resourceRow.get());
+                    resourceFileWriter.write("\n");
+                } catch (IOException e) {
+                    LOGGER.error("Error while writing row : {}", e.getMessage());
+                }
+        });
 
-            resourceFileWriter.flush();
-            resourceFileWriter.close();
-            LOGGER.info("Wrote temp data in file {}", resourceFile.getAbsolutePath());
-            return Optional.of(resourceFile);
-        } catch (IOException e) {
-            LOGGER.error("Unable to create temp file : {}", e.getMessage());
-            return Optional.empty();
+        resourceFileWriter.flush();
+        resourceFileWriter.close();
+    }
+
+    private void writeCsvFileHeader(File resourceFile, List<String> resourceKeys) throws IOException {
+        FileWriter resourceFileWriter = new FileWriter(resourceFile);
+        Optional<String> header = resourceKeys.stream().reduce((result, key) -> result + "," + key);
+        if (header.isPresent()) {
+            resourceFileWriter.write(header.get());
+            resourceFileWriter.write("\n");
         }
     }
 
