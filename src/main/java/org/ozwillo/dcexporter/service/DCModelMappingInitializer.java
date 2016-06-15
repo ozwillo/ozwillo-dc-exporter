@@ -30,25 +30,39 @@ public class DCModelMappingInitializer implements ApplicationListener<Applicatio
     @Value("${ckan.poisResourceId}")
     private String poisResourceId;
 
+    @Value("${ckan.geoAreasResourceId}")
+    private String geoAreasResourceId;
+
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        if (dcModelMappingRepository.count() > 0) {
-            LOGGER.info("Already some data in DC model mapping, returning");
-            return;
+
+        LOGGER.info("Initializing missing sample DC model mappings");
+
+        if (dcModelMappingRepository.findByDcId("http://data.ozwillo.com/dc/type/dcmo:model_0/org:Organization_0") == null) {
+            DcModelMapping orgMapping = new DcModelMapping("http://data.ozwillo.com/dc/type/dcmo:model_0/org:Organization_0",
+                "org_1", "org:Organization_0", "Organisations");
+            orgMapping.setCkanPackageId("organisations");
+            orgMapping.setCkanResourceId(organizationsResourceId);
+            dcModelMappingRepository.save(orgMapping);
+            LOGGER.info("Initialized organizations mappping");
         }
 
-        LOGGER.info("Initializing sample DC model mappings");
+        if (dcModelMappingRepository.findByDcId("http://data.ozwillo.com/dc/type/dcmo:model_0/poi:Geoloc_0") == null) {
+            DcModelMapping poiMapping = new DcModelMapping("http://data.ozwillo.com/dc/type/dcmo:model_0/poi:Geoloc_0",
+                "poi_0", "poi:Geoloc_0", "Points d'intérêt");
+            poiMapping.setCkanPackageId("points-interet-poi");
+            poiMapping.setCkanResourceId(poisResourceId);
+            dcModelMappingRepository.save(poiMapping);
+            LOGGER.info("Initialized pois mappping");
+        }
 
-        DcModelMapping orgMapping = new DcModelMapping("http://data.ozwillo.com/dc/type/dcmo:model_0/org:Organization_0",
-            "org_1", "org:Organization_0", "Organisations");
-        orgMapping.setCkanPackageId("organisations");
-        orgMapping.setCkanResourceId(organizationsResourceId);
-        dcModelMappingRepository.save(orgMapping);
-
-        DcModelMapping poiMapping = new DcModelMapping("http://data.ozwillo.com/dc/type/dcmo:model_0/poi:Geoloc_0",
-            "poi_0", "poi:Geoloc_0", "Points d'intérêt");
-        poiMapping.setCkanPackageId("points-interet-poi");
-        poiMapping.setCkanResourceId(poisResourceId);
-        dcModelMappingRepository.save(poiMapping);
+        if (dcModelMappingRepository.findByDcId("http://data.ozwillo.com/dc/type/dcmo:model_0/geo:Area_0") == null) {
+            DcModelMapping geoAreaMapping = new DcModelMapping("http://data.ozwillo.com/dc/type/dcmo:model_0/geo:Area_0",
+                "geo_1", "geo:Area_0", "Données géographiques");
+            geoAreaMapping.setCkanPackageId("donnees-geographiques");
+            geoAreaMapping.setCkanResourceId(geoAreasResourceId);
+            dcModelMappingRepository.save(geoAreaMapping);
+            LOGGER.info("Initialized geo areas mappping");
+        }
     }
 }

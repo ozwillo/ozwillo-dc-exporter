@@ -72,3 +72,4 @@ ckan:
   # Temp resources ids until dataset and resource created are handled by the application
   organizationsResourceId: aaaaaaaa-bbbb-cccc-dddd-ffffffffffff
   poisResourceId: aaaaaaaa-bbbb-cccc-dddd-ffffffffffff
+  geoAreasResourceId: aaaaaaaa-bbbb-cccc-dddd-ffffffffffff
