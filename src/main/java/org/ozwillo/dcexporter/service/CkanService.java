@@ -75,18 +75,18 @@ public class CkanService {
         return ckanClient.createResource(ckanResource);
     }
 
-    public void updateResourceData(String packageId, String id, File poiCsvFile) {
+    public void updateResourceData(String packageId, String id, File dataFile) {
         CkanClient ckanClient = new CheckedCkanClient(ckanUrl, ckanApiKey);
 
         CkanResourceBase ckanResourceBase = new CkanResourceBase();
         ckanResourceBase.setPackageId(packageId);
         ckanResourceBase.setUrl("upload");
         ckanResourceBase.setId(id);
-        ckanResourceBase.setUpload(poiCsvFile, true);
+        ckanResourceBase.setUpload(dataFile, true);
 
         DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateHourMinuteSecondMillis();
         ckanResourceBase.setLastModified(dateTimeFormatter.print(LocalDateTime.now()));
 
-        CkanResource result = ckanClient.updateResourceData(ckanResourceBase);
+        ckanClient.updateResourceData(ckanResourceBase);
     }
 }
