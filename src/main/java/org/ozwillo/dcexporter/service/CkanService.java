@@ -2,9 +2,7 @@ package org.ozwillo.dcexporter.service;
 
 import eu.trentorise.opendata.jackan.CheckedCkanClient;
 import eu.trentorise.opendata.jackan.CkanClient;
-import eu.trentorise.opendata.jackan.model.CkanLicense;
-import eu.trentorise.opendata.jackan.model.CkanResource;
-import eu.trentorise.opendata.jackan.model.CkanResourceBase;
+import eu.trentorise.opendata.jackan.model.*;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -29,6 +27,29 @@ public class CkanService {
         CkanClient ckanClient = new CkanClient(ckanUrl);
         List<CkanLicense> licenses = ckanClient.getLicenseList();
         return licenses.stream().collect(Collectors.toMap(CkanLicense::getId, CkanLicense::getTitle));
+    }
+
+    public CkanDataset createDataset(String name, String title) {
+        CkanClient ckanClient = new CkanClient(ckanUrl, ckanApiKey);
+
+        CkanOrganization ckanOrganization = ckanClient.getOrganization("ozwillo");
+        CkanDataset ckanDataset = new CkanDataset(name);
+        ckanDataset.setOrganization(ckanOrganization);
+        ckanDataset.setOwnerOrg(ckanOrganization.getId());
+        ckanDataset.setTitle(title);
+        ckanDataset.setPriv(false);
+
+        return ckanClient.createDataset(ckanDataset);
+    }
+
+    public CkanResource createResource(String packageId) {
+        CkanClient ckanClient = new CkanClient(ckanUrl, ckanApiKey);
+
+        CkanResource ckanResource = new CkanResource();
+        ckanResource.setPackageId(packageId);
+        ckanResource.setUrl("upload");
+
+        return ckanClient.createResource(ckanResource);
     }
 
     public void updateResourceData(String packageId, String id, File poiCsvFile) {

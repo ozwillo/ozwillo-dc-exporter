@@ -1,5 +1,7 @@
 package org.ozwillo.dcexporter.service;
 
+import eu.trentorise.opendata.jackan.model.CkanDataset;
+import eu.trentorise.opendata.jackan.model.CkanResource;
 import org.ozwillo.dcexporter.dao.DcModelMappingRepository;
 import org.ozwillo.dcexporter.model.DcModelMapping;
 import org.slf4j.Logger;
@@ -33,36 +35,36 @@ public class DCModelMappingInitializer implements ApplicationListener<Applicatio
     @Value("${ckan.geoAreasResourceId}")
     private String geoAreasResourceId;
 
+    @Autowired
+    private CkanService ckanService;
+
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
 
         LOGGER.info("Initializing missing sample DC model mappings");
 
-        if (dcModelMappingRepository.findByDcId("http://data.ozwillo.com/dc/type/dcmo:model_0/org:Organization_0") == null) {
-            DcModelMapping orgMapping = new DcModelMapping("http://data.ozwillo.com/dc/type/dcmo:model_0/org:Organization_0",
-                "org_1", "org:Organization_0", "Organisations");
-            orgMapping.setCkanPackageId("organisations");
-            orgMapping.setCkanResourceId(organizationsResourceId);
+        createMappingIfNotExists("http://data.ozwillo.com/dc/type/dcmo:model_0/org:Organization_0", "organisations",
+            "Organisations", "org_1", "org:Organization_0");
+        createMappingIfNotExists("http://data.ozwillo.com/dc/type/dcmo:model_0/poi:Geoloc_0", "points-interet",
+            "Points d'intérêt", "poi_0", "poi:Geoloc_0");
+        createMappingIfNotExists("http://data.ozwillo.com/dc/type/dcmo:model_0/geo:Area_0", "donnes-geographiques",
+            "Données géographiques", "geo_1", "geo:Area_0");
+    }
+
+    private void createMappingIfNotExists(String modelUrl, String packageId, String packageName, String project,
+                                          String model) {
+
+        if (dcModelMappingRepository.findByDcId(modelUrl) == null) {
+
+            CkanDataset ckanDataset = ckanService.createDataset(packageId, packageName);
+            CkanResource ckanResource = ckanService.createResource(ckanDataset.getId());
+
+            DcModelMapping orgMapping = new DcModelMapping(modelUrl, project, model, packageName);
+            orgMapping.setCkanPackageId(ckanDataset.getId());
+            orgMapping.setCkanResourceId(ckanResource.getId());
             dcModelMappingRepository.save(orgMapping);
-            LOGGER.info("Initialized organizations mappping");
-        }
 
-        if (dcModelMappingRepository.findByDcId("http://data.ozwillo.com/dc/type/dcmo:model_0/poi:Geoloc_0") == null) {
-            DcModelMapping poiMapping = new DcModelMapping("http://data.ozwillo.com/dc/type/dcmo:model_0/poi:Geoloc_0",
-                "poi_0", "poi:Geoloc_0", "Points d'intérêt");
-            poiMapping.setCkanPackageId("points-interet-poi");
-            poiMapping.setCkanResourceId(poisResourceId);
-            dcModelMappingRepository.save(poiMapping);
-            LOGGER.info("Initialized pois mappping");
-        }
-
-        if (dcModelMappingRepository.findByDcId("http://data.ozwillo.com/dc/type/dcmo:model_0/geo:Area_0") == null) {
-            DcModelMapping geoAreaMapping = new DcModelMapping("http://data.ozwillo.com/dc/type/dcmo:model_0/geo:Area_0",
-                "geo_1", "geo:Area_0", "Données géographiques");
-            geoAreaMapping.setCkanPackageId("donnees-geographiques");
-            geoAreaMapping.setCkanResourceId(geoAreasResourceId);
-            dcModelMappingRepository.save(geoAreaMapping);
-            LOGGER.info("Initialized geo areas mappping");
+            LOGGER.info("Initialized {} mappping", packageName);
         }
     }
 }
