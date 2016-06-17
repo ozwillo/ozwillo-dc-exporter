@@ -44,20 +44,20 @@ public class DCModelMappingInitializer implements ApplicationListener<Applicatio
         LOGGER.info("Initializing missing sample DC model mappings");
 
         createMappingIfNotExists("http://data.ozwillo.com/dc/type/dcmo:model_0/org:Organization_0", "organisations",
-            "Organisations", "org_1", "org:Organization_0");
+            "Organisations", "org_1", "org:Organization_0", "Export des organisations");
         createMappingIfNotExists("http://data.ozwillo.com/dc/type/dcmo:model_0/poi:Geoloc_0", "points-interet",
-            "Points d'intérêt", "poi_0", "poi:Geoloc_0");
+            "Points d'intérêt", "poi_0", "poi:Geoloc_0", "Export des points d'intérêt");
         createMappingIfNotExists("http://data.ozwillo.com/dc/type/dcmo:model_0/geo:Area_0", "donnes-geographiques",
-            "Données géographiques", "geo_1", "geo:Area_0");
+            "Données géographiques", "geo_1", "geo:Area_0", "Export des données géographiques");
     }
 
     private void createMappingIfNotExists(String modelUrl, String packageId, String packageName, String project,
-                                          String model) {
+                                          String model, String resourceName) {
 
         if (dcModelMappingRepository.findByDcId(modelUrl) == null) {
 
-            CkanDataset ckanDataset = ckanService.createDataset(packageId, packageName);
-            CkanResource ckanResource = ckanService.createResource(ckanDataset.getId());
+            CkanDataset ckanDataset = ckanService.getOrCreateDataset(packageId, packageName);
+            CkanResource ckanResource = ckanService.createResource(ckanDataset.getId(), resourceName);
 
             DcModelMapping orgMapping = new DcModelMapping(modelUrl, project, model, packageName);
             orgMapping.setCkanPackageId(ckanDataset.getId());
