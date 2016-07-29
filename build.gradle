@@ -52,7 +52,11 @@ dependencies {
 	compile('org.ozwillo:ozwillo-java-spring-integration:1.25-SNAPSHOT')
 	compile('eu.trentorise.opendata:jackan:0.4.3-SNAPSHOT')
 
-	testCompile('org.springframework.boot:spring-boot-starter-test') 
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+
+    // required to parse logback-spring.groovy
+    // TODO : quite a fat dependency for a configuration file
+    runtime('org.codehaus.groovy:groovy:2.4.7')
 }
 
 bootRun {
