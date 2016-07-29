@@ -1,5 +1,6 @@
 spring:
   output.ansi.enabled: DETECT
+  session.store-type: none
 
 server:
   compression.enabled: true
