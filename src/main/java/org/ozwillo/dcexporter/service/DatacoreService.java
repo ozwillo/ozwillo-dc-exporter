@@ -49,7 +49,7 @@ public class DatacoreService {
 
     public Optional<File> exportResourceToCsv(String project, String type) {
 
-        DCModel model = datacore.findModel(type);
+        DCModel model = datacore.findModel(project, type);
         List<String> resourceKeys = model.getFields().stream()
             .filter(field -> !exportExcludedFields.contains(field.getName()))
             .map(DCModel.DcModelField::getName)
