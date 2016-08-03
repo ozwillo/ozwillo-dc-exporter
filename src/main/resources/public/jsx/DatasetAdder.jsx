@@ -4,19 +4,27 @@ import renderIf from 'render-if'
 
 import { Form, FormGroup, Label, SelectField, InputText, SubmitButton } from './Form'
 
-export default React.createClass({
-    contextTypes: {
-        csrfToken: React.PropTypes.string,
-        csrfTokenHeaderName: React.PropTypes.string
-    },
-    getInitialState() {
-        return {
-            dcId: ''
-        }
-    },
+export default class DatasetAdder extends React.Component {
+    constructor(props) {
+        super(props)
+
+        this.state = { dcId: '', datasets: [], licenses: {} }
+
+        this.onDatasetSelected = this.onDatasetSelected.bind(this)
+        this.registerDataset = this.registerDataset.bind(this)
+    }
+    componentDidMount() {
+        fetch('/api/dc/models', { credentials: 'same-origin' })
+            .then(response => response.json())
+            .then(json => this.setState({ datasets: json }))
+
+        fetch('/api/ckan/licences', {credentials: 'same-origin'})
+            .then(response => response.json())
+            .then(json => this.setState({licenses: json}))
+    }
     onDatasetSelected(dcId) {
         this.setState({ dcId })
-    },
+    }
     registerDataset(fields) {
         fields['dcId'] = this.state.dcId
         fetch('/api/dc-model-mapping', {
@@ -29,66 +37,67 @@ export default React.createClass({
             body: JSON.stringify(fields)
         })
             .catch(error => console.log(error.message))
-    },
+    }
     render() {
         return (
             <div>
                 <h1>Dataset registration</h1>
-                <DatasetChooser dcId={this.state.dcId} onDatasetSelected={this.onDatasetSelected} />
+                <DatasetChooser dcId={this.state.dcId} onDatasetSelected={this.onDatasetSelected}
+                    datasets={this.state.datasets} />
                 {renderIf(this.state.dcId)(
-                    <DatasetConfigurer onSubmit={this.registerDataset} />
+                    <DatasetConfigurer onSubmit={this.registerDataset} licenses={this.state.licenses} />
                 )}
             </div>
         )
     }
-})
+}
 
-const DatasetChooser = React.createClass({
-    getInitialState() {
-        return {
-            datasets: []
-        }
-    },
-    componentDidMount() {
-        fetch('/api/dc/models', { credentials: 'same-origin' })
-            .then(response => response.json())
-            .then(json => this.setState({ datasets: json }))
-    },
-    render() {
-        const options = this.state.datasets.map(dataset =>
-            <option key={dataset['@id']} value={dataset['@id']}>{dataset['dcmo:name']}</option>
-        )
-        return (
-            <Form>
-                <FormGroup>
-                    <Label htmlFor="dcId" value="Choose a dataset" />
-                    <SelectField id="dcId" options={options} value={this.props.dcId}
-                                 onChange={(event) => this.props.onDatasetSelected(event.target.value)} />
-                </FormGroup>
-            </Form>
-        )
-    }
-})
+DatasetAdder.contextTypes = {
+    csrfToken: React.PropTypes.string,
+    csrfTokenHeaderName: React.PropTypes.string
+}
 
-const DatasetConfigurer = React.createClass({
-    getInitialState() {
-        return {
+const DatasetChooser = ({ datasets, dcId, onDatasetSelected }) => {
+    const options = datasets.map(dataset =>
+        <option key={dataset['@id']} value={dataset['@id']}>{dataset['dcmo:name']}</option>
+    )
+    return (
+        <Form>
+            <FormGroup>
+                <Label htmlFor="dcId" value="Choose a dataset"/>
+                <SelectField id="dcId" value={dcId}
+                             onChange={(event) => onDatasetSelected(event.target.value)}>
+                    {options}
+                </SelectField>
+            </FormGroup>
+        </Form>
+    )
+}
+
+DatasetChooser.propTypes = {
+    dcId: React.PropTypes.string.isRequired,
+    onDatasetSelected: React.PropTypes.func.isRequired,
+    datasets: React.PropTypes.array.isRequired
+}
+
+class DatasetConfigurer extends React.Component {
+    constructor(props) {
+        super(props)
+
+        this.state = {
             fields: {
                 name: '',
-                licence: '',
-                frequency: ''
+                license: ''
             }
         }
-    },
+        this.onFieldChange = this.onFieldChange.bind(this)
+    }
     onFieldChange(id, value) {
         const fields = this.state.fields
         fields[id] = value
         this.setState({ fields })
-    },
+    }
     render() {
-        const frequencyOptions = ['Daily', 'Weekly', 'Monthly'].map(frequency =>
-            <option key={frequency} value={frequency}>{frequency}</option>
-        )
         return (
             <Form>
                 <FormGroup>
@@ -96,42 +105,28 @@ const DatasetConfigurer = React.createClass({
                     <InputText id="name" value={this.state.fields['name']}
                                onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
                 </FormGroup>
-                <LicenceChooser currentLicence={this.state.fields['licence']}
+                <LicenceChooser licenses={this.props.licenses} currentLicense={this.state.fields['license']}
                                 onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
-                <FormGroup>
-                    <Label htmlFor="frequency" value="Frequency" />
-                    <SelectField id="frequency" value={this.state.fields['frequency']}
-                                 options={frequencyOptions}
-                                 onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
-                </FormGroup>
                 <SubmitButton label="Create" onClick={(event) => this.props.onSubmit(this.state.fields)} />
             </Form>
         )
     }
-})
+}
 
-const LicenceChooser = React.createClass({
-    getInitialState() {
-        return {
-            licences: {}
-        }
-    },
-    componentDidMount() {
-        fetch('/api/ckan/licences', { credentials: 'same-origin' })
-            .then(response => response.json())
-            .then(json => this.setState({ licences: json }))
+DatasetAdder.PropTypes = {
+    onSubmit: React.PropTypes.func.isRequired
+}
 
-    },
-    render() {
-        const options = Object.keys(this.state.licences).map(key =>
-            <option key={key} value={key}>{this.state.licences[key]}</option>
-        )
-        return (
-            <FormGroup>
-                <Label htmlForm="licence" value="Licence"/>
-                <SelectField id="licence" value={this.props.currentLicence}
-                    options={options} onChange={this.props.onChange} />
-            </FormGroup>
-        )
-    }
-})
+const LicenceChooser = ({ licenses, currentLicense, onChange }) => {
+    const options = Object.keys(licenses).map(key =>
+        <option key={key} value={key}>{licenses[key]}</option>
+    )
+    return (
+        <FormGroup>
+            <Label htmlForm="license" value="License"/>
+            <SelectField id="license" value={currentLicense} onChange={onChange}>
+                {options}
+            </SelectField>
+        </FormGroup>
+    )
+}
