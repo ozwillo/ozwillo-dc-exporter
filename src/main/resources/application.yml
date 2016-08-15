@@ -40,6 +40,7 @@ kernel:
 
 datacore:
   #url: http://localhost:8080
+  containerUrl: http://data.sictiam.fr
   #url: https://data.ozwillo-dev.eu    # dev, doesn't work with current gen'd cert
   url: https://plnm-dev-dc             # dev, requires (MUST) set the IP in /etc/hosts, and installing gen'd cert :
   # go to https://data.ozwillo-dev.eu, right click on lock, export certificate to plnm-dev-dc.cer,
