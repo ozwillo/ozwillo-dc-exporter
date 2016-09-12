@@ -38,7 +38,7 @@ public class DCModelMappingInitializer implements ApplicationListener<Applicatio
         LOGGER.info("Initializing missing sample DC model mappings");
 
         createMappingIfNotExists(dcContainerUrl + "/dc/type/dcmo:model_0/orgfr:Organisation_0", "organisations",
-            "Organisations", "org_1", "orgfr:Organisation_0", "Export des organisations française");
+            "Organisations", "org_1", "orgfr:Organisation_0", "Export des organisations françaises");
         createMappingIfNotExists(dcContainerUrl + "/dc/type/dcmo:model_0/orgbg:Организация_0", "organisations",
             "Organisations", "org_1", "orgbg:Организация_0", "Export des organisations bulgares");
         createMappingIfNotExists(dcContainerUrl + "/dc/type/dcmo:model_0/orgit:Organizzazione_0", "organisations",
