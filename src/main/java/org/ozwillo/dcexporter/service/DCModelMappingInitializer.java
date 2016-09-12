@@ -98,6 +98,10 @@ public class DCModelMappingInitializer implements ApplicationListener<Applicatio
 
         createMappingIfNotExists(dcContainerUrl + "/dc/type/dcmo:model_0/geoditr:İlçe_0", "districts",
             "Districts", "geo_1", "geoditr:İlçe_0", "Export des districts turcs");
+
+        createMappingIfNotExists(dcContainerUrl + "/dc/type/dcmo:model_0/citizenkin:electoral_roll_registration_0",
+            "electoral-roll-registration", "Inscriptions sur les listes électorales", "citiken_0",
+            "citizenkin:electoral_roll_registration_0", "Export des inscriptions sur les listes électorales françaises");
     }
 
     private void createMappingIfNotExists(String modelUrl, String packageId, String packageName, String project,
