@@ -47,18 +47,22 @@ public class DatacoreService {
         return !newResources.isEmpty();
     }
 
-    public Optional<File> exportResourceToCsv(String project, String type) {
+    Optional<File> exportResourceToCsv(String project, String type) {
 
+        // Extract all possible columns from the type's model (filtering explicitely excluded ones)
         DCModel model = datacore.findModel(project, type);
         List<String> resourceKeys = model.getFields().stream()
             .filter(field -> !exportExcludedFields.contains(field.getName()))
             .map(DCModel.DcModelField::getName)
             .collect(Collectors.toList());
 
-        File resourceFile = null;
+        // And add a fake column to allow for easier charting in CKAN
+        resourceKeys.add("fake-weight");
+
+        File resourceFile;
         try {
             resourceFile = File.createTempFile("export-", ".csv");
-            LOGGER.info("Writing data in temp file {}", resourceFile.getAbsolutePath());
+            LOGGER.debug("Writing data in temp file {}", resourceFile.getAbsolutePath());
         } catch (IOException e) {
             LOGGER.error("Error while creating temp file", e);
             return Optional.empty();
@@ -101,18 +105,17 @@ public class DatacoreService {
     private void writeCsvFileLines(File resourceFile, List<String> resourceKeys, List<DCResource> resources) throws IOException {
         FileWriter resourceFileWriter = new FileWriter(resourceFile, true);
 
-        Optional<String> header = resourceKeys.stream().reduce((result, key) -> result + "," + key);
-        if (header.isPresent()) {
-            resourceFileWriter.write(header.get());
-            resourceFileWriter.write("\n");
-        }
-
         resources.forEach(resource -> {
             LOGGER.debug("Resource : {}", resource);
 
             Optional<String> resourceRow =
                 resourceKeys.stream().map(key -> {
                     LOGGER.debug("Searching for key {}", key);
+                    // special case for the fake weight column
+                    // we want them all to be equal to 1 for charts
+                    if (key.equals("fake-weight"))
+                        return "1";
+
                     DCResource.Value resourceValue = resource.getValues().get(key);
 
                     if (resourceValue == null) {
@@ -166,6 +169,9 @@ public class DatacoreService {
             resourceFileWriter.write(header.get());
             resourceFileWriter.write("\n");
         }
+
+        resourceFileWriter.flush();
+        resourceFileWriter.close();
     }
 
     private String getI18nFieldValue(Map<String, String> field, String lang) {
