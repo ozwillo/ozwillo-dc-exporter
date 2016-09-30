@@ -55,6 +55,18 @@ datacore:
   exportExcludedFields:
     # General rule
     - "@type"
+    # For organizations
+    - relt:displayName
+    - adrpost:adminUnit
+    - orgpu:officialId
+    - orgtypch:idStat2
+    - orgtypch:mayor
+    - orgtypch:mayorTitle
+    - org:altName
+    - org:displayAltName
+    - org:country
+    - org:vatNumber
+    - org:source
     # For POIs
     - org:email
     - poi:author
