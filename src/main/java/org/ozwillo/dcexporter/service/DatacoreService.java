@@ -38,13 +38,32 @@ public class DatacoreService {
         return datacore.findModels(50);
     }
 
-    public boolean hasMoreRecentResources(String project, String type, DateTime fromDate) {
+    boolean hasMoreRecentResources(String project, String type, DateTime fromDate) {
         DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateTime();
         DCQueryParameters parameters = new DCQueryParameters(modifiedField, DCOperator.GTE, dateTimeFormatter.print(fromDate));
 
         List<DCResource> newResources = datacore.findResources(project, type, parameters, 0, 1);
         LOGGER.debug("Retrieved {} resources newer than {}", newResources.size(), dateTimeFormatter.print(fromDate));
         return !newResources.isEmpty();
+    }
+
+    List<DCResource> getAllResourcesForType(String project, String type) {
+        DCQueryParameters parameters = new DCQueryParameters("@id", DCOrdering.DESCENDING);
+        List<DCResource> result = new ArrayList<>();
+        while (true) {
+            List<DCResource> intermediateResult = datacore.findResources(project, type, parameters, 0, 100);
+            result.addAll(intermediateResult);
+            if (intermediateResult.size() < 100) {
+                break;
+            } else {
+                // TODO : why DCResource does not have the @id field in its data ?
+                //        (it is present in the data returned from the DC)
+                String lastResultId = intermediateResult.get(99).getUri();
+                parameters = new DCQueryParameters("@id", DCOrdering.DESCENDING, DCOperator.LT, lastResultId);
+            }
+        }
+
+        return result;
     }
 
     Optional<File> exportResourceToCsv(String project, String type) {
@@ -191,6 +210,22 @@ public class DatacoreService {
         ).findFirst();
 
         return result.isPresent() ? result.get().asMap().values().toArray()[0].toString() : "";
+    }
+
+    Optional<String> getDepartementNameFromOrganization(DCResource orgResource) {
+        String postName = orgResource.getAsString("adrpost:postName");
+        if (postName == null)
+            return Optional.empty();
+
+        DCResource cityResource = datacore.getResourceFromURI("geo_1", postName).getResource();
+        String departmentUri = cityResource.getAsString("geoci:nuts3");
+        if (departmentUri == null)
+            return Optional.empty();
+
+        DCResource departmentResource = datacore.getResourceFromURI("geo_1", departmentUri).getResource();
+        String departmentName = getI18nFieldValueFromList(departmentResource.getValues().get("geon:name").asArray(), "fr");
+
+        return Optional.of(departmentName);
     }
 
     // needed for field binding into a list
