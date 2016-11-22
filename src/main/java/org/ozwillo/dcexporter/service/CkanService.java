@@ -13,8 +13,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,18 +78,34 @@ public class CkanService {
         return ckanClient.createResource(ckanResource);
     }
 
-    public void updateResourceData(String packageId, String id, File dataFile) {
+    public void updateResourceData(String packageId, String id, Optional<String> dataFile) {
         CkanClient ckanClient = new CheckedCkanClient(ckanUrl, ckanApiKey);
+        //We create a file waiting to modify the "setUpload" function in jackan
+        String resource = dataFile.get();
+        File resourceFile = null;
+        try {
+            resourceFile = File.createTempFile("export-", ".csv");
+            LOGGER.debug("Writing data in temp file {}", resourceFile.getAbsolutePath());
+            FileWriter resourceFileWriter = new FileWriter(resourceFile, true);
+            resourceFileWriter.write(resource);
+            resourceFileWriter.flush();
+            resourceFileWriter.close();
+        } catch (IOException e) {
+            LOGGER.error("Error while creating temp file", e);
+        }
+
 
         CkanResourceBase ckanResourceBase = new CkanResourceBase();
         ckanResourceBase.setPackageId(packageId);
         ckanResourceBase.setUrl("upload");
         ckanResourceBase.setId(id);
-        ckanResourceBase.setUpload(dataFile, true);
+        // TODO: Change the "setUpload" function to set an "inputstream" object in jackan(External Libraries)
+        ckanResourceBase.setUpload(resourceFile, true);
 
         DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateHourMinuteSecondMillis();
         ckanResourceBase.setLastModified(dateTimeFormatter.print(LocalDateTime.now()));
 
         ckanClient.updateResourceData(ckanResourceBase);
+        resourceFile.delete();
     }
 }

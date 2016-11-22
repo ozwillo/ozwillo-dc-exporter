@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,10 +42,10 @@ public class SynchronizerService {
 
             dcModelMappingRepository.findAll().forEach(dcModelMapping -> {
                 List<SynchronizerAuditLog> auditLogs =
-                    synchronizerAuditLogRepository.findByTypeOrderByDateDesc(dcModelMapping.getType());
+                        synchronizerAuditLogRepository.findByTypeOrderByDateDesc(dcModelMapping.getType());
 
                 if (!auditLogs.isEmpty() &&
-                    !datacoreService.hasMoreRecentResources(dcModelMapping.getProject(), dcModelMapping.getType(), auditLogs.get(0).getDate())) {
+                        !datacoreService.hasMoreRecentResources(dcModelMapping.getProject(), dcModelMapping.getType(), auditLogs.get(0).getDate())) {
                     LOGGER.info("No more recent resources for {}, returning", dcModelMapping.getType());
                     return;
                 }
@@ -61,17 +60,15 @@ public class SynchronizerService {
     }
 
     public String sync(DcModelMapping dcModelMapping) {
-        Optional<File> optionalResourceCsvFile =
-            datacoreService.exportResourceToCsv(dcModelMapping.getProject(), dcModelMapping.getType());
+        Optional<String> optionalResourceCsvFile =
+                datacoreService.exportResourceToCsv(dcModelMapping.getProject(), dcModelMapping.getType());
 
         if (!optionalResourceCsvFile.isPresent()) {
             LOGGER.error("Did not get the resource's CSV file, stopping");
             return "KO";
         }
 
-        File csvFile = optionalResourceCsvFile.get();
-
-        ckanService.updateResourceData(dcModelMapping.getCkanPackageId(), dcModelMapping.getCkanResourceId(), csvFile);
+        ckanService.updateResourceData(dcModelMapping.getCkanPackageId(), dcModelMapping.getCkanResourceId(), optionalResourceCsvFile);
 
         return "OK";
     }

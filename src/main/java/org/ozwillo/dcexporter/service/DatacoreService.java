@@ -11,10 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,29 +49,22 @@ public class DatacoreService {
         return !newResources.isEmpty();
     }
 
-    Optional<File> exportResourceToCsv(String project, String type) {
+    Optional<String> exportResourceToCsv(String project, String type) {
 
         // Extract all possible columns from the type's model (filtering explicitely excluded ones)
         DCModel model = datacore.findModel(project, type);
         List<String> resourceKeys = model.getFields().stream()
-            .filter(field -> !exportExcludedFields.contains(field.getName()))
-            .map(DCModel.DcModelField::getName)
-            .collect(Collectors.toList());
+                .filter(field -> !exportExcludedFields.contains(field.getName()))
+                .map(DCModel.DcModelField::getName)
+                .collect(Collectors.toList());
 
         // And add a fake column to allow for easier charting in CKAN
         resourceKeys.add("fake-weight");
 
-        File resourceFile;
-        try {
-            resourceFile = File.createTempFile("export-", ".csv");
-            LOGGER.debug("Writing data in temp file {}", resourceFile.getAbsolutePath());
-        } catch (IOException e) {
-            LOGGER.error("Error while creating temp file", e);
-            return Optional.empty();
-        }
+        StringWriter resourceCsv = new StringWriter();
 
         try {
-            writeCsvFileHeader(resourceFile, resourceKeys);
+            writeCsvFileHeader( resourceKeys, resourceCsv);
         } catch (IOException e) {
             LOGGER.error("Error while writing CSV file header", e);
             return Optional.empty();
@@ -80,7 +75,7 @@ public class DatacoreService {
         while (true) {
             List<DCResource> intermediateResult = datacore.findResources(project, type, parameters, 0, 100);
             try {
-                writeCsvFileLines(resourceFile, resourceKeys, intermediateResult);
+                writeCsvFileLines( resourceKeys, intermediateResult, resourceCsv);
             } catch (IOException e) {
                 LOGGER.error("Error while writing data to temp file", e);
                 return Optional.empty();
@@ -99,84 +94,78 @@ public class DatacoreService {
 
         LOGGER.debug("Got {} resources to export", count);
 
-        return Optional.of(resourceFile);
+        return Optional.of(resourceCsv.toString());
     }
 
-    private void writeCsvFileLines(File resourceFile, List<String> resourceKeys, List<DCResource> resources) throws IOException {
-        FileWriter resourceFileWriter = new FileWriter(resourceFile, true);
+    private void writeCsvFileLines( List<String> resourceKeys, List<DCResource> resources, StringWriter resourceCsv) throws IOException {
 
         resources.forEach(resource -> {
             LOGGER.debug("Resource : {}", resource);
 
             Optional<String> resourceRow =
-                resourceKeys.stream().map(key -> {
-                    LOGGER.debug("Searching for key {}", key);
-                    // special case for the fake weight column
-                    // we want them all to be equal to 1 for charts
-                    if (key.equals("fake-weight"))
-                        return "1";
+                    resourceKeys.stream().map(key -> {
+                        LOGGER.debug("Searching for key {}", key);
+                        // special case for the fake weight column
+                        // we want them all to be equal to 1 for charts
+                        if (key.equals("fake-weight"))
+                            return "1";
 
-                    DCResource.Value resourceValue = resource.getValues().get(key);
+                        DCResource.Value resourceValue = resource.getValues().get(key);
 
-                    if (resourceValue == null) {
-                        LOGGER.debug("No value for this key, skipping");
-                        return "";
-                    } else if (resourceValue.isString()) {
-                        return resource.getAsString(key);
-                    } else if (resourceValue.isMap()) {
-                        // TODO it seems like we neither get a map
-                        return getI18nFieldValue(resource.getAsStringMap(key), "fr");
-                    } else if (resourceValue.isArray()) {
-                        List<DCResource.Value> resourceRowInnerValues = resourceValue.asArray();
-                        if (resourceRowInnerValues.isEmpty())
+                        if (resourceValue == null) {
+                            LOGGER.debug("No value for this key, skipping");
                             return "";
+                        } else if (resourceValue.isString()) {
+                            return resource.getAsString(key);
+                        } else if (resourceValue.isMap()) {
+                            // TODO it seems like we neither get a map
+                            return getI18nFieldValue(resource.getAsStringMap(key), "fr");
+                        } else if (resourceValue.isArray()) {
+                            List<DCResource.Value> resourceRowInnerValues = resourceValue.asArray();
+                            if (resourceRowInnerValues.isEmpty())
+                                return "";
 
-                        if (resourceRowInnerValues.get(0).isString()) {
-                            Optional<String> reducedValue =
-                                resource.getAsStringList(key).stream().reduce((result, value) -> result + "," + value);
-                            return reducedValue.orElse("");
-                        } else if (resourceRowInnerValues.get(0).isMap()) {
-                            String frenchValue = getI18nFieldValueFromList(resourceRowInnerValues, "fr");
-                            if (!frenchValue.isEmpty())
-                                return frenchValue;
-                            else
-                                return getI18nFieldValueFromList(resourceRowInnerValues, "en");
-                        } else {
-                            LOGGER.warn("Inner row value not managed for {}", resourceRowInnerValues);
+                            if (resourceRowInnerValues.get(0).isString()) {
+                                Optional<String> reducedValue =
+                                        resource.getAsStringList(key).stream().reduce((result, value) -> result + "," + value);
+                                return reducedValue.orElse("");
+                            } else if (resourceRowInnerValues.get(0).isMap()) {
+                                String frenchValue = getI18nFieldValueFromList(resourceRowInnerValues, "fr");
+                                if (!frenchValue.isEmpty())
+                                    return frenchValue;
+                                else
+                                    return getI18nFieldValueFromList(resourceRowInnerValues, "en");
+                            } else {
+                                LOGGER.warn("Inner row value not managed for {}", resourceRowInnerValues);
+                                return "";
+                            }
+                        } else
                             return "";
-                        }
-                    } else
-                        return "";
-                }).map(value -> "\"" + value + "\"").reduce((result, value) -> result + "," + value);
+                    }).map(value -> "\"" + value + "\"").reduce((result, value) -> result + "," + value);
 
             if (resourceRow.isPresent())
-                try {
-                    resourceFileWriter.write(resourceRow.get());
-                    resourceFileWriter.write("\n");
-                } catch (IOException e) {
-                    LOGGER.error("Error while writing row : {}", e.getMessage());
-                }
+                    resourceCsv.write(resourceRow.get());
+                    resourceCsv.write("\n");
         });
 
-        resourceFileWriter.flush();
-        resourceFileWriter.close();
+        resourceCsv.flush();
+        resourceCsv.close();
     }
 
-    private void writeCsvFileHeader(File resourceFile, List<String> resourceKeys) throws IOException {
-        FileWriter resourceFileWriter = new FileWriter(resourceFile);
+    private void writeCsvFileHeader( List<String> resourceKeys, StringWriter resourceCsv) throws IOException {
         Optional<String> header = resourceKeys.stream().reduce((result, key) -> result + "," + key);
         if (header.isPresent()) {
-            resourceFileWriter.write(header.get());
-            resourceFileWriter.write("\n");
+            resourceCsv.write(header.get());
+            resourceCsv.write("\n");
         }
 
-        resourceFileWriter.flush();
-        resourceFileWriter.close();
+        resourceCsv.flush();
+        resourceCsv.close();
     }
 
     private String getI18nFieldValue(Map<String, String> field, String lang) {
         Optional<Map.Entry<String,String>> value = field.entrySet().stream()
-            .filter(entry -> lang.equals(entry.getValue())).findFirst();
+                .filter(entry -> lang.equals(entry.getValue())).findFirst();
 
         return value.isPresent() ? value.get().getKey() : "";
     }
@@ -187,7 +176,7 @@ public class DatacoreService {
         // which are lists of two entries maps, second entry having the language for value !
 
         Optional<DCResource.Value> result = valueList.stream().filter(value ->
-            value.asMap().values().toArray()[1].toString().equals(lang)
+                value.asMap().values().toArray()[1].toString().equals(lang)
         ).findFirst();
 
         return result.isPresent() ? result.get().asMap().values().toArray()[0].toString() : "";
