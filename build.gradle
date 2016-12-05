@@ -63,6 +63,8 @@ dependencies {
 bootRun {
     // needed for hot reload of thymeleaf templates
     addResources = true
+
+	environment SPRING_PROFILES_ACTIVE: environment.SPRING_PROFILES_ACTIVE ?: "dev"
 }
 
 springBoot {

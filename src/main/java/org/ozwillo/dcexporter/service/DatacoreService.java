@@ -64,7 +64,7 @@ public class DatacoreService {
         StringWriter resourceCsv = new StringWriter();
 
         try {
-            writeCsvFileHeader( resourceKeys, resourceCsv);
+            writeCsvFileHeader( resourceCsv, resourceKeys);
         } catch (IOException e) {
             LOGGER.error("Error while writing CSV file header", e);
             return Optional.empty();
@@ -75,7 +75,7 @@ public class DatacoreService {
         while (true) {
             List<DCResource> intermediateResult = datacore.findResources(project, type, parameters, 0, 100);
             try {
-                writeCsvFileLines( resourceKeys, intermediateResult, resourceCsv);
+                writeCsvFileLines( resourceCsv, resourceKeys, intermediateResult);
             } catch (IOException e) {
                 LOGGER.error("Error while writing data to temp file", e);
                 return Optional.empty();
@@ -97,7 +97,7 @@ public class DatacoreService {
         return Optional.of(resourceCsv.toString());
     }
 
-    private void writeCsvFileLines( List<String> resourceKeys, List<DCResource> resources, StringWriter resourceCsv) throws IOException {
+    private void writeCsvFileLines( StringWriter resourceCsv, List<String> resourceKeys, List<DCResource> resources) throws IOException {
 
         resources.forEach(resource -> {
             LOGGER.debug("Resource : {}", resource);
@@ -152,7 +152,7 @@ public class DatacoreService {
         resourceCsv.close();
     }
 
-    private void writeCsvFileHeader( List<String> resourceKeys, StringWriter resourceCsv) throws IOException {
+    private void writeCsvFileHeader( StringWriter resourceCsv, List<String> resourceKeys) throws IOException {
         Optional<String> header = resourceKeys.stream().reduce((result, key) -> result + "," + key);
         if (header.isPresent()) {
             resourceCsv.write(header.get());
