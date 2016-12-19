@@ -19,4 +19,7 @@ public class CkanController {
     public Map<String, String> getLicences() {
         return ckanService.getLicences();
     }
+
+    @RequestMapping(value = "/tags", method = RequestMethod.GET)
+    public Map<String, String> getTags() { return ckanService.getTags(); }
 }

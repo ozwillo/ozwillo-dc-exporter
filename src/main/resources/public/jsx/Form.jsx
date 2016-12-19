@@ -26,6 +26,11 @@ const InputText = ({ id, value, onChange }) =>
         <input type="text " name={id} id={id} value={value} className="form-control" onChange={onChange} />
     </div>
 
+const Textarea = ({ id, value, onChange }) =>
+    <div className="col-sm-8">
+        <textarea name={id} id={id} value={value} className="form-control" onChange={onChange}></textarea>
+    </div>
+
 const SubmitButton = ({ label, onClick }) =>
     <div className="form-group">
         <div className="col-sm-offset-2 col-sm-8">
@@ -33,4 +38,4 @@ const SubmitButton = ({ label, onClick }) =>
         </div>
     </div>
 
-module.exports = { Form, FormGroup, Label, SelectField, InputText, SubmitButton }
+module.exports = { Form, FormGroup, Label, SelectField, InputText, Textarea, SubmitButton }
