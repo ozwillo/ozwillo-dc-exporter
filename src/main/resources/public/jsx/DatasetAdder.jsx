@@ -8,7 +8,7 @@ export default class DatasetAdder extends React.Component {
     constructor(props) {
         super(props)
 
-        this.state = { dcId: '', datasets: [], licenses: {} }
+        this.state = { dcId: '', type: '', datasets: [], licenses: {} }
 
         this.onDatasetSelected = this.onDatasetSelected.bind(this)
         this.registerDataset = this.registerDataset.bind(this)
@@ -23,10 +23,18 @@ export default class DatasetAdder extends React.Component {
             .then(json => this.setState({licenses: json}))
     }
     onDatasetSelected(dcId) {
+        console.log(this.state.datasets);
+        const dataset = this.state.datasets.find(function(dataset){
+            return dataset['@id'] == dcId
+        });
+        console.log(dataset)
+        this.setState({ type: dataset['dcmo:name']})
         this.setState({ dcId })
     }
     registerDataset(fields) {
         fields['dcId'] = this.state.dcId
+        fields['type'] = this.state.type
+        console.log(JSON.stringify(fields))
         fetch('/api/dc-model-mapping', {
             method: 'POST',
             credentials: 'same-origin',
@@ -45,7 +53,7 @@ export default class DatasetAdder extends React.Component {
                 <DatasetChooser dcId={this.state.dcId} onDatasetSelected={this.onDatasetSelected}
                     datasets={this.state.datasets} />
                 {renderIf(this.state.dcId)(
-                    <DatasetConfigurer onSubmit={this.registerDataset} licenses={this.state.licenses} />
+                    <DatasetConfigurer onSubmit={this.registerDataset} licenses={this.state.licenses} datasets={this.state.datasets} />
                 )}
             </div>
         )
@@ -87,9 +95,11 @@ class DatasetConfigurer extends React.Component {
         this.state = {
             fields: {
                 name: '',
+                type: '',
                 license: ''
             }
         }
+        console.log(this.props.datasets)
         this.onFieldChange = this.onFieldChange.bind(this)
     }
     onFieldChange(id, value) {
@@ -102,7 +112,7 @@ class DatasetConfigurer extends React.Component {
             <Form>
                 <FormGroup>
                     <Label htmlFor="name" value="Name" />
-                    <InputText id="name" value={this.state.fields['name']}
+                    <InputText id="name" value={this.props.name}
                                onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
                 </FormGroup>
                 <LicenceChooser licenses={this.props.licenses} currentLicense={this.state.fields['license']}
