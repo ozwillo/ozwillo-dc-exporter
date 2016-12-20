@@ -8,10 +8,23 @@ export default class DatasetAdder extends React.Component {
     constructor(props) {
         super(props)
 
-        this.state = { dcId: '', type: '', datasets: [], licenses: {} }
+        this.state = { dcId: '', type: '', project: '', datasets: [], licenses: {}, projects:[{"name":"oasis.sandbox"},
+            {"name":"oasis.main"},
+            {"name":"oasis.meta"},
+            {"name":"geo"},
+            {"name":"geo_1"},
+            {"name":"org"},
+            {"name":"org_1"},
+            {"name":"oasis.sample"},
+            {"name":"samples_org1"},
+            {"name":"samples_org2"},
+            {"name":"samples_org3"},
+            {"name":"citizenkin"},
+            {"name":"citizenkin_0"}]}
 
         this.onDatasetSelected = this.onDatasetSelected.bind(this)
         this.registerDataset = this.registerDataset.bind(this)
+        this.onProjectSelected = this.onProjectSelected.bind(this)
     }
     componentDidMount() {
         fetch('/api/dc/models', { credentials: 'same-origin' })
@@ -21,6 +34,9 @@ export default class DatasetAdder extends React.Component {
         fetch('/api/ckan/licences', {credentials: 'same-origin'})
             .then(response => response.json())
             .then(json => this.setState({licenses: json}))
+    }
+    onProjectSelected(project) {
+        this.setState({ project })
     }
     onDatasetSelected(dcId) {
         console.log(this.state.datasets);
@@ -34,6 +50,7 @@ export default class DatasetAdder extends React.Component {
     registerDataset(fields) {
         fields['dcId'] = this.state.dcId
         fields['type'] = this.state.type
+        fields['project'] = this.state.project
         console.log(JSON.stringify(fields))
         fetch('/api/dc-model-mapping', {
             method: 'POST',
@@ -52,8 +69,12 @@ export default class DatasetAdder extends React.Component {
                 <h1>Dataset registration</h1>
                 <DatasetChooser dcId={this.state.dcId} onDatasetSelected={this.onDatasetSelected}
                     datasets={this.state.datasets} />
+
                 {renderIf(this.state.dcId)(
-                    <DatasetConfigurer onSubmit={this.registerDataset} licenses={this.state.licenses} datasets={this.state.datasets} />
+                    <div>
+                        <ProjectChooser project={this.state.project} onProjectSelected={this.onProjectSelected} type={this.state.type} datasets={this.state.datasets} projects={this.state.projects} />
+                        <DatasetConfigurer onSubmit={this.registerDataset} licenses={this.state.licenses} datasets={this.state.datasets} />
+                    </div>
                 )}
             </div>
         )
@@ -63,6 +84,31 @@ export default class DatasetAdder extends React.Component {
 DatasetAdder.contextTypes = {
     csrfToken: React.PropTypes.string,
     csrfTokenHeaderName: React.PropTypes.string
+}
+
+const ProjectChooser = ({ projects, project, datasets, type, onProjectSelected}) => {
+    const options = projects.map(project =>
+        <option key={project['name']} value={project['name']}>{project['name']}</option>
+    )
+    return (
+        <Form>
+            <FormGroup>
+                <Label htmlFor="project" value="Choose a project"/>
+                <SelectField id="project" value={project}
+                             onChange={(event) => onProjectSelected(event.target.value)}>
+                    {options}
+                </SelectField>
+            </FormGroup>
+        </Form>
+    )
+}
+
+ProjectChooser.propTypes = {
+    projects: React.PropTypes.array.isRequired,
+    onProjectSelected: React.PropTypes.func.isRequired,
+    datasets: React.PropTypes.array.isRequired,
+    project: React.PropTypes.string.isRequired,
+    type: React.PropTypes.string.isRequired
 }
 
 const DatasetChooser = ({ datasets, dcId, onDatasetSelected }) => {
