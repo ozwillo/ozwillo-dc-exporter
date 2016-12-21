@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +36,12 @@ public class CkanService {
         CkanClient ckanClient = new CkanClient(ckanUrl);
         List<CkanLicense> licenses = ckanClient.getLicenseList();
         return licenses.stream().collect(Collectors.toMap(CkanLicense::getId, CkanLicense::getTitle));
+    }
+
+    public Map<String, String> getTagNamesList() {
+        CkanClient ckanClient = new CkanClient(ckanUrl);
+        List<CkanTag> tags = ckanClient.getTagList();
+        return tags.stream().collect(Collectors.toMap(CkanTag::getId, CkanTagBase::getName));
     }
 
     public CkanDataset getOrCreateDataset(String name, String title) {
