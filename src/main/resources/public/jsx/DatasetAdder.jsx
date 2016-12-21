@@ -20,7 +20,7 @@ export default class DatasetAdder extends React.Component {
             {"name":"samples_org2"},
             {"name":"samples_org3"},
             {"name":"citizenkin"},
-            {"name":"citizenkin_0"}]}
+            {"name":"citizenkin_0"}], tags:{}}
 
         this.onDatasetSelected = this.onDatasetSelected.bind(this)
         this.registerDataset = this.registerDataset.bind(this)
@@ -34,12 +34,16 @@ export default class DatasetAdder extends React.Component {
         fetch('/api/ckan/licences', {credentials: 'same-origin'})
             .then(response => response.json())
             .then(json => this.setState({licenses: json}))
+
+        fetch('/api/ckan/tags', {credentials: 'same-origin'})
+            .then(response => response.json())
+            .then(json => this.setState({tags: json}))
     }
     onProjectSelected(project) {
         this.setState({ project })
     }
     onDatasetSelected(dcId) {
-        console.log(this.state.datasets);
+        console.log(this.state.tags);
         const dataset = this.state.datasets.find(function(dataset){
             return dataset['@id'] == dcId
         });
