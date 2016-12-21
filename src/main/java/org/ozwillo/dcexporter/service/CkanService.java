@@ -38,7 +38,7 @@ public class CkanService {
         return licenses.stream().collect(Collectors.toMap(CkanLicense::getId, CkanLicense::getTitle));
     }
 
-    public Map<String, String> getTagNamesList() {
+    public Map<String, String> getTags() {
         CkanClient ckanClient = new CkanClient(ckanUrl);
         List<CkanTag> tags = ckanClient.getTagList();
         return tags.stream().collect(Collectors.toMap(CkanTag::getId, CkanTagBase::getName));
