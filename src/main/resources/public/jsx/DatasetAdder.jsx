@@ -2,6 +2,10 @@ import React from 'react'
 
 import renderIf from 'render-if'
 
+import { WithContext as ReactTags } from 'react-tag-input'
+
+import tagStyles from '../reactTags.css'
+
 import { Form, FormGroup, Label, SelectField, InputText, SubmitButton } from './Form'
 
 export default class DatasetAdder extends React.Component {
@@ -20,11 +24,14 @@ export default class DatasetAdder extends React.Component {
             {"name":"samples_org2"},
             {"name":"samples_org3"},
             {"name":"citizenkin"},
-            {"name":"citizenkin_0"}], tags:{}}
+            {"name":"citizenkin_0"}], tags: [], suggestions: [] }
 
         this.onDatasetSelected = this.onDatasetSelected.bind(this)
         this.registerDataset = this.registerDataset.bind(this)
         this.onProjectSelected = this.onProjectSelected.bind(this)
+        this.handleAddition = this.handleAddition.bind(this)
+        this.handleDelete = this.handleDelete.bind(this)
+        this.handleDrag = this.handleDrag.bind(this)
     }
     componentDidMount() {
         fetch('/api/dc/models', { credentials: 'same-origin' })
@@ -37,13 +44,13 @@ export default class DatasetAdder extends React.Component {
 
         fetch('/api/ckan/tags', {credentials: 'same-origin'})
             .then(response => response.json())
-            .then(json => this.setState({tags: json}))
+            .then(json => this.setState({suggestions: json}))
     }
     onProjectSelected(project) {
         this.setState({ project })
     }
     onDatasetSelected(dcId) {
-        console.log(this.state.tags);
+        console.log(this.state.suggestions);
         const dataset = this.state.datasets.find(function(dataset){
             return dataset['@id'] == dcId
         });
@@ -67,7 +74,35 @@ export default class DatasetAdder extends React.Component {
         })
             .catch(error => console.log(error.message))
     }
+    handleDelete(i) {
+        let tags = this.state.tags
+        tags.splice(i, 1)
+        this.setState({tags: tags})
+    }
+    handleAddition(tag) {
+        let tags = this.state.tags
+        tags.push({
+            id: tags.length + 1,
+            text: tag
+        })
+        this.setState({tags: tags})
+    }
+    handleDrag(tag, currPos, newPos) {
+        let tags = this.state.tags
+
+        // mutate array
+        tags.splice(currPos, 1)
+        tags.splice(newPos, 0, tag)
+
+        // re-render
+        this.setState({ tags: tags })
+    }
     render() {
+        let tags = this.state.tags
+        let suggections = this.state.suggestions
+        let tabSuggestions = Object.keys(this.state.suggestions).map(key =>
+            suggections[key]
+        )
         return (
             <div>
                 <h1>Dataset registration</h1>
@@ -77,6 +112,16 @@ export default class DatasetAdder extends React.Component {
                 {renderIf(this.state.dcId)(
                     <div>
                         <ProjectChooser project={this.state.project} onProjectSelected={this.onProjectSelected} type={this.state.type} datasets={this.state.datasets} projects={this.state.projects} />
+                        <Form>
+                            <FormGroup>
+                                <Label htmlFor="Tags" value="Tag"/>
+                                <ReactTags tags={tags}
+                                           suggestions={tabSuggestions}
+                                           handleDelete={this.handleDelete}
+                                           handleAddition={this.handleAddition}
+                                           handleDrag={this.handleDrag} />
+                            </FormGroup>
+                        </Form>
                         <DatasetConfigurer onSubmit={this.registerDataset} licenses={this.state.licenses} datasets={this.state.datasets} />
                     </div>
                 )}
