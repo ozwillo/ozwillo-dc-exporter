@@ -5,6 +5,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 public class DcModelMapping {
 
@@ -35,6 +36,14 @@ public class DcModelMapping {
     @NotEmpty
     private String name;
 
+    private String description;
+
+    private List<String>  tags;
+
+    private String source;
+
+    private String version;
+
     private String ckanPackageId;
 
     private String ckanResourceId;
@@ -47,6 +56,17 @@ public class DcModelMapping {
         this.project = project;
         this.type = type;
         this.name = name;
+    }
+
+    public DcModelMapping(String dcId, String project, String type, String name, String description, List<String> tags, String source, String version) {
+        this.dcId = dcId;
+        this.project = project;
+        this.type = type;
+        this.name = name;
+        this.description = description;
+        this.tags = tags;
+        this.source = source;
+        this.version = version;
     }
 
     public String getId() {
@@ -105,12 +125,52 @@ public class DcModelMapping {
         this.ckanResourceId = ckanResourceId;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
     @Override
     public String toString() {
         return "DcModelMapping{" +
-            "id='" + id + '\'' +
-            ", dcId='" + dcId + '\'' +
-            ", name='" + name + '\'' +
-            '}';
+                "id='" + id + '\'' +
+                ", dcId='" + dcId + '\'' +
+                ", project='" + project + '\'' +
+                ", type='" + type + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", tags=" + tags +
+                ", source='" + source + '\'' +
+                ", version='" + version + '\'' +
+                ", ckanPackageId='" + ckanPackageId + '\'' +
+                ", ckanResourceId='" + ckanResourceId + '\'' +
+                '}';
     }
 }
