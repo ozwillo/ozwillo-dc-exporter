@@ -24,7 +24,7 @@ export default class DatasetAdder extends React.Component {
             {"name":"samples_org2"},
             {"name":"samples_org3"},
             {"name":"citizenkin"},
-            {"name":"citizenkin_0"}], suggestions: [] }
+            {"name":"citizenkin_0"}], suggestions: [], version: ''}
 
         this.onDatasetSelected = this.onDatasetSelected.bind(this)
         this.registerDataset = this.registerDataset.bind(this)
@@ -43,12 +43,11 @@ export default class DatasetAdder extends React.Component {
             .then(json => this.setState({suggestions: json}))
     }
     onDatasetSelected(dcId) {
-        console.log(this.state.suggestions);
         const dataset = this.state.datasets.find(function(dataset){
             return dataset['@id'] == dcId
-        });
-        console.log(dataset)
+        })
         this.setState({ type: dataset['dcmo:name']})
+        this.setState({ version: dataset['o:version']})
         this.setState({ dcId })
     }
     registerDataset(fields) {
@@ -73,7 +72,7 @@ export default class DatasetAdder extends React.Component {
                 <h1>Dataset registration</h1>
                 <DatasetChooser dcId={this.state.dcId} onDatasetSelected={this.onDatasetSelected}
                     datasets={this.state.datasets} />
-
+                <Version version={this.state.version} />
                 {renderIf(this.state.dcId)(
                         <DatasetConfigurer onSubmit={this.registerDataset} licenses={this.state.licenses}
                                            datasets={this.state.datasets} projects={this.state.projects}
@@ -112,6 +111,17 @@ DatasetChooser.propTypes = {
     datasets: React.PropTypes.array.isRequired
 }
 
+const Version = ({ version }) => {
+    return (
+        <Form>
+            <FormGroup>
+                <Label htmlFor="version" value="Version" />
+                <InputText id="version" value={version}/>
+            </FormGroup>
+        </Form>
+    )
+}
+
 class DatasetConfigurer extends React.Component {
     constructor(props) {
         super(props)
@@ -119,7 +129,7 @@ class DatasetConfigurer extends React.Component {
         this.state = {
             fields: {
                 name: '',
-                type: '',
+                description: '',
                 license: '',
                 project: '',
                 tags: []
@@ -163,7 +173,12 @@ class DatasetConfigurer extends React.Component {
             <Form>
                 <FormGroup>
                     <Label htmlFor="name" value="Name" />
-                    <InputText id="name" value={this.props.name}
+                    <InputText id="name" value={this.state.name}
+                               onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
+                </FormGroup>
+                <FormGroup>
+                    <Label htmlFor="description" value="Description" />
+                    <InputText id="description" value={this.state.description}
                                onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
                 </FormGroup>
                 <ProjectChooser project={this.state.project}
