@@ -12,7 +12,7 @@ export default class DatasetAdder extends React.Component {
     constructor(props) {
         super(props)
 
-        this.state = { dcId: '', type: '', project: '', datasets: [], licenses: {}, projects:[{"name":"oasis.sandbox"},
+        this.state = { dcId: '', type: '', datasets: [], licenses: {}, projects:[{"name":"oasis.sandbox"},
             {"name":"oasis.main"},
             {"name":"oasis.meta"},
             {"name":"geo"},
@@ -28,7 +28,6 @@ export default class DatasetAdder extends React.Component {
 
         this.onDatasetSelected = this.onDatasetSelected.bind(this)
         this.registerDataset = this.registerDataset.bind(this)
-        this.onProjectSelected = this.onProjectSelected.bind(this)
         this.handleAddition = this.handleAddition.bind(this)
         this.handleDelete = this.handleDelete.bind(this)
         this.handleDrag = this.handleDrag.bind(this)
@@ -36,7 +35,7 @@ export default class DatasetAdder extends React.Component {
     componentDidMount() {
         fetch('/api/dc/models', { credentials: 'same-origin' })
             .then(response => response.json())
-            .then(json => this.setState({ datasets: json }))
+            .then(json => this.setState({datasets: json}))
 
         fetch('/api/ckan/licences', {credentials: 'same-origin'})
             .then(response => response.json())
@@ -45,9 +44,6 @@ export default class DatasetAdder extends React.Component {
         fetch('/api/ckan/tags', {credentials: 'same-origin'})
             .then(response => response.json())
             .then(json => this.setState({suggestions: json}))
-    }
-    onProjectSelected(project) {
-        this.setState({ project })
     }
     onDatasetSelected(dcId) {
         console.log(this.state.suggestions);
@@ -111,7 +107,6 @@ export default class DatasetAdder extends React.Component {
 
                 {renderIf(this.state.dcId)(
                     <div>
-                        <ProjectChooser project={this.state.project} onProjectSelected={this.onProjectSelected} type={this.state.type} datasets={this.state.datasets} projects={this.state.projects} />
                         <Form>
                             <FormGroup>
                                 <Label htmlFor="Tags" value="Tag"/>
@@ -122,7 +117,7 @@ export default class DatasetAdder extends React.Component {
                                            handleDrag={this.handleDrag} />
                             </FormGroup>
                         </Form>
-                        <DatasetConfigurer onSubmit={this.registerDataset} licenses={this.state.licenses} datasets={this.state.datasets} />
+                        <DatasetConfigurer onSubmit={this.registerDataset} licenses={this.state.licenses} datasets={this.state.datasets} projects={this.state.projects} />
                     </div>
                 )}
             </div>
@@ -133,31 +128,6 @@ export default class DatasetAdder extends React.Component {
 DatasetAdder.contextTypes = {
     csrfToken: React.PropTypes.string,
     csrfTokenHeaderName: React.PropTypes.string
-}
-
-const ProjectChooser = ({ projects, project, datasets, type, onProjectSelected}) => {
-    const options = projects.map(project =>
-        <option key={project['name']} value={project['name']}>{project['name']}</option>
-    )
-    return (
-        <Form>
-            <FormGroup>
-                <Label htmlFor="project" value="Choose a project"/>
-                <SelectField id="project" value={project}
-                             onChange={(event) => onProjectSelected(event.target.value)}>
-                    {options}
-                </SelectField>
-            </FormGroup>
-        </Form>
-    )
-}
-
-ProjectChooser.propTypes = {
-    projects: React.PropTypes.array.isRequired,
-    onProjectSelected: React.PropTypes.func.isRequired,
-    datasets: React.PropTypes.array.isRequired,
-    project: React.PropTypes.string.isRequired,
-    type: React.PropTypes.string.isRequired
 }
 
 const DatasetChooser = ({ datasets, dcId, onDatasetSelected }) => {
@@ -191,10 +161,10 @@ class DatasetConfigurer extends React.Component {
             fields: {
                 name: '',
                 type: '',
-                license: ''
+                license: '',
+                project: ''
             }
         }
-        console.log(this.props.datasets)
         this.onFieldChange = this.onFieldChange.bind(this)
     }
     onFieldChange(id, value) {
@@ -210,6 +180,8 @@ class DatasetConfigurer extends React.Component {
                     <InputText id="name" value={this.props.name}
                                onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
                 </FormGroup>
+                <ProjectChooser project={this.state.project}
+                                onClick={(event) => this.props.onSubmit(this.state.fields)} projects={this.props.projects} />
                 <LicenceChooser licenses={this.props.licenses} currentLicense={this.state.fields['license']}
                                 onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
                 <SubmitButton label="Create" onClick={(event) => this.props.onSubmit(this.state.fields)} />
@@ -233,5 +205,19 @@ const LicenceChooser = ({ licenses, currentLicense, onChange }) => {
                 {options}
             </SelectField>
         </FormGroup>
+    )
+}
+
+const ProjectChooser = ({ projects, currentProject, onChange}) => {
+    const options = projects.map(project =>
+        <option key={project['name']} value={project['name']}>{project['name']}</option>
+    )
+    return (
+            <FormGroup>
+                <Label htmlFor="project" value="Choose a project"/>
+                <SelectField id="project" value={currentProject} onChange={onChange}>
+                    {options}
+                </SelectField>
+            </FormGroup>
     )
 }
