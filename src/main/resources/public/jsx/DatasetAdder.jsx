@@ -24,13 +24,10 @@ export default class DatasetAdder extends React.Component {
             {"name":"samples_org2"},
             {"name":"samples_org3"},
             {"name":"citizenkin"},
-            {"name":"citizenkin_0"}], tags: [], suggestions: [] }
+            {"name":"citizenkin_0"}], suggestions: [] }
 
         this.onDatasetSelected = this.onDatasetSelected.bind(this)
         this.registerDataset = this.registerDataset.bind(this)
-        this.handleAddition = this.handleAddition.bind(this)
-        this.handleDelete = this.handleDelete.bind(this)
-        this.handleDrag = this.handleDrag.bind(this)
     }
     componentDidMount() {
         fetch('/api/dc/models', { credentials: 'same-origin' })
@@ -70,35 +67,7 @@ export default class DatasetAdder extends React.Component {
         })
             .catch(error => console.log(error.message))
     }
-    handleDelete(i) {
-        let tags = this.state.tags
-        tags.splice(i, 1)
-        this.setState({tags: tags})
-    }
-    handleAddition(tag) {
-        let tags = this.state.tags
-        tags.push({
-            id: tags.length + 1,
-            text: tag
-        })
-        this.setState({tags: tags})
-    }
-    handleDrag(tag, currPos, newPos) {
-        let tags = this.state.tags
-
-        // mutate array
-        tags.splice(currPos, 1)
-        tags.splice(newPos, 0, tag)
-
-        // re-render
-        this.setState({ tags: tags })
-    }
     render() {
-        let tags = this.state.tags
-        let suggections = this.state.suggestions
-        let tabSuggestions = Object.keys(this.state.suggestions).map(key =>
-            suggections[key]
-        )
         return (
             <div>
                 <h1>Dataset registration</h1>
@@ -106,19 +75,9 @@ export default class DatasetAdder extends React.Component {
                     datasets={this.state.datasets} />
 
                 {renderIf(this.state.dcId)(
-                    <div>
-                        <Form>
-                            <FormGroup>
-                                <Label htmlFor="Tags" value="Tag"/>
-                                <ReactTags tags={tags}
-                                           suggestions={tabSuggestions}
-                                           handleDelete={this.handleDelete}
-                                           handleAddition={this.handleAddition}
-                                           handleDrag={this.handleDrag} />
-                            </FormGroup>
-                        </Form>
-                        <DatasetConfigurer onSubmit={this.registerDataset} licenses={this.state.licenses} datasets={this.state.datasets} projects={this.state.projects} />
-                    </div>
+                        <DatasetConfigurer onSubmit={this.registerDataset} licenses={this.state.licenses}
+                                           datasets={this.state.datasets} projects={this.state.projects}
+                                           suggestions={this.state.suggestions} />
                 )}
             </div>
         )
@@ -162,15 +121,42 @@ class DatasetConfigurer extends React.Component {
                 name: '',
                 type: '',
                 license: '',
-                project: ''
+                project: '',
+                tags: []
             }
         }
         this.onFieldChange = this.onFieldChange.bind(this)
+        this.handleAddition = this.handleAddition.bind(this)
+        this.handleDelete = this.handleDelete.bind(this)
+        this.handleDrag = this.handleDrag.bind(this)
     }
     onFieldChange(id, value) {
         const fields = this.state.fields
         fields[id] = value
         this.setState({ fields })
+    }
+    handleDelete(i) {
+        let tags = this.state.fields['tags']
+        tags.splice(i, 1)
+        this.setState({tags: tags})
+    }
+    handleAddition(tag) {
+        let tags = this.state.fields['tags']
+        tags.push({
+            id: tags.length + 1,
+            text: tag
+        })
+        this.setState({tags: tags})
+    }
+    handleDrag(tag, currPos, newPos) {
+        let tags = this.state.fields['tags']
+
+        // mutate array
+        tags.splice(currPos, 1)
+        tags.splice(newPos, 0, tag)
+
+        // re-render
+        this.setState({ tags: tags })
     }
     render() {
         return (
@@ -182,6 +168,8 @@ class DatasetConfigurer extends React.Component {
                 </FormGroup>
                 <ProjectChooser project={this.state.project}
                                 onClick={(event) => this.props.onSubmit(this.state.fields)} projects={this.props.projects} />
+                <TagAutocomplet tags={this.state.fields['tags']} suggestions={this.props.suggestions}
+                                handleAddition={this.handleAddition} handleDelete={this.handleDelete} />
                 <LicenceChooser licenses={this.props.licenses} currentLicense={this.state.fields['license']}
                                 onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
                 <SubmitButton label="Create" onClick={(event) => this.props.onSubmit(this.state.fields)} />
@@ -219,5 +207,20 @@ const ProjectChooser = ({ projects, currentProject, onChange}) => {
                     {options}
                 </SelectField>
             </FormGroup>
+    )
+}
+
+const TagAutocomplet = ({ tags, suggestions, handleDelete, handleAddition}) => {
+    let tabSuggestions = Object.keys(suggestions).map(key =>
+        suggestions[key]
+    )
+    return (
+        <FormGroup>
+            <Label htmlFor="Tag" value="Tags"/>
+            <ReactTags tags={tags}
+                       suggestions={tabSuggestions}
+                       handleDelete={handleDelete}
+                       handleAddition={handleAddition}/>
+        </FormGroup>
     )
 }
