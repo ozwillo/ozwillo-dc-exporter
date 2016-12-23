@@ -128,6 +128,7 @@ class DatasetConfigurer extends React.Component {
 
         this.state = {
             fields: {
+                packageName: '',
                 name: '',
                 description: '',
                 license: '',
@@ -172,6 +173,11 @@ class DatasetConfigurer extends React.Component {
     render() {
         return (
             <Form>
+                <FormGroup>
+                    <Label htmlFor="packageName" value="Package Name" />
+                    <InputText id="packageName" value={this.state.packageName}
+                               onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
+                </FormGroup>
                 <FormGroup>
                     <Label htmlFor="name" value="Name" />
                     <InputText id="name" value={this.state.name}
