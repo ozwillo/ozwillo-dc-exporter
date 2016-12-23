@@ -132,6 +132,7 @@ class DatasetConfigurer extends React.Component {
                 description: '',
                 license: '',
                 project: '',
+                source: '',
                 tags: []
             }
         }
@@ -181,12 +182,17 @@ class DatasetConfigurer extends React.Component {
                     <InputText id="description" value={this.state.description}
                                onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
                 </FormGroup>
-                <ProjectChooser project={this.state.project}
-                                onClick={(event) => this.props.onSubmit(this.state.fields)} projects={this.props.projects} />
-                <TagAutocomplet tags={this.state.fields['tags']} suggestions={this.props.suggestions}
-                                handleAddition={this.handleAddition} handleDelete={this.handleDelete} />
+                <FormGroup>
+                    <Label htmlFor="source" value="Source" />
+                    <InputText id="source" value={this.state.source}
+                               onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
+                </FormGroup>
+                <ProjectChooser currentProject={this.state.project}
+                                onChange={(event) => this.onFieldChange(event.target.id, event.target.value)} projects={this.props.projects} />
                 <LicenceChooser licenses={this.props.licenses} currentLicense={this.state.fields['license']}
                                 onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
+                <TagAutocomplet tags={this.state.fields['tags']} suggestions={this.props.suggestions}
+                                handleAddition={this.handleAddition} handleDelete={this.handleDelete} />
                 <SubmitButton label="Create" onClick={(event) => this.props.onSubmit(this.state.fields)} />
             </Form>
         )
