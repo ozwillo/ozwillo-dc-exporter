@@ -54,6 +54,7 @@ export default class DatasetAdder extends React.Component {
         fields['dcId'] = this.state.dcId
         fields['type'] = this.state.type
         fields['project'] = this.state.project
+        fields['tags'] = ''
         console.log(JSON.stringify(fields))
         fetch('/api/dc-model-mapping', {
             method: 'POST',

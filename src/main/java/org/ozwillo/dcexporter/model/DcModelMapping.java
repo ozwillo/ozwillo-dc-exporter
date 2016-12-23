@@ -39,9 +39,7 @@ public class DcModelMapping {
     private String name;
 
     private String description;
-
-    private List<String>  tags;
-
+    //TODO: add propertie tags (check a tags model in jackan.model.CkanTags)
     private String source;
 
     private String version;
@@ -66,7 +64,6 @@ public class DcModelMapping {
         this.type = type;
         this.name = name;
         this.description = description;
-        this.tags = tags;
         this.source = source;
         this.version = version;
     }
@@ -143,14 +140,6 @@ public class DcModelMapping {
         this.description = description;
     }
 
-    public List<String> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<String> tags) {
-        this.tags = tags;
-    }
-
     public String getSource() {
         return source;
     }
@@ -177,7 +166,6 @@ public class DcModelMapping {
                 ", name='" + packageName + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", tags=" + tags +
                 ", source='" + source + '\'' +
                 ", version='" + version + '\'' +
                 ", ckanPackageId='" + ckanPackageId + '\'' +
