@@ -149,7 +149,7 @@ class DatasetConfigurer extends React.Component {
     handleDelete(i) {
         let tags = this.state.fields['tags']
         tags.splice(i, 1)
-        this.setState({tags: tags})
+        this.onFieldChange('tags', tags)
     }
     handleAddition(tag) {
         let tags = this.state.fields['tags']
@@ -157,7 +157,7 @@ class DatasetConfigurer extends React.Component {
             id: tags.length + 1,
             text: tag
         })
-        this.setState({tags: tags})
+        this.onFieldChange('tags', tags)
     }
     handleDrag(tag, currPos, newPos) {
         let tags = this.state.fields['tags']
@@ -167,7 +167,7 @@ class DatasetConfigurer extends React.Component {
         tags.splice(newPos, 0, tag)
 
         // re-render
-        this.setState({ tags: tags })
+        this.onFieldChange('tags', tags)
     }
     render() {
         return (
