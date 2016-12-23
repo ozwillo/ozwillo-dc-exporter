@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,8 +70,13 @@ public class SynchronizerService {
         }
 
         String resourceCsvFile = optionalResourceCsvFile.get();
+        try{
+            ckanService.updateResourceData(dcModelMapping.getCkanPackageId(), dcModelMapping.getCkanResourceId(), resourceCsvFile);
+        }catch (IOException e){
+            LOGGER.error("Did not update ResourceData, Exception : {}", e.getMessage());
+            return "KO";
+        }
 
-        ckanService.updateResourceData(dcModelMapping.getCkanPackageId(), dcModelMapping.getCkanResourceId(), resourceCsvFile);
 
         return "OK";
     }

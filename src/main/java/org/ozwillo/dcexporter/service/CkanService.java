@@ -78,21 +78,17 @@ public class CkanService {
         return ckanClient.createResource(ckanResource);
     }
 
-    public void updateResourceData(String packageId, String id, String resource) {
+    public void updateResourceData(String packageId, String id, String resource) throws IOException {
         CkanClient ckanClient = new CheckedCkanClient(ckanUrl, ckanApiKey);
         //We create a file waiting to modify the "setUpload" function in jackan
         File resourceFile = null;
-        try {
-            resourceFile = File.createTempFile("export-", ".csv");
-            LOGGER.debug("Writing data in temp file {}", resourceFile.getAbsolutePath());
-            FileWriter resourceFileWriter = new FileWriter(resourceFile, true);
-            resourceFileWriter.write(resource);
-            resourceFileWriter.flush();
-            resourceFileWriter.close();
-        } catch (IOException e) {
-            LOGGER.error("Error while creating temp file", e);
-            return;
-        }
+
+        resourceFile = File.createTempFile("export-", ".csv");
+        LOGGER.debug("Writing data in temp file {}", resourceFile.getAbsolutePath());
+        FileWriter resourceFileWriter = new FileWriter(resourceFile, true);
+        resourceFileWriter.write(resource);
+        resourceFileWriter.flush();
+        resourceFileWriter.close();
 
 
         CkanResourceBase ckanResourceBase = new CkanResourceBase();
