@@ -1,6 +1,8 @@
 package org.ozwillo.dcexporter.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import eu.trentorise.opendata.jackan.model.CkanDatasetBase;
+import eu.trentorise.opendata.jackan.model.CkanTagBase;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 
@@ -39,7 +41,9 @@ public class DcModelMapping {
     private String name;
 
     private String description;
-    //TODO: add propertie tags (check a tags model in jackan.model.CkanTags)
+
+    private List<CkanTagBase> tags;
+
     private String source;
 
     private String version;
@@ -58,7 +62,7 @@ public class DcModelMapping {
         this.name = name;
     }
 
-    public DcModelMapping(String dcId, String project, String type, String name, String description, List<String> tags, String source, String version) {
+    public DcModelMapping(String dcId, String project, String type, String name, String description, List<CkanDatasetBase> tags, String source, String version) {
         this.dcId = dcId;
         this.project = project;
         this.type = type;
@@ -140,6 +144,14 @@ public class DcModelMapping {
         this.description = description;
     }
 
+    public List<CkanTagBase> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<CkanTagBase> tags) {
+        this.tags = tags;
+    }
+
     public String getSource() {
         return source;
     }
@@ -163,9 +175,10 @@ public class DcModelMapping {
                 ", dcId='" + dcId + '\'' +
                 ", project='" + project + '\'' +
                 ", type='" + type + '\'' +
-                ", name='" + packageName + '\'' +
+                ", packageName='" + packageName + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
+                ", tags=" + tags +
                 ", source='" + source + '\'' +
                 ", version='" + version + '\'' +
                 ", ckanPackageId='" + ckanPackageId + '\'' +
