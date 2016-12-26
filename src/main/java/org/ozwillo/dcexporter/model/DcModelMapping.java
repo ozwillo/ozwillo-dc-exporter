@@ -33,7 +33,7 @@ public class DcModelMapping {
     @NotEmpty
     private String type;
 
-    private String packageName;
+    private String resourceName;
 
     @JsonProperty
     @NotNull
@@ -104,12 +104,12 @@ public class DcModelMapping {
         this.type = type;
     }
 
-    public String getPackageName() {
-        return packageName;
+    public String getResourceName() {
+        return resourceName;
     }
 
-    public void setPackageName(String packageName) {
-        this.packageName = packageName;
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
     }
 
     public String getName() {
@@ -175,7 +175,7 @@ public class DcModelMapping {
                 ", dcId='" + dcId + '\'' +
                 ", project='" + project + '\'' +
                 ", type='" + type + '\'' +
-                ", packageName='" + packageName + '\'' +
+                ", resourceName='" + resourceName + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", tags=" + tags +

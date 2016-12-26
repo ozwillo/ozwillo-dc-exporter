@@ -27,7 +27,7 @@ public class DcModelMappingController {
     @RequestMapping(method = POST)
     public ResponseEntity<String> addMapping(@RequestBody DcModelMapping dcModelMapping) {
         CkanDataset ckanDataset = ckanService.getOrCreateDataset(dcModelMapping.getName(), dcModelMapping.getName()); //TODO : Remove the capital letter and special caracteres for first parametre before passing
-        CkanResource ckanResource = ckanService.createResource(ckanDataset.getId(), dcModelMapping.getName());
+        CkanResource ckanResource = ckanService.createResource(ckanDataset.getId(), dcModelMapping.getResourceName());
 
         dcModelMapping.setCkanPackageId(ckanDataset.getId());
         dcModelMapping.setCkanResourceId(ckanResource.getId());
