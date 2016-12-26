@@ -12,19 +12,7 @@ export default class DatasetAdder extends React.Component {
     constructor(props) {
         super(props)
 
-        this.state = { dcId: '', type: '', datasets: [], licenses: {}, projects:[{"name":"oasis.sandbox"},
-            {"name":"oasis.main"},
-            {"name":"oasis.meta"},
-            {"name":"geo"},
-            {"name":"geo_1"},
-            {"name":"org"},
-            {"name":"org_1"},
-            {"name":"oasis.sample"},
-            {"name":"samples_org1"},
-            {"name":"samples_org2"},
-            {"name":"samples_org3"},
-            {"name":"citizenkin"},
-            {"name":"citizenkin_0"}], suggestions: [], version: ''}
+        this.state = { dcId: '', type: '', datasets: [], licenses: {}, project: '', suggestions: [], version: ''}
 
         this.onDatasetSelected = this.onDatasetSelected.bind(this)
         this.registerDataset = this.registerDataset.bind(this)
@@ -48,6 +36,7 @@ export default class DatasetAdder extends React.Component {
         })
         this.setState({ type: dataset['dcmo:name']})
         this.setState({ version: dataset['o:version']})
+        this.setState({ project: dataset['dcmo:pointOfViewAbsoluteName']})
         this.setState({ dcId })
     }
     registerDataset(fields) {
@@ -133,7 +122,6 @@ class DatasetConfigurer extends React.Component {
                 name: '',
                 description: '',
                 license: '',
-                project: '',
                 source: ''
                 //tags: []
             }
@@ -196,8 +184,6 @@ class DatasetConfigurer extends React.Component {
                     <InputText id="source" value={this.state.source}
                                onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
                 </FormGroup>
-                <ProjectChooser currentProject={this.state.fields['project']}
-                                onChange={(event) => this.onFieldChange(event.target.id, event.target.value)} projects={this.props.projects} />
                 <LicenceChooser licenses={this.props.licenses} currentLicense={this.state.fields['license']}
                                 onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
                 <SubmitButton label="Create" onClick={(event) => this.props.onSubmit(this.state.fields)} />
@@ -221,20 +207,6 @@ const LicenceChooser = ({ licenses, currentLicense, onChange }) => {
                 {options}
             </SelectField>
         </FormGroup>
-    )
-}
-
-const ProjectChooser = ({ projects, currentProject, onChange}) => {
-    const options = projects.map(project =>
-        <option key={project['name']} value={project['name']}>{project['name']}</option>
-    )
-    return (
-            <FormGroup>
-                <Label htmlFor="project" value="Choose a project"/>
-                <SelectField id="project" value={currentProject} onChange={onChange}>
-                    {options}
-                </SelectField>
-            </FormGroup>
     )
 }
 
