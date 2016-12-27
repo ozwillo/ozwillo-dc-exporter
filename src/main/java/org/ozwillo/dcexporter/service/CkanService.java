@@ -66,6 +66,7 @@ public class CkanService {
             ckanDataset.setOrganization(ckanOrganization);
             ckanDataset.setMaintainer("ozwillo");
             ckanDataset.setMaintainerEmail("contact@ozwillo.org");
+            ckanDataset.setOpen(true);
             ckanDataset.setOwnerOrg(ckanOrganization.getId());
             ckanDataset.setTitle(title);
             ckanDataset.setPriv(false);

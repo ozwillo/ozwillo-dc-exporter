@@ -40,10 +40,17 @@ export default class DatasetAdder extends React.Component {
         this.setState({ dcId })
     }
     registerDataset(fields) {
+        const suggestions = this.state.suggestions
         fields['dcId'] = this.state.dcId
         fields['type'] = this.state.type
         fields['project'] = this.state.project
-        //fields['tags'] = ''
+        fields['tags'] = fields['tags'].map(tag => {
+            for( var suggestion of Object.entries(suggestions)) {
+                if (tag.text === suggestion[1] ){
+                    return {id:suggestion[0], name:suggestion[1]}
+                }
+            }
+        })
         console.log(JSON.stringify(fields))
         fetch('/api/dc-model-mapping', {
             method: 'POST',
@@ -122,8 +129,8 @@ class DatasetConfigurer extends React.Component {
                 name: '',
                 description: '',
                 license: '',
-                source: ''
-                //tags: []
+                source: '',
+                tags: []
             }
         }
         this.onFieldChange = this.onFieldChange.bind(this)
@@ -132,8 +139,6 @@ class DatasetConfigurer extends React.Component {
         this.handleDrag = this.handleDrag.bind(this)
     }
     onFieldChange(id, value) {
-        console.log(id)
-        console.log(value)
         const fields = this.state.fields
         fields[id] = value
         this.setState({ fields })
@@ -186,6 +191,8 @@ class DatasetConfigurer extends React.Component {
                 </FormGroup>
                 <LicenceChooser licenses={this.props.licenses} currentLicense={this.state.fields['license']}
                                 onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
+                <TagAutocomplet tags={this.state.fields['tags']} suggestions={this.props.suggestions}
+                                handleAddition={this.handleAddition} handleDelete={this.handleDelete} />
                 <SubmitButton label="Create" onClick={(event) => this.props.onSubmit(this.state.fields)} />
             </Form>
         )
