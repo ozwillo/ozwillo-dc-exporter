@@ -2,7 +2,7 @@ package org.ozwillo.dcexporter.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.trentorise.opendata.jackan.model.CkanDatasetBase;
-import eu.trentorise.opendata.jackan.model.CkanTagBase;
+import eu.trentorise.opendata.jackan.model.CkanTag;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 
@@ -42,7 +42,9 @@ public class DcModelMapping {
 
     private String description;
 
-    private List<CkanTagBase> tags;
+    private List<CkanTag> tags;
+
+    private String license;
 
     private String source;
 
@@ -62,12 +64,15 @@ public class DcModelMapping {
         this.name = name;
     }
 
-    public DcModelMapping(String dcId, String project, String type, String name, String description, List<CkanDatasetBase> tags, String source, String version) {
+    public DcModelMapping(String dcId, String project, String type, String resourceName, String name, String description, List<CkanTag> tags, String license, String source, String version) {
         this.dcId = dcId;
         this.project = project;
         this.type = type;
+        this.resourceName = resourceName;
         this.name = name;
         this.description = description;
+        this.tags = tags;
+        this.license = license;
         this.source = source;
         this.version = version;
     }
@@ -108,9 +113,7 @@ public class DcModelMapping {
         return resourceName;
     }
 
-    public void setResourceName(String resourceName) {
-        this.resourceName = resourceName;
-    }
+    public void setResourceName(String resourceName) { this.resourceName = resourceName; }
 
     public String getName() {
         return name;
@@ -144,13 +147,17 @@ public class DcModelMapping {
         this.description = description;
     }
 
-    public List<CkanTagBase> getTags() {
+    public List<CkanTag> getTags() {
         return tags;
     }
 
-    public void setTags(List<CkanTagBase> tags) {
+    public void setTags(List<CkanTag> tags) {
         this.tags = tags;
     }
+
+    public String getLicense() { return license; }
+
+    public void setLicense(String license) { this.license = license; }
 
     public String getSource() {
         return source;
@@ -171,14 +178,14 @@ public class DcModelMapping {
     @Override
     public String toString() {
         return "DcModelMapping{" +
-                "id='" + id + '\'' +
-                ", dcId='" + dcId + '\'' +
+                "dcId='" + dcId + '\'' +
                 ", project='" + project + '\'' +
                 ", type='" + type + '\'' +
                 ", resourceName='" + resourceName + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", tags=" + tags +
+                ", license='" + license + '\'' +
                 ", source='" + source + '\'' +
                 ", version='" + version + '\'' +
                 ", ckanPackageId='" + ckanPackageId + '\'' +

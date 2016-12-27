@@ -7,6 +7,7 @@ import eu.trentorise.opendata.jackan.model.*;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.ozwillo.dcexporter.model.DcModelMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,12 +45,12 @@ public class CkanService {
         return tags.stream().collect(Collectors.toMap(CkanTag::getId, CkanTagBase::getName));
     }
 
-    public CkanDataset getOrCreateDataset(String name, String title) {
+    public CkanDataset getOrCreateDataset(DcModelMapping dcModelMapping) {
         CkanClient ckanClient = new CkanClient(ckanUrl, ckanApiKey);
 
         CkanDataset ckanDataset = null;
         try {
-            ckanDataset = ckanClient.getDataset(name);
+            ckanDataset = ckanClient.getDataset(dcModelMapping.getName());
         } catch (CkanException e) {
             // Not Found Error is an « expected » result
             // FIXME : this is a poor way to perform a search
@@ -57,23 +58,35 @@ public class CkanService {
                 throw e;
             }
 
-            LOGGER.debug("Dataset {} already exists", name);
+            LOGGER.debug("Dataset {} already exists", dcModelMapping.getName());
         }
 
         if (ckanDataset == null) {
             CkanOrganization ckanOrganization = ckanClient.getOrganization("ozwillo");
-            ckanDataset = new CkanDataset(name);
+            ckanDataset = new CkanDataset(dcModelMapping.getName());
             ckanDataset.setOrganization(ckanOrganization);
             ckanDataset.setMaintainer("ozwillo");
             ckanDataset.setMaintainerEmail("contact@ozwillo.org");
             ckanDataset.setOpen(true);
             ckanDataset.setOwnerOrg(ckanOrganization.getId());
-            ckanDataset.setTitle(title);
+            ckanDataset.setTitle(dcModelMapping.getResourceName());
             ckanDataset.setPriv(false);
 
             return ckanClient.createDataset(ckanDataset);
         } else {
-            return ckanDataset;
+            CkanOrganization ckanOrganization = ckanClient.getOrganization("ozwillo");
+            ckanDataset = new CkanDataset(dcModelMapping.getName());
+            ckanDataset.setOrganization(ckanOrganization);
+            ckanDataset.setMaintainer("ozwillo");
+            ckanDataset.setMaintainerEmail("contact@ozwillo.org");
+            ckanDataset.setOwnerOrg(ckanOrganization.getId());
+            ckanDataset.setTitle(dcModelMapping.getResourceName());
+            ckanDataset.setLicenseTitle(dcModelMapping.getLicense());
+            ckanDataset.setUrl(dcModelMapping.getSource());
+            ckanDataset.setVersion(dcModelMapping.getVersion());
+            ckanDataset.setTags(dcModelMapping.getTags());
+            ckanDataset.setPriv(false);
+            return ckanClient.updateDataset(ckanDataset);
         }
     }
 

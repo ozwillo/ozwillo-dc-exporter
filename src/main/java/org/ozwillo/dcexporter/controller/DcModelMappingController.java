@@ -26,13 +26,16 @@ public class DcModelMappingController {
 
     @RequestMapping(method = POST)
     public ResponseEntity<String> addMapping(@RequestBody DcModelMapping dcModelMapping) {
-        CkanDataset ckanDataset = ckanService.getOrCreateDataset(dcModelMapping.getName(), dcModelMapping.getName()); //TODO : Remove the capital letter and special caracteres for first parametre before passing
-        CkanResource ckanResource = ckanService.createResource(ckanDataset.getId(), dcModelMapping.getResourceName());
+        if (dcModelMappingRepository.findByDcId(dcModelMapping.getDcId()) == null) {
+            CkanDataset ckanDataset = ckanService.getOrCreateDataset(dcModelMapping);
+            CkanResource ckanResource = ckanService.createResource(ckanDataset.getId(), dcModelMapping.getResourceName());
 
-        dcModelMapping.setCkanPackageId(ckanDataset.getId());
-        dcModelMapping.setCkanResourceId(ckanResource.getId());
+            dcModelMapping.setCkanPackageId(ckanDataset.getId());
+            dcModelMapping.setCkanResourceId(ckanResource.getId());
 
-        dcModelMappingRepository.save(dcModelMapping);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+            dcModelMappingRepository.save(dcModelMapping);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        }
+        return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 }
