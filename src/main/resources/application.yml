@@ -95,4 +95,3 @@ datacore:
 ckan:
   url: https://opendata.ozwillo.com
   apikey: your-ckan-api-key
-
