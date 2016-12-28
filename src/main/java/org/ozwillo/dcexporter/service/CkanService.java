@@ -69,20 +69,22 @@ public class CkanService {
             ckanDataset.setMaintainerEmail("contact@ozwillo.org");
             ckanDataset.setOpen(true);
             ckanDataset.setOwnerOrg(ckanOrganization.getId());
-            ckanDataset.setTitle(dcModelMapping.getResourceName());
+            ckanDataset.setTitle(dcModelMapping.getName());
             ckanDataset.setPriv(false);
 
             return ckanClient.createDataset(ckanDataset);
         } else {
+            //Temporarily Solution for update dataset on CKAN
             CkanOrganization ckanOrganization = ckanClient.getOrganization("ozwillo");
             ckanDataset = new CkanDataset(dcModelMapping.getName());
             ckanDataset.setOrganization(ckanOrganization);
             ckanDataset.setMaintainer("ozwillo");
             ckanDataset.setMaintainerEmail("contact@ozwillo.org");
             ckanDataset.setOwnerOrg(ckanOrganization.getId());
-            ckanDataset.setTitle(dcModelMapping.getResourceName());
+            ckanDataset.setTitle(dcModelMapping.getName());
             ckanDataset.setLicenseTitle(dcModelMapping.getLicense());
             ckanDataset.setUrl(dcModelMapping.getSource());
+            ckanDataset.setOpen(true);
             ckanDataset.setVersion(dcModelMapping.getVersion());
             ckanDataset.setTags(dcModelMapping.getTags());
             ckanDataset.setPriv(false);
