@@ -5,10 +5,13 @@ import eu.trentorise.opendata.jackan.model.CkanDatasetBase;
 import eu.trentorise.opendata.jackan.model.CkanTag;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+@Document
 public class DcModelMapping {
 
     @Id
@@ -53,6 +56,9 @@ public class DcModelMapping {
     private String ckanPackageId;
 
     private String ckanResourceId;
+
+    @JsonProperty
+    private SynchronizerAuditLog synchronizerAuditLog;
 
     public DcModelMapping() {
     }
@@ -173,6 +179,14 @@ public class DcModelMapping {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public SynchronizerAuditLog getSynchronizerAuditLog() {
+        return synchronizerAuditLog;
+    }
+
+    public void setSynchronizerAuditLog(SynchronizerAuditLog synchronizerAuditLog) {
+        this.synchronizerAuditLog = synchronizerAuditLog;
     }
 
     @Override

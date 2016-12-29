@@ -3,9 +3,11 @@ package org.ozwillo.dcexporter.model;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
 
+@Document
 public class SynchronizerAuditLog {
 
     @Id

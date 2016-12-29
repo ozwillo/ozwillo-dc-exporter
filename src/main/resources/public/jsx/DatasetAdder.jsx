@@ -52,7 +52,7 @@ export default class DatasetAdder extends React.Component {
             }
         })
         console.log(JSON.stringify(fields))
-        fetch('/api/dc-model-mapping', {
+        fetch('/api/dc-exporter/models', {
             method: 'POST',
             credentials: 'same-origin',
             headers: {
