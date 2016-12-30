@@ -11,14 +11,14 @@ const PanelGroup = ({children}) =>
     </div>
 
 const Panel = ({log}) =>
-    <div className="panel panel-success">
+    <div className={log.synchronizerAuditLog.sync ? "panel panel-success" : " panel panel-warning"}>
         <div className="panel-heading">
             <div className="row">
                 <div className="col-md-9">
                     <h3 className="panel-title">{log.name}</h3>
                 </div>
                 <div className="col-md-3">
-                    {log.synchronizerAuditLog.date}<span className="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                    {log.synchronizerAuditLog.date}<span className={log.synchronizerAuditLog.sync ? "glyphicon glyphicon-ok" :"glyphicon glyphicon-warning-sign"} aria-hidden="true"></span>
                 </div>
             </div>
         </div>
