@@ -19,13 +19,18 @@ public class SynchronizerAuditLog {
 
     @NotNull
     @NotEmpty
+    private Boolean sync;
+
+    @NotNull
+    @NotEmpty
     private DateTime date;
 
     public SynchronizerAuditLog() {
     }
 
-    public SynchronizerAuditLog(String type, DateTime date) {
+    public SynchronizerAuditLog(String type,Boolean sync, DateTime date) {
         this.type = type;
+        this.sync = sync;
         this.date = date;
     }
 
@@ -45,6 +50,14 @@ public class SynchronizerAuditLog {
         this.type = type;
     }
 
+    public Boolean getSync() {
+        return sync;
+    }
+
+    public void setSync(Boolean sync) {
+        this.sync = sync;
+    }
+
     public DateTime getDate() {
         return date;
     }
@@ -56,9 +69,10 @@ public class SynchronizerAuditLog {
     @Override
     public String toString() {
         return "SynchronizerAuditLog{" +
-            "id='" + id + '\'' +
-            ", type='" + type + '\'' +
-            ", date=" + date +
-            '}';
+                "id='" + id + '\'' +
+                ", type='" + type + '\'' +
+                ", syncj=" + sync +
+                ", date=" + date +
+                '}';
     }
 }
