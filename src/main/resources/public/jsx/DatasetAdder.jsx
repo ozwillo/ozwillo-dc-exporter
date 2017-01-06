@@ -4,6 +4,8 @@ import renderIf from 'render-if'
 
 import { WithContext as ReactTags } from 'react-tag-input'
 
+import Autosuggest from 'react-bootstrap-autosuggest'
+
 import tagStyles from '../reactTags.css'
 
 import { Form, FormGroup, Label, SelectField, InputText, Textarea, SubmitButton } from './Form'
@@ -64,7 +66,7 @@ export default class DatasetAdder extends React.Component {
             <div>
                 <h1>Dataset registration</h1>
                 <DatasetChooser dcId={this.state.dcId} onDatasetSelected={this.onDatasetSelected}
-                    datasets={this.state.datasets} />
+                                datasets={this.state.datasets} />
                 {renderIf(this.state.dcId)(
                     <div>
                         <Version version={this.state.version} />
@@ -129,11 +131,18 @@ class DatasetConfigurer extends React.Component {
                 license: '',
                 source: '',
                 tags: []
-            }
+            },
+            datasetsCkan: []
         }
         this.onFieldChange = this.onFieldChange.bind(this)
         this.handleAddition = this.handleAddition.bind(this)
         this.handleDelete = this.handleDelete.bind(this)
+        this.onNameChange = this.onNameChange.bind(this)
+    }
+    componentDidMount() {
+        fetch('/api/ckan/datasets', {credentials: 'same-origin'})
+            .then(response => response.json())
+            .then(json => this.setState({datasetsCkan: json}))
     }
     onFieldChange(id, value) {
         const fields = this.state.fields
@@ -153,27 +162,31 @@ class DatasetConfigurer extends React.Component {
         })
         this.onFieldChange('tags', tags)
     }
+    onNameChange(value){
+        this.onFieldChange("name",value)
+    }
+
     render() {
         return (
             <Form>
-                <FormGroup>
-                    <Label htmlFor="name" value="Name" />
-                    <InputText id="name" value={this.state.name}
-                               onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
-                </FormGroup>
+                <InputAutocomplet
+                    suggestions={this.state.datasetsCkan}
+                    onChange={this.onNameChange}
+                    value={this.state.fields.name}
+                />
                 <FormGroup>
                     <Label htmlFor="resourceName" value="Resource Name" />
-                    <InputText id="resourceName" value={this.state.resourceName}
+                    <InputText id="resourceName" value={this.state.fields.resourceName}
                                onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
                 </FormGroup>
                 <FormGroup>
                     <Label htmlFor="description" value="Description" />
-                    <Textarea id="description" value={this.state.description}
-                               onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
+                    <Textarea id="description" value={this.state.fields.description}
+                              onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
                 </FormGroup>
                 <FormGroup>
                     <Label htmlFor="source" value="Source" />
-                    <InputText id="source" value={this.state.source}
+                    <InputText id="source" value={this.state.fields.source}
                                onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
                 </FormGroup>
                 <LicenceChooser licenses={this.props.licenses} currentLicense={this.state.fields['license']}
@@ -217,4 +230,26 @@ const TagAutocomplet = ({ tags, suggestions, handleDelete, handleAddition}) => {
                        handleAddition={handleAddition}/>
         </FormGroup>
     )
+}
+
+const InputAutocomplet = ({ suggestions, value, onChange}) => {
+    return (
+        <FormGroup>
+            <Label htmlFor="name" value="Name"/>
+            <div className="col-sm-8">
+                <Autosuggest
+                    datalist={suggestions}
+                    onChange={onChange}
+                    value={value}
+                    className={"col-sm-8"}
+                />
+            </div>
+        </FormGroup>
+    )
+}
+
+InputAutocomplet.PropTypes = {
+    suggestions: React.PropTypes.array.isRequired,
+    value: React.PropTypes.string.isRequired,
+    onChange: React.PropTypes.func.isRequired
 }

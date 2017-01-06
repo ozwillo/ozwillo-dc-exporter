@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -22,4 +23,7 @@ public class CkanController {
 
     @RequestMapping(value = "/tags", method = RequestMethod.GET)
     public Map<String, String> getTags() { return ckanService.getTags(); }
+
+    @RequestMapping(value = "/datasets", method = RequestMethod.GET)
+    public List<String> getDatasets() { return ckanService.getDatasets(); }
 }
