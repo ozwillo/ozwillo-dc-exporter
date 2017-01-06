@@ -27,10 +27,14 @@ const common = {
             jQuery: 'jquery',
             'Promise': 'es6-promise', // Thanks Aaron (https://gist.github.com/Couto/b29676dd1ab8714a818f#gistcomment-1584602)
             'fetch': 'imports?this=>global!exports?global.fetch!whatwg-fetch'
-        })
+        }),
+        new ExtractTextPlugin('styles.css', { allChunks: true })
     ],
     resolve: {
-        extensions: [ '', '.js', '.jsx' ]
+        extensions: [ '', '.js', '.jsx' ],
+        alias: {
+            'Autosuggest.scss': path.resolve(__dirname, 'node_modules/react-bootstrap-autosuggest/src/Autosuggest.scss')
+        }
     },
     module: {
         loaders: [
@@ -72,8 +76,17 @@ if(TARGET === 'start' || !TARGET) {
             loaders: [
                 {test: /\.css$/, loaders: ['style', 'css', 'postcss']},
                 /* loaders for Bootstrap */
-                {test: /\.scss$/, loaders: ['style', 'css', 'postcss', 'sass']}
+                {test: /\.scss$/, loaders: ['style', 'css', 'postcss', 'sass']},
+                {
+                    test: /\.scss$/,
+                    loader: ExtractTextPlugin.extract('style', 'css!sass?includePaths[]=./node_modules/bootstrap-sass/assets/stylesheets')
+                }
             ]
+        },
+        resolve: {
+            alias: {
+                'Autosuggest.scss': path.resolve(__dirname, 'node_modules/react-bootstrap-autosuggest/src/Autosuggest.scss')
+            }
         }
     });
 }

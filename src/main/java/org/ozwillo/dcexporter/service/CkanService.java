@@ -33,6 +33,11 @@ public class CkanService {
     @Value("${ckan.apikey:apikey}")
     private String ckanApiKey;
 
+    public List<String> getDatasets() {
+        CkanClient ckanClient = new CkanClient(ckanUrl);
+        return ckanClient.getDatasetList();
+    }
+
     public Map<String, String> getLicences() {
         CkanClient ckanClient = new CkanClient(ckanUrl);
         List<CkanLicense> licenses = ckanClient.getLicenseList();
@@ -69,7 +74,11 @@ public class CkanService {
             ckanDataset.setMaintainerEmail("contact@ozwillo.org");
             ckanDataset.setOpen(true);
             ckanDataset.setOwnerOrg(ckanOrganization.getId());
-            ckanDataset.setTitle(dcModelMapping.getName());
+            ckanDataset.setTitle(dcModelMapping.getResourceName());
+            ckanDataset.setLicenseTitle(dcModelMapping.getLicense());
+            ckanDataset.setUrl(dcModelMapping.getSource());
+            ckanDataset.setVersion(dcModelMapping.getVersion());
+            ckanDataset.setTags(dcModelMapping.getTags());
             ckanDataset.setPriv(false);
 
             return ckanClient.createDataset(ckanDataset);
@@ -79,6 +88,7 @@ public class CkanService {
             ckanDataset.setOrganization(ckanOrganization);
             ckanDataset.setMaintainer("ozwillo");
             ckanDataset.setMaintainerEmail("contact@ozwillo.org");
+            ckanDataset.setOpen(true);
             ckanDataset.setOwnerOrg(ckanOrganization.getId());
             ckanDataset.setTitle(dcModelMapping.getResourceName());
             ckanDataset.setLicenseTitle(dcModelMapping.getLicense());
