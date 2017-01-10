@@ -28,7 +28,7 @@ public class DcModelMappingController {
     public ResponseEntity<String> addMapping(@RequestBody DcModelMapping dcModelMapping) {
         if (dcModelMappingRepository.findByDcId(dcModelMapping.getDcId()) == null) {
             CkanDataset ckanDataset = ckanService.getOrCreateDataset(dcModelMapping);
-            CkanResource ckanResource = ckanService.createResource(ckanDataset.getId(), dcModelMapping.getResourceName());
+            CkanResource ckanResource = ckanService.createResource(ckanDataset.getId(), dcModelMapping.getResourceName(), dcModelMapping.getDescription());
 
             dcModelMapping.setCkanPackageId(ckanDataset.getId());
             dcModelMapping.setCkanResourceId(ckanResource.getId());

@@ -67,14 +67,16 @@ public class CkanService {
         }
 
         if (ckanDataset == null) {
+            String name = dcModelMapping.getName().replaceAll(" ", "-").toLowerCase();
+            LOGGER.debug("Dataset {} creating id", name);
             CkanOrganization ckanOrganization = ckanClient.getOrganization("ozwillo");
-            ckanDataset = new CkanDataset(dcModelMapping.getName());
+            ckanDataset = new CkanDataset(name);
             ckanDataset.setOrganization(ckanOrganization);
             ckanDataset.setMaintainer("ozwillo");
             ckanDataset.setMaintainerEmail("contact@ozwillo.org");
             ckanDataset.setOpen(true);
             ckanDataset.setOwnerOrg(ckanOrganization.getId());
-            ckanDataset.setTitle(dcModelMapping.getResourceName());
+            ckanDataset.setTitle(dcModelMapping.getName());
             ckanDataset.setLicenseTitle(dcModelMapping.getLicense());
             ckanDataset.setUrl(dcModelMapping.getSource());
             ckanDataset.setVersion(dcModelMapping.getVersion());
@@ -90,7 +92,7 @@ public class CkanService {
             ckanDataset.setMaintainerEmail("contact@ozwillo.org");
             ckanDataset.setOpen(true);
             ckanDataset.setOwnerOrg(ckanOrganization.getId());
-            ckanDataset.setTitle(dcModelMapping.getResourceName());
+            ckanDataset.setTitle(dcModelMapping.getName());
             ckanDataset.setLicenseTitle(dcModelMapping.getLicense());
             ckanDataset.setUrl(dcModelMapping.getSource());
             ckanDataset.setVersion(dcModelMapping.getVersion());
@@ -100,11 +102,12 @@ public class CkanService {
         }
     }
 
-    public CkanResource createResource(String packageId, String name) {
+    public CkanResource createResource(String packageId, String name,String description) {
         CkanClient ckanClient = new CkanClient(ckanUrl, ckanApiKey);
 
         CkanResource ckanResource = new CkanResource();
         ckanResource.setPackageId(packageId);
+        ckanResource.setDescription(description);
         ckanResource.setName(name);
         ckanResource.setUrl("upload");
 
