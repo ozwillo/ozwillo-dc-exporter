@@ -169,7 +169,7 @@ class DatasetConfigurer extends React.Component {
     render() {
         return (
             <Form>
-                <InputAutocomplet
+                <InputAutocomplete
                     suggestions={this.state.datasetsCkan}
                     onChange={this.onNameChange}
                     value={this.state.fields.name}
@@ -191,7 +191,7 @@ class DatasetConfigurer extends React.Component {
                 </FormGroup>
                 <LicenceChooser licenses={this.props.licenses} currentLicense={this.state.fields['license']}
                                 onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
-                <TagAutocomplet tags={this.state.fields['tags']} suggestions={this.props.suggestions}
+                <TagAutocomplete tags={this.state.fields['tags']} suggestions={this.props.suggestions}
                                 handleAddition={this.handleAddition} handleDelete={this.handleDelete} />
                 <SubmitButton label="Create" onClick={(event) => this.props.onSubmit(this.state.fields)} />
             </Form>
@@ -217,7 +217,7 @@ const LicenceChooser = ({ licenses, currentLicense, onChange }) => {
     )
 }
 
-const TagAutocomplet = ({ tags, suggestions, handleDelete, handleAddition}) => {
+const TagAutocomplete = ({ tags, suggestions, handleDelete, handleAddition}) => {
     let tabSuggestions = Object.keys(suggestions).map(key =>
         suggestions[key]
     )
@@ -232,7 +232,7 @@ const TagAutocomplet = ({ tags, suggestions, handleDelete, handleAddition}) => {
     )
 }
 
-const InputAutocomplet = ({ suggestions, value, onChange}) => {
+const InputAutocomplete = ({ suggestions, value, onChange}) => {
     return (
         <FormGroup>
             <Label htmlFor="name" value="Name"/>
@@ -248,7 +248,7 @@ const InputAutocomplet = ({ suggestions, value, onChange}) => {
     )
 }
 
-InputAutocomplet.PropTypes = {
+InputAutocomplete.PropTypes = {
     suggestions: React.PropTypes.array.isRequired,
     value: React.PropTypes.string.isRequired,
     onChange: React.PropTypes.func.isRequired

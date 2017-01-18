@@ -70,13 +70,7 @@ public class SynchronizerService {
         }
 
         String resourceCsvFile = optionalResourceCsvFile.get();
-        try{
-            ckanService.updateResourceData(dcModelMapping.getCkanPackageId(), dcModelMapping.getCkanResourceId(), resourceCsvFile);
-        }catch (IOException e){
-            LOGGER.error("Did not update ResourceData, Exception : {}", e.getMessage());
-            return "KO";
-        }
-
+        ckanService.updateResourceData(dcModelMapping, resourceCsvFile);
 
         return "OK";
     }

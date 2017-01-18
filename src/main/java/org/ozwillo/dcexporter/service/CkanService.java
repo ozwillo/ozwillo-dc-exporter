@@ -13,14 +13,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
+
+import static com.sun.deploy.util.StringUtils.trimWhitespace;
+import static org.apache.commons.lang3.StringUtils.stripAccents;
 
 @Service
 public class CkanService {
@@ -67,7 +65,7 @@ public class CkanService {
         }
 
         if (ckanDataset == null) {
-            String name = dcModelMapping.getName().replaceAll(" ", "-").toLowerCase();
+            String name = stripAccents(trimWhitespace(dcModelMapping.getName()).replaceAll(" ", "-").toLowerCase());
             LOGGER.debug("Dataset {} creating id", name);
             CkanOrganization ckanOrganization = ckanClient.getOrganization("ozwillo");
             ckanDataset = new CkanDataset(name);
@@ -77,7 +75,7 @@ public class CkanService {
             ckanDataset.setOpen(true);
             ckanDataset.setOwnerOrg(ckanOrganization.getId());
             ckanDataset.setTitle(dcModelMapping.getName());
-            ckanDataset.setLicenseTitle(dcModelMapping.getLicense());
+            ckanDataset.setLicenseId(dcModelMapping.getLicense());
             ckanDataset.setUrl(dcModelMapping.getSource());
             ckanDataset.setVersion(dcModelMapping.getVersion());
             ckanDataset.setTags(dcModelMapping.getTags());
@@ -85,6 +83,7 @@ public class CkanService {
 
             return ckanClient.createDataset(ckanDataset);
         } else {
+            String title = dcModelMapping.getName().replaceAll("-", " ");
             CkanOrganization ckanOrganization = ckanClient.getOrganization("ozwillo");
             ckanDataset = new CkanDataset(dcModelMapping.getName());
             ckanDataset.setOrganization(ckanOrganization);
@@ -92,8 +91,8 @@ public class CkanService {
             ckanDataset.setMaintainerEmail("contact@ozwillo.org");
             ckanDataset.setOpen(true);
             ckanDataset.setOwnerOrg(ckanOrganization.getId());
-            ckanDataset.setTitle(dcModelMapping.getName());
-            ckanDataset.setLicenseTitle(dcModelMapping.getLicense());
+            ckanDataset.setTitle(title);
+            ckanDataset.setLicenseId(dcModelMapping.getLicense());
             ckanDataset.setUrl(dcModelMapping.getSource());
             ckanDataset.setVersion(dcModelMapping.getVersion());
             ckanDataset.setTags(dcModelMapping.getTags());
@@ -114,30 +113,23 @@ public class CkanService {
         return ckanClient.createResource(ckanResource);
     }
 
-    public void updateResourceData(String packageId, String id, String resource) throws IOException {
+    public void updateResourceData(DcModelMapping dcModelMapping, String resource) {
         CkanClient ckanClient = new CheckedCkanClient(ckanUrl, ckanApiKey);
-        //We create a file waiting to modify the "setUpload" function in jackan
-        File resourceFile = null;
-
-        resourceFile = File.createTempFile("export-", ".csv");
-        LOGGER.debug("Writing data in temp file {}", resourceFile.getAbsolutePath());
-        FileWriter resourceFileWriter = new FileWriter(resourceFile, true);
-        resourceFileWriter.write(resource);
-        resourceFileWriter.flush();
-        resourceFileWriter.close();
 
 
         CkanResourceBase ckanResourceBase = new CkanResourceBase();
-        ckanResourceBase.setPackageId(packageId);
+        ckanResourceBase.setPackageId(dcModelMapping.getCkanPackageId());
         ckanResourceBase.setUrl("upload");
-        ckanResourceBase.setId(id);
-        // TODO: Change the "setUpload" function to set an "inputstream" object in jackan(External Libraries)
-        ckanResourceBase.setUpload(resourceFile, true);
+        ckanResourceBase.setFormat("CSV");
+        ckanResourceBase.setMimetype("text/csv");
+        ckanResourceBase.setName("file.csv");
+        ckanResourceBase.setDescription(dcModelMapping.getDescription());
+        ckanResourceBase.setId(dcModelMapping.getCkanResourceId());
+        ckanResourceBase.setUploadByte(resource.getBytes());
 
         DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateHourMinuteSecondMillis();
         ckanResourceBase.setLastModified(dateTimeFormatter.print(LocalDateTime.now()));
 
         ckanClient.updateResourceData(ckanResourceBase);
-        resourceFile.delete();
     }
 }
