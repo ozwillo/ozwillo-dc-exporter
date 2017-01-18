@@ -70,7 +70,7 @@ public class SynchronizerService {
 
         String resourceCsvFile = optionalResourceCsvFile.get();
 
-        ckanService.updateResourceData(dcModelMapping.getCkanPackageId(), dcModelMapping.getCkanResourceId(), resourceCsvFile);
+        ckanService.updateResourceData(dcModelMapping, resourceCsvFile);
 
         return "OK";
     }
