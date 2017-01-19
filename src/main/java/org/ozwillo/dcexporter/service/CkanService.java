@@ -13,12 +13,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.text.Normalizer;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static com.sun.deploy.util.StringUtils.trimWhitespace;
-import static org.apache.commons.lang3.StringUtils.stripAccents;
 
 @Service
 public class CkanService {
@@ -65,7 +63,7 @@ public class CkanService {
         }
 
         if (ckanDataset == null) {
-            String name = stripAccents(trimWhitespace(dcModelMapping.getName()).replaceAll(" ", "-").toLowerCase());
+            String name = this.slugify(dcModelMapping.getName());
             LOGGER.debug("Dataset {} creating id", name);
             CkanOrganization ckanOrganization = ckanClient.getOrganization("ozwillo");
             ckanDataset = new CkanDataset(name);
@@ -83,7 +81,6 @@ public class CkanService {
 
             return ckanClient.createDataset(ckanDataset);
         } else {
-            String title = dcModelMapping.getName().replaceAll("-", " ");
             CkanOrganization ckanOrganization = ckanClient.getOrganization("ozwillo");
             ckanDataset = new CkanDataset(dcModelMapping.getName());
             ckanDataset.setOrganization(ckanOrganization);
@@ -91,7 +88,6 @@ public class CkanService {
             ckanDataset.setMaintainerEmail("contact@ozwillo.org");
             ckanDataset.setOpen(true);
             ckanDataset.setOwnerOrg(ckanOrganization.getId());
-            ckanDataset.setTitle(title);
             ckanDataset.setLicenseId(dcModelMapping.getLicense());
             ckanDataset.setUrl(dcModelMapping.getSource());
             ckanDataset.setVersion(dcModelMapping.getVersion());
@@ -131,5 +127,18 @@ public class CkanService {
         ckanResourceBase.setLastModified(dateTimeFormatter.print(LocalDateTime.now()));
 
         ckanClient.updateResourceData(ckanResourceBase);
+    }
+
+    private String slugify(String input) {
+        // Decompose unicode characters
+        return Normalizer.normalize(input.toLowerCase(), Normalizer.Form.NFD)
+                // replace all combining diacritical marks and also everything that isn't a word or a whitespace character
+                .replaceAll("\\p{InCombiningDiacriticalMarks}|[^\\w\\s]", "")
+                // replace all occurences of whitespaces or dashes with one single whitespace
+                .replaceAll("[\\s-]+", " ")
+                // trim the string
+                .trim()
+                // and replace all blanks with a dash
+                .replaceAll("\\s", "-");
     }
 }
