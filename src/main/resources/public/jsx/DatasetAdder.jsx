@@ -43,6 +43,7 @@ export default class DatasetAdder extends React.Component {
         fields['dcId'] = this.state.dcId
         fields['type'] = this.state.type
         fields['project'] = this.state.project
+        fields['version'] = this.state.version
         fields['tags'] = fields['tags'].map(tag => {
             for( var suggestion of Object.entries(suggestions)) {
                 if (tag.text === suggestion[1] ){
