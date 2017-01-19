@@ -39,17 +39,12 @@ export default class DatasetAdder extends React.Component {
         this.setState({ type: dataset['dcmo:name'], version: dataset['o:version'], project: dataset['dcmo:pointOfViewAbsoluteName'], dcId: dcId })
     }
     registerDataset(fields) {
-        const suggestions = this.state.suggestions
         fields['dcId'] = this.state.dcId
         fields['type'] = this.state.type
         fields['project'] = this.state.project
         fields['version'] = this.state.version
         fields['tags'] = fields['tags'].map(tag => {
-            for( var suggestion of Object.entries(suggestions)) {
-                if (tag.text === suggestion[1] ){
-                    return {id:suggestion[0], name:suggestion[1]}
-                }
-            }
+                    return {name: tag.text}
         })
         fetch('/api/dc-model-mapping', {
             method: 'POST',
