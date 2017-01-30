@@ -1,7 +1,6 @@
 package org.ozwillo.dcexporter.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import eu.trentorise.opendata.jackan.model.CkanDatasetBase;
 import eu.trentorise.opendata.jackan.model.CkanTag;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
