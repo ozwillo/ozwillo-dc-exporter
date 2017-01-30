@@ -1,5 +1,6 @@
 package org.ozwillo.dcexporter.controller;
 
+import eu.trentorise.opendata.jackan.exceptions.CkanException;
 import eu.trentorise.opendata.jackan.model.CkanDataset;
 import eu.trentorise.opendata.jackan.model.CkanResource;
 import org.ozwillo.dcexporter.dao.DcModelMappingRepository;
@@ -27,15 +28,20 @@ public class DcModelMappingController {
     @RequestMapping(method = POST)
     public ResponseEntity<String> addMapping(@RequestBody DcModelMapping dcModelMapping) {
         if (dcModelMappingRepository.findByDcId(dcModelMapping.getDcId()) == null) {
-            CkanDataset ckanDataset = ckanService.getOrCreateDataset(dcModelMapping);
+            CkanDataset ckanDataset = null;
+            try{
+                ckanDataset = ckanService.getOrCreateDataset(dcModelMapping);
+            }catch (CkanException e){
+                return new ResponseEntity(e.getCkanResponse(),HttpStatus.CONFLICT);
+            }
             CkanResource ckanResource = ckanService.createResource(ckanDataset.getId(), dcModelMapping.getResourceName(), dcModelMapping.getDescription());
 
             dcModelMapping.setCkanPackageId(ckanDataset.getId());
             dcModelMapping.setCkanResourceId(ckanResource.getId());
 
             dcModelMappingRepository.save(dcModelMapping);
-            return new ResponseEntity<>(HttpStatus.CREATED);
+            return new ResponseEntity(HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(HttpStatus.CONFLICT);
+        return new ResponseEntity("{\"success\":false ,\"error\":{\"name\":[\"this dataset is already synchronized\"]}}",HttpStatus.CONFLICT);
     }
 }
