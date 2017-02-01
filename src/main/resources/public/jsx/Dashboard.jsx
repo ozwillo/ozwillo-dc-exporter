@@ -16,7 +16,7 @@ export default class Dashboard extends React.Component {
             <Panel key={log.dcModelMapping.name} log={log}/>
         )
         return (
-            <div id="container">
+            <div id="container" className="col-sm-10">
                 <h1>Dashboard</h1>
                 <ContainerPanel>
                     <PanelGroup>{list}</PanelGroup>

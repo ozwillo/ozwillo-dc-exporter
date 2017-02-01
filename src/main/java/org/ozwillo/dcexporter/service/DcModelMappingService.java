@@ -9,9 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class DcModelMappingService {
@@ -37,7 +35,7 @@ public class DcModelMappingService {
                 LOGGER.info("Found a mapping without audit logs : {}", dcModelMapping.getName());
             }
         });
-        Collections.reverse(dcModelMappingListWithLog);
+        Collections.sort(dcModelMappingListWithLog, Collections.reverseOrder());
         return dcModelMappingListWithLog;
     }
 }

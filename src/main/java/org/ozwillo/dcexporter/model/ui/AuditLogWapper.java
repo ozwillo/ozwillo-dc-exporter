@@ -8,7 +8,7 @@ import org.ozwillo.dcexporter.model.SynchronizerAuditLog;
 
 import javax.validation.constraints.NotNull;
 
-public class AuditLogWapper {
+public class AuditLogWapper implements Comparable<AuditLogWapper>{
 
     @JsonProperty
     @NotNull
@@ -31,5 +31,12 @@ public class AuditLogWapper {
 
     public SynchronizerAuditLog getSynchronizerAuditLog() {
         return synchronizerAuditLog;
+    }
+
+    @Override
+    public int compareTo(AuditLogWapper auditLogWapper) {
+        if (this.synchronizerAuditLog.getDate() == null || auditLogWapper.synchronizerAuditLog.getDate() == null)
+            return 0;
+        return this.synchronizerAuditLog.getDate().compareTo(auditLogWapper.synchronizerAuditLog.getDate());
     }
 }

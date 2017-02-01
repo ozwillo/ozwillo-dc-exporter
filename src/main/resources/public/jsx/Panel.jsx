@@ -11,14 +11,14 @@ const PanelGroup = ({children}) =>
     </div>
 
 const Panel = ({log}) =>
-    <div className="panel panel-success">
+    <div className={log.synchronizerAuditLog.succeeded ? "panel panel-success" : "panel panel-warning"}>
         <div className="panel-heading">
             <div className="row">
                 <div className="col-md-9">
                     <h3 className="panel-title">{log.dcModelMapping.name}</h3>
                 </div>
                 <div className="col-md-3">
-                    {new Date(log.synchronizerAuditLog.date).toUTCString()}<span className={"glyphicon glyphicon-ok"} aria-hidden="true"></span>
+                    {new Date(log.synchronizerAuditLog.date).toUTCString()}<span className={log.synchronizerAuditLog.succeeded ? "glyphicon glyphicon-ok" :"glyphicon glyphicon-warning-sign"} aria-hidden="true"></span>
                 </div>
             </div>
         </div>
