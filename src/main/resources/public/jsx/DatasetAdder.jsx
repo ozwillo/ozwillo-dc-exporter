@@ -56,7 +56,7 @@ export default class DatasetAdder extends React.Component {
         fields['tags'] = fields['tags'].map(tag => {
                     return {name: tag.text}
         })
-        fetch('/api/dc-model-mapping', {
+        fetch('/api/dc-model-mapping/models', {
             method: 'POST',
             credentials: 'same-origin',
             headers: {

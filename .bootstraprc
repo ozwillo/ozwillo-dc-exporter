@@ -82,7 +82,7 @@ styles:
   progress-bars: false
   media: false
   list-group: true
-  panels: false
+  panels: true
   wells: false
   responsive-embed: false
   close: true
