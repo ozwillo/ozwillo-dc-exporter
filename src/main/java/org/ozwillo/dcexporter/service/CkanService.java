@@ -109,7 +109,7 @@ public class CkanService {
         return ckanClient.createResource(ckanResource);
     }
 
-    public void updateResourceData(DcModelMapping dcModelMapping, String resource) {
+    public Boolean updateResourceData(DcModelMapping dcModelMapping, String resource) {
         CkanClient ckanClient = new CheckedCkanClient(ckanUrl, ckanApiKey);
 
 
@@ -126,7 +126,12 @@ public class CkanService {
         DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateHourMinuteSecondMillis();
         ckanResourceBase.setLastModified(dateTimeFormatter.print(LocalDateTime.now()));
 
-        ckanClient.updateResourceData(ckanResourceBase);
+        try{
+            ckanClient.updateResourceData(ckanResourceBase);
+            return true;
+        }catch(CkanException ckanException){
+            return false;
+        }
     }
 
     private String slugify(String input) {

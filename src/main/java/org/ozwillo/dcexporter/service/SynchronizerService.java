@@ -52,26 +52,24 @@ public class SynchronizerService {
                 }
 
                 LOGGER.info("Got some recent data for {}, synchronizing them", dcModelMapping.getType());
-                this.sync(dcModelMapping);
+                boolean succeeded = this.sync(dcModelMapping);
 
-                SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), DateTime.now());
+                SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), succeeded, DateTime.now());
                 synchronizerAuditLogRepository.save(newAuditLog);
             });
         });
     }
 
-    public String sync(DcModelMapping dcModelMapping) {
+    public Boolean sync(DcModelMapping dcModelMapping) {
         Optional<String> optionalResourceCsvFile =
                 datacoreService.exportResourceToCsv(dcModelMapping.getProject(), dcModelMapping.getType());
 
         if (!optionalResourceCsvFile.isPresent()) {
             LOGGER.error("Did not get the resource's CSV file, stopping");
-            return "KO";
+            return false;
         }
 
         String resourceCsvFile = optionalResourceCsvFile.get();
-        ckanService.updateResourceData(dcModelMapping, resourceCsvFile);
-
-        return "OK";
+        return ckanService.updateResourceData(dcModelMapping, resourceCsvFile);
     }
 }
