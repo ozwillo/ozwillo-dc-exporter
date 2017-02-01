@@ -17,13 +17,18 @@ public class SynchronizerAuditLog {
 
     @NotNull
     @NotEmpty
+    private boolean succeeded;
+
+    @NotNull
+    @NotEmpty
     private DateTime date;
 
     public SynchronizerAuditLog() {
     }
 
-    public SynchronizerAuditLog(String type, DateTime date) {
+    public SynchronizerAuditLog(String type, boolean succeeded, DateTime date) {
         this.type = type;
+        this.succeeded = succeeded;
         this.date = date;
     }
 
@@ -43,6 +48,10 @@ public class SynchronizerAuditLog {
         this.type = type;
     }
 
+    public boolean isSucceeded() {
+        return succeeded;
+    }
+
     public DateTime getDate() {
         return date;
     }
@@ -56,6 +65,7 @@ public class SynchronizerAuditLog {
         return "SynchronizerAuditLog{" +
             "id='" + id + '\'' +
             ", type='" + type + '\'' +
+            ", succeeded=" + succeeded + '\'' +
             ", date=" + date +
             '}';
     }
