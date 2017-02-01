@@ -46,7 +46,7 @@ public class CkanService {
         return tags.stream().collect(Collectors.toMap(CkanTag::getId, CkanTagBase::getName));
     }
 
-    public CkanDataset getOrCreateDataset(DcModelMapping dcModelMapping) {
+    public CkanDataset getOrCreateDataset(DcModelMapping dcModelMapping) throws CkanException {
         CkanClient ckanClient = new CkanClient(ckanUrl, ckanApiKey);
 
         CkanDataset ckanDataset = null;

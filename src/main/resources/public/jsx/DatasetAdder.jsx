@@ -8,16 +8,26 @@ import Autosuggest from 'react-bootstrap-autosuggest'
 
 import tagStyles from '../reactTags.css'
 
-import { Form, FormGroup, Label, SelectField, InputText, Textarea, SubmitButton } from './Form'
+import { Form, FormGroup, Label, SelectField, InputText, Textarea, SubmitButton, Alert } from './Form'
 
 export default class DatasetAdder extends React.Component {
     constructor(props) {
         super(props)
 
-        this.state = { dcId: '', type: '', datasets: [], licenses: {}, project: '', suggestions: [], version: ''}
+        this.state = { dcId: '', type: '', datasets: [], licenses: {}, project: '', suggestions: [], version: '', message: '', success: true}
 
         this.onDatasetSelected = this.onDatasetSelected.bind(this)
         this.registerDataset = this.registerDataset.bind(this)
+        this.checkStatus = this.checkStatus.bind(this)
+    }
+    checkStatus(response) {
+        if (response.status >= 200 && response.status < 300) {
+            this.setState({ success : true })
+            return response
+        } else {
+            this.setState({ success : false })
+            throw response
+        }
     }
     componentDidMount() {
         fetch('/api/dc/models', { credentials: 'same-origin' })
@@ -55,22 +65,33 @@ export default class DatasetAdder extends React.Component {
             },
             body: JSON.stringify(fields)
         })
-            .catch(error => console.log(error.message))
+        .then(this.checkStatus)
+        .then(() => this.setState({ updated: true, message: 'Dataset mapping created' }))
+        .catch(response => {
+            response.text().then(text => this.setState({ message: text }))
+        })
     }
     render() {
         return (
-            <div>
+            <div  id="container" className="col-sm-10">
                 <h1>Dataset registration</h1>
-                <DatasetChooser dcId={this.state.dcId} onDatasetSelected={this.onDatasetSelected}
-                                datasets={this.state.datasets} />
-                {renderIf(this.state.dcId)(
-                    <div>
-                        <Version version={this.state.version} />
-                        <DatasetConfigurer onSubmit={this.registerDataset} licenses={this.state.licenses}
-                                           datasets={this.state.datasets} projects={this.state.projects}
-                                           suggestions={this.state.suggestions} />
-                    </div>
-                )}
+                <Form>
+                    {renderIf(this.state.message)(
+                        <FormGroup>
+                            <Alert message={this.state.message} success={this.state.success} />
+                        </FormGroup>
+                    )}
+                    <DatasetChooser dcId={this.state.dcId} onDatasetSelected={this.onDatasetSelected}
+                                    datasets={this.state.datasets} />
+                    {renderIf(this.state.dcId)(
+                        <div>
+                            <Version version={this.state.version} />
+                            <DatasetConfigurer onSubmit={this.registerDataset} licenses={this.state.licenses}
+                                               datasets={this.state.datasets} projects={this.state.projects}
+                                               suggestions={this.state.suggestions} />
+                        </div>
+                    )}
+                </Form>
             </div>
         )
     }
@@ -86,7 +107,6 @@ const DatasetChooser = ({ datasets, dcId, onDatasetSelected }) => {
         <option key={dataset['@id']} value={dataset['@id']}>{dataset['dcmo:name']}</option>
     )
     return (
-        <Form>
             <FormGroup>
                 <Label htmlFor="dcId" value="Choose a dataset"/>
                 <SelectField id="dcId" value={dcId}
@@ -94,7 +114,6 @@ const DatasetChooser = ({ datasets, dcId, onDatasetSelected }) => {
                     {options}
                 </SelectField>
             </FormGroup>
-        </Form>
     )
 }
 
@@ -106,12 +125,10 @@ DatasetChooser.propTypes = {
 
 const Version = ({ version }) => {
     return (
-        <Form>
             <FormGroup>
                 <Label htmlFor="version" value="Version" />
                 <InputText id="version" value={version}/>
             </FormGroup>
-        </Form>
     )
 }
 
@@ -164,7 +181,7 @@ class DatasetConfigurer extends React.Component {
 
     render() {
         return (
-            <Form>
+            <div>
                 <InputAutocomplete
                     suggestions={this.state.datasetsCkan}
                     onChange={this.onNameChange}
@@ -190,7 +207,7 @@ class DatasetConfigurer extends React.Component {
                 <TagAutocomplete tags={this.state.fields['tags']} suggestions={this.props.suggestions}
                                 handleAddition={this.handleAddition} handleDelete={this.handleDelete} />
                 <SubmitButton label="Create" onClick={(event) => this.props.onSubmit(this.state.fields)} />
-            </Form>
+            </div>
         )
     }
 }
@@ -232,12 +249,12 @@ const InputAutocomplete = ({ suggestions, value, onChange}) => {
     return (
         <FormGroup>
             <Label htmlFor="name" value="Name"/>
-            <div className="col-sm-8">
+            <div className="col-sm-10">
                 <Autosuggest
                     datalist={suggestions}
                     onChange={onChange}
                     value={value}
-                    className={"col-sm-8"}
+                    className={"col-sm-10"}
                 />
             </div>
         </FormGroup>
