@@ -11,7 +11,7 @@ const PanelGroup = ({children}) =>
     </div>
 
 const Panel = ({log}) =>
-    <div className={"panel panel-success"}>
+    <div className="panel panel-success">
         <div className="panel-heading">
             <div className="row">
                 <div className="col-md-9">

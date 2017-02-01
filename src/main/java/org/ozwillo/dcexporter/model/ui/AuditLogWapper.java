@@ -20,19 +20,16 @@ public class AuditLogWapper {
     @NotEmpty
     SynchronizerAuditLog synchronizerAuditLog;
 
+    public AuditLogWapper(DcModelMapping dcModelMapping, SynchronizerAuditLog synchronizerAuditLog) {
+        this.dcModelMapping = dcModelMapping;
+        this.synchronizerAuditLog = synchronizerAuditLog;
+    }
+
     public DcModelMapping getDcModelMapping() {
         return dcModelMapping;
     }
 
-    public void setDcModelMapping(DcModelMapping dcModelMapping) {
-        this.dcModelMapping = dcModelMapping;
-    }
-
     public SynchronizerAuditLog getSynchronizerAuditLog() {
         return synchronizerAuditLog;
-    }
-
-    public void setSynchronizerAuditLog(SynchronizerAuditLog synchronizerAuditLog) {
-        this.synchronizerAuditLog = synchronizerAuditLog;
     }
 }
