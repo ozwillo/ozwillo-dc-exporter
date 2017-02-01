@@ -14,7 +14,7 @@ export default class DatasetAdder extends React.Component {
     constructor(props) {
         super(props)
 
-        this.state = { dcId: '', type: '', datasets: [], licenses: {}, project: '', suggestions: [], version: '', message: '', success: ''}
+        this.state = { dcId: '', type: '', datasets: [], licenses: {}, project: '', suggestions: [], version: '', message: '', success: true}
 
         this.onDatasetSelected = this.onDatasetSelected.bind(this)
         this.registerDataset = this.registerDataset.bind(this)
@@ -22,10 +22,10 @@ export default class DatasetAdder extends React.Component {
     }
     checkStatus(response) {
         if (response.status >= 200 && response.status < 300) {
-            this.setState({success : "alert-success"})
+            this.setState({ success : true })
             return response
         } else {
-            this.setState({success : "alert-danger"})
+            this.setState({ success : false })
             throw response
         }
     }
@@ -65,20 +65,20 @@ export default class DatasetAdder extends React.Component {
             },
             body: JSON.stringify(fields)
         })
-            .then(this.checkStatus)
-            .then(() => this.setState({ updated: true, message: 'Dataset mapping created'}))
-            .catch(json => {
-                json.json().then(text => this.setState({ message: text.error.name[0]}))
-            })
+        .then(this.checkStatus)
+        .then(() => this.setState({ updated: true, message: 'Dataset mapping created' }))
+        .catch(response => {
+            response.text().then(text => this.setState({ message: text }))
+        })
     }
     render() {
         return (
             <div  id="container" className="col-sm-10">
                 <h1>Dataset registration</h1>
                 <Form>
-                    {renderIf(this.state.success || this.state.message)(
+                    {renderIf(this.state.message)(
                         <FormGroup>
-                            <Alert message={this.state.message} status={this.state.success} />
+                            <Alert message={this.state.message} success={this.state.success} />
                         </FormGroup>
                     )}
                     <DatasetChooser dcId={this.state.dcId} onDatasetSelected={this.onDatasetSelected}

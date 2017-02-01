@@ -37,10 +37,10 @@ const SubmitButton = ({ label, onClick }) =>
             <button type="button" className="btn btn-default" onClick={onClick}>{label}</button>
         </div>
     </div>
-const Alert = ({ message, status }) =>
+
+const Alert = ({ message, success }) =>
     <div className="col-sm-10 col-sm-offset-2">
-        <div></div>
-        <div className={"alert " + status} role="alert">
+        <div className={'alert ' + (success ? 'alert-success' : 'alert-danger')} role="alert">
             {message}
         </div>
     </div>

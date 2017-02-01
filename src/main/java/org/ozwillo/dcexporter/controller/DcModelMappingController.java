@@ -28,20 +28,25 @@ public class DcModelMappingController {
     @RequestMapping(method = POST)
     public ResponseEntity<String> addMapping(@RequestBody DcModelMapping dcModelMapping) {
         if (dcModelMappingRepository.findByDcId(dcModelMapping.getDcId()) == null) {
-            CkanDataset ckanDataset = null;
-            try{
+            CkanDataset ckanDataset;
+            try {
                 ckanDataset = ckanService.getOrCreateDataset(dcModelMapping);
-            }catch (CkanException e){
-                return new ResponseEntity(e.getCkanResponse(),HttpStatus.CONFLICT);
+            } catch (CkanException e) {
+                if (e.getCkanResponse() != null && e.getCkanResponse().getError() != null)
+                   return new ResponseEntity<>(e.getCkanResponse().getError().getMessage(), HttpStatus.CONFLICT);
+                else
+                    return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
             }
+
             CkanResource ckanResource = ckanService.createResource(ckanDataset.getId(), dcModelMapping.getResourceName(), dcModelMapping.getDescription());
 
             dcModelMapping.setCkanPackageId(ckanDataset.getId());
             dcModelMapping.setCkanResourceId(ckanResource.getId());
 
             dcModelMappingRepository.save(dcModelMapping);
-            return new ResponseEntity(HttpStatus.CREATED);
+            return new ResponseEntity<>(HttpStatus.CREATED);
         }
-        return new ResponseEntity("{\"success\":false ,\"error\":{\"name\":[\"this dataset is already synchronized\"]}}",HttpStatus.CONFLICT);
+
+        return new ResponseEntity<>("This dataset is already synchronized", HttpStatus.CONFLICT);
     }
 }
