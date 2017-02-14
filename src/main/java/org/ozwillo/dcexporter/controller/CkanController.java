@@ -1,5 +1,6 @@
 package org.ozwillo.dcexporter.controller;
 
+import eu.trentorise.opendata.jackan.model.CkanTag;
 import org.ozwillo.dcexporter.service.CkanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +23,7 @@ public class CkanController {
     }
 
     @RequestMapping(value = "/tags", method = RequestMethod.GET)
-    public Map<String, String> getTags() { return ckanService.getTags(); }
+    public List<CkanTag> getTags() { return ckanService.getTags(); }
 
     @RequestMapping(value = "/datasets", method = RequestMethod.GET)
     public List<String> getDatasets() { return ckanService.getDatasets(); }

@@ -31,10 +31,7 @@ const common = {
         new ExtractTextPlugin('styles.css', { allChunks: true })
     ],
     resolve: {
-        extensions: [ '', '.js', '.jsx' ],
-        alias: {
-            'Autosuggest.scss': path.resolve(__dirname, 'node_modules/react-bootstrap-autosuggest/src/Autosuggest.scss')
-        }
+        extensions: [ '', '.js', '.jsx' ]
     },
     module: {
         loaders: [
@@ -82,11 +79,6 @@ if(TARGET === 'start' || !TARGET) {
                     loader: ExtractTextPlugin.extract('style', 'css!sass?includePaths[]=./node_modules/bootstrap-sass/assets/stylesheets')
                 }
             ]
-        },
-        resolve: {
-            alias: {
-                'Autosuggest.scss': path.resolve(__dirname, 'node_modules/react-bootstrap-autosuggest/src/Autosuggest.scss')
-            }
         }
     });
 }

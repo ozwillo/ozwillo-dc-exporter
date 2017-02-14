@@ -40,10 +40,9 @@ public class CkanService {
         return licenses.stream().collect(Collectors.toMap(CkanLicense::getId, CkanLicense::getTitle));
     }
 
-    public Map<String, String> getTags() {
+    public List<CkanTag> getTags() {
         CkanClient ckanClient = new CkanClient(ckanUrl);
-        List<CkanTag> tags = ckanClient.getTagList();
-        return tags.stream().collect(Collectors.toMap(CkanTag::getId, CkanTagBase::getName));
+        return ckanClient.getTagList();
     }
 
     public CkanDataset getOrCreateDataset(DcModelMapping dcModelMapping) throws CkanException {
