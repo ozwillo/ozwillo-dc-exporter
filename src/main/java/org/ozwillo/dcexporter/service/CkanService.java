@@ -108,7 +108,7 @@ public class CkanService {
         return ckanClient.createResource(ckanResource);
     }
 
-    public Boolean updateResourceData(DcModelMapping dcModelMapping, String resource) {
+    public void updateResourceData(DcModelMapping dcModelMapping, String resource) throws Exception {
         CkanClient ckanClient = new CheckedCkanClient(ckanUrl, ckanApiKey);
 
 
@@ -127,9 +127,8 @@ public class CkanService {
 
         try{
             ckanClient.updateResourceData(ckanResourceBase);
-            return true;
         }catch(CkanException ckanException){
-            return false;
+            throw new Exception(ckanException.getCkanResponse().getError().getMessage());
         }
     }
 

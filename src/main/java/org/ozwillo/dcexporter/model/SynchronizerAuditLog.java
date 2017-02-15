@@ -21,14 +21,19 @@ public class SynchronizerAuditLog {
 
     @NotNull
     @NotEmpty
+    private String message;
+
+    @NotNull
+    @NotEmpty
     private DateTime date;
 
     public SynchronizerAuditLog() {
     }
 
-    public SynchronizerAuditLog(String type, boolean succeeded, DateTime date) {
+    public SynchronizerAuditLog(String type, boolean succeeded, String message, DateTime date) {
         this.type = type;
         this.succeeded = succeeded;
+        this.message = message;
         this.date = date;
     }
 
@@ -52,6 +57,18 @@ public class SynchronizerAuditLog {
         return succeeded;
     }
 
+    public void setSucceeded(boolean succeeded) {
+        this.succeeded = succeeded;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     public DateTime getDate() {
         return date;
     }
@@ -66,6 +83,7 @@ public class SynchronizerAuditLog {
             "id='" + id + '\'' +
             ", type='" + type + '\'' +
             ", succeeded=" + succeeded + '\'' +
+            ", message='" + message + '\'' +
             ", date=" + date +
             '}';
     }
