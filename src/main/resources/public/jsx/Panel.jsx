@@ -23,7 +23,7 @@ const Panel = ({log}) =>
             </div>
         </div>
         <ul className="list-group">
-            <li className="list-group-item"><label className="col-sm-3 control-label">Ressource Name</label>{log.dcModelMapping.resourceName}</li>
+            <li className="list-group-item"><label className="col-sm-3 control-label">Nom de la ressource</label>{log.dcModelMapping.resourceName}</li>
             <li className="list-group-item"><label className="col-sm-3 control-label">Type DC</label>{log.dcModelMapping.type}</li>
         </ul>
     </div>

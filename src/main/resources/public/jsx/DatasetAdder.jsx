@@ -74,7 +74,7 @@ export default class DatasetAdder extends React.Component {
     render() {
         return (
             <div  id="container" className="col-sm-10">
-                <h1>Dataset registration</h1>
+                <h1>Enregistrement d'un jeu de données</h1>
                 <Form>
                     {renderIf(this.state.message)(
                         <FormGroup>
@@ -108,7 +108,7 @@ const DatasetChooser = ({ datasets, dcId, onDatasetSelected }) => {
     )
     return (
             <FormGroup>
-                <Label htmlFor="dcId" value="Choose a dataset"/>
+                <Label htmlFor="dcId" value="Choisir un jeu de données"/>
                 <SelectField id="dcId" value={dcId}
                              onChange={(event) => onDatasetSelected(event.target.value)}>
                     {options}
@@ -188,7 +188,7 @@ class DatasetConfigurer extends React.Component {
                     value={this.state.fields.name}
                 />
                 <FormGroup>
-                    <Label htmlFor="resourceName" value="Resource Name" />
+                    <Label htmlFor="resourceName" value="Nom de la ressource" />
                     <InputText id="resourceName" value={this.state.fields.resourceName}
                                onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
                 </FormGroup>
@@ -206,7 +206,7 @@ class DatasetConfigurer extends React.Component {
                                 onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
                 <TagAutocomplete tags={this.state.fields['tags']} suggestions={this.props.suggestions}
                                 handleAddition={this.handleAddition} handleDelete={this.handleDelete} />
-                <SubmitButton label="Create" onClick={(event) => this.props.onSubmit(this.state.fields)} />
+                <SubmitButton label="Créer" onClick={(event) => this.props.onSubmit(this.state.fields)} />
             </div>
         )
     }
@@ -236,7 +236,7 @@ const TagAutocomplete = ({ tags, suggestions, handleDelete, handleAddition}) => 
     )
     return (
         <FormGroup>
-            <Label htmlFor="Tag" value="Tags"/>
+            <Label htmlFor="Tag" value="Mots-clés"/>
             <ReactTags tags={tags}
                        suggestions={tabSuggestions}
                        handleDelete={handleDelete}
@@ -248,7 +248,7 @@ const TagAutocomplete = ({ tags, suggestions, handleDelete, handleAddition}) => 
 const InputAutocomplete = ({ suggestions, value, onChange}) => {
     return (
         <FormGroup>
-            <Label htmlFor="name" value="Name"/>
+            <Label htmlFor="name" value="Titre du jeu de données"/>
             <div className="col-sm-10">
                 <Autosuggest
                     datalist={suggestions}

@@ -17,7 +17,7 @@ export default class Dashboard extends React.Component {
         )
         return (
             <div id="container" className="col-sm-10">
-                <h1>Dashboard</h1>
+                <h1>Flux d'activités</h1>
                 <ContainerPanel>
                     <PanelGroup>{list}</PanelGroup>
                 </ContainerPanel>
