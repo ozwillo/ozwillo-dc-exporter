@@ -47,7 +47,6 @@ export default class DatasetAdder extends React.Component {
         fields['type'] = this.state.type
         fields['project'] = this.state.project
         fields['version'] = this.state.version
-        console.log(fields)
         fetch('/api/dc-model-mapping/models', {
             method: 'POST',
             credentials: 'same-origin',
@@ -164,7 +163,7 @@ class DatasetConfigurer extends React.Component {
 
     render() {
         const tags = this.state.fields.tags.map(( tag,key ) =>
-            <Tag key={key} keyword={tag.name} remove={this.handleDelete} />)
+            <Tag key={key} keyword={tag.name} remove={this.handleDelete} id={key} />)
         return (
             <div>
                 <FormGroup>
