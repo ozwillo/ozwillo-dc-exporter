@@ -2,11 +2,9 @@ import React from 'react'
 
 import renderIf from 'render-if'
 
-import { WithContext as ReactTags } from 'react-tag-input'
+import DatasetAutosuggest from './DatasetAutosuggest'
 
-import Autosuggest from 'react-bootstrap-autosuggest'
-
-import tagStyles from '../reactTags.css'
+import { TagAutosuggest, Tag } from './TagAutosuggest'
 
 import { Form, FormGroup, Label, SelectField, InputText, Textarea, SubmitButton, Alert } from './Form'
 
@@ -14,7 +12,7 @@ export default class DatasetAdder extends React.Component {
     constructor(props) {
         super(props)
 
-        this.state = { dcId: '', type: '', datasets: [], licenses: {}, project: '', suggestions: [], version: '', message: '', success: true}
+        this.state = { dcId: '', type: '', datasets: [], licenses: {}, project: '', version: '', message: '', success: true}
 
         this.onDatasetSelected = this.onDatasetSelected.bind(this)
         this.registerDataset = this.registerDataset.bind(this)
@@ -37,10 +35,6 @@ export default class DatasetAdder extends React.Component {
         fetch('/api/ckan/licences', {credentials: 'same-origin'})
             .then(response => response.json())
             .then(json => this.setState({licenses: json}))
-
-        fetch('/api/ckan/tags', {credentials: 'same-origin'})
-            .then(response => response.json())
-            .then(json => this.setState({suggestions: json}))
     }
     onDatasetSelected(dcId) {
         const dataset = this.state.datasets.find(function(dataset){
@@ -53,9 +47,7 @@ export default class DatasetAdder extends React.Component {
         fields['type'] = this.state.type
         fields['project'] = this.state.project
         fields['version'] = this.state.version
-        fields['tags'] = fields['tags'].map(tag => {
-                    return {name: tag.text}
-        })
+        console.log(fields)
         fetch('/api/dc-model-mapping/models', {
             method: 'POST',
             credentials: 'same-origin',
@@ -88,7 +80,7 @@ export default class DatasetAdder extends React.Component {
                             <Version version={this.state.version} />
                             <DatasetConfigurer onSubmit={this.registerDataset} licenses={this.state.licenses}
                                                datasets={this.state.datasets} projects={this.state.projects}
-                                               suggestions={this.state.suggestions} />
+                            />
                         </div>
                     )}
                 </Form>
@@ -144,18 +136,12 @@ class DatasetConfigurer extends React.Component {
                 license: '',
                 source: '',
                 tags: []
-            },
-            datasetsCkan: []
+            }
         }
         this.onFieldChange = this.onFieldChange.bind(this)
         this.handleAddition = this.handleAddition.bind(this)
         this.handleDelete = this.handleDelete.bind(this)
         this.onNameChange = this.onNameChange.bind(this)
-    }
-    componentDidMount() {
-        fetch('/api/ckan/datasets', {credentials: 'same-origin'})
-            .then(response => response.json())
-            .then(json => this.setState({datasetsCkan: json}))
     }
     onFieldChange(id, value) {
         const fields = this.state.fields
@@ -163,16 +149,13 @@ class DatasetConfigurer extends React.Component {
         this.setState({ fields })
     }
     handleDelete(i) {
-        let tags = this.state.fields['tags']
+        let tags = this.state.fields.tags
         tags.splice(i, 1)
         this.onFieldChange('tags', tags)
     }
     handleAddition(tag) {
-        let tags = this.state.fields['tags']
-        tags.push({
-            id: tags.length + 1,
-            text: tag
-        })
+        let tags = this.state.fields.tags
+        tags.push(tag)
         this.onFieldChange('tags', tags)
     }
     onNameChange(value){
@@ -180,13 +163,14 @@ class DatasetConfigurer extends React.Component {
     }
 
     render() {
+        const tags = this.state.fields.tags.map(( tag,key ) =>
+            <Tag key={key} keyword={tag.name} remove={this.handleDelete} />)
         return (
             <div>
-                <InputAutocomplete
-                    suggestions={this.state.datasetsCkan}
-                    onChange={this.onNameChange}
-                    value={this.state.fields.name}
-                />
+                <FormGroup>
+                    <Label htmlFor="name" value="Name"/>
+                    <DatasetAutosuggest onSelect={ this.onNameChange }/>
+                </FormGroup>
                 <FormGroup>
                     <Label htmlFor="resourceName" value="Nom de la ressource" />
                     <InputText id="resourceName" value={this.state.fields.resourceName}
@@ -204,8 +188,17 @@ class DatasetConfigurer extends React.Component {
                 </FormGroup>
                 <LicenceChooser licenses={this.props.licenses} currentLicense={this.state.fields['license']}
                                 onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
-                <TagAutocomplete tags={this.state.fields['tags']} suggestions={this.props.suggestions}
-                                handleAddition={this.handleAddition} handleDelete={this.handleDelete} />
+                <FormGroup>
+                    <Label htmlFor="tags" value="Tags"/>
+                    <TagAutosuggest onSelect={ this.handleAddition }/>
+                    {renderIf(tags.length > 0) (
+                            <div className="col-sm-10 col-sm-offset-2">
+                                <ul className="list-group">
+                                    {tags}
+                                </ul>
+                            </div>
+                    )}
+                </FormGroup>
                 <SubmitButton label="Créer" onClick={(event) => this.props.onSubmit(this.state.fields)} />
             </div>
         )
@@ -228,41 +221,4 @@ const LicenceChooser = ({ licenses, currentLicense, onChange }) => {
             </SelectField>
         </FormGroup>
     )
-}
-
-const TagAutocomplete = ({ tags, suggestions, handleDelete, handleAddition}) => {
-    let tabSuggestions = Object.keys(suggestions).map(key =>
-        suggestions[key]
-    )
-    return (
-        <FormGroup>
-            <Label htmlFor="Tag" value="Mots-clés"/>
-            <ReactTags tags={tags}
-                       suggestions={tabSuggestions}
-                       handleDelete={handleDelete}
-                       handleAddition={handleAddition}/>
-        </FormGroup>
-    )
-}
-
-const InputAutocomplete = ({ suggestions, value, onChange}) => {
-    return (
-        <FormGroup>
-            <Label htmlFor="name" value="Titre du jeu de données"/>
-            <div className="col-sm-10">
-                <Autosuggest
-                    datalist={suggestions}
-                    onChange={onChange}
-                    value={value}
-                    className={"col-sm-10"}
-                />
-            </div>
-        </FormGroup>
-    )
-}
-
-InputAutocomplete.PropTypes = {
-    suggestions: React.PropTypes.array.isRequired,
-    value: React.PropTypes.string.isRequired,
-    onChange: React.PropTypes.func.isRequired
 }
