@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,24 +51,30 @@ public class SynchronizerService {
                 }
 
                 LOGGER.info("Got some recent data for {}, synchronizing them", dcModelMapping.getType());
-                boolean succeeded = this.sync(dcModelMapping);
 
-                SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), succeeded, DateTime.now());
-                synchronizerAuditLogRepository.save(newAuditLog);
+                SynchronizerAuditLog newAuditLog;
+                try {
+                    this.sync(dcModelMapping);
+                    newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), true, null,  DateTime.now());
+                    synchronizerAuditLogRepository.save(newAuditLog);
+                } catch (Exception exception) {
+                    newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), false, exception.getMessage(),  DateTime.now());
+                    synchronizerAuditLogRepository.save(newAuditLog);
+                }
             });
         });
     }
 
-    public Boolean sync(DcModelMapping dcModelMapping) {
+    private void sync(DcModelMapping dcModelMapping) throws Exception {
         Optional<String> optionalResourceCsvFile =
                 datacoreService.exportResourceToCsv(dcModelMapping.getProject(), dcModelMapping.getType());
 
         if (!optionalResourceCsvFile.isPresent()) {
             LOGGER.error("Did not get the resource's CSV file, stopping");
-            return false;
+            throw new Exception("Unable to get the resource from datacore");
         }
 
         String resourceCsvFile = optionalResourceCsvFile.get();
-        return ckanService.updateResourceData(dcModelMapping, resourceCsvFile);
+        ckanService.updateResourceData(dcModelMapping, resourceCsvFile);
     }
 }
