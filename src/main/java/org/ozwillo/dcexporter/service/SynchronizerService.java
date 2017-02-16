@@ -53,11 +53,11 @@ public class SynchronizerService {
                 LOGGER.info("Got some recent data for {}, synchronizing them", dcModelMapping.getType());
 
                 SynchronizerAuditLog newAuditLog;
-                try{
+                try {
                     this.sync(dcModelMapping);
-                    newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), true, "Resource successfully synchronized",  DateTime.now());
+                    newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), true, null,  DateTime.now());
                     synchronizerAuditLogRepository.save(newAuditLog);
-                }catch (Exception exception){
+                } catch (Exception exception) {
                     newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), false, exception.getMessage(),  DateTime.now());
                     synchronizerAuditLogRepository.save(newAuditLog);
                 }
@@ -65,13 +65,13 @@ public class SynchronizerService {
         });
     }
 
-    public void sync(DcModelMapping dcModelMapping) throws Exception {
+    private void sync(DcModelMapping dcModelMapping) throws Exception {
         Optional<String> optionalResourceCsvFile =
                 datacoreService.exportResourceToCsv(dcModelMapping.getProject(), dcModelMapping.getType());
 
         if (!optionalResourceCsvFile.isPresent()) {
             LOGGER.error("Did not get the resource's CSV file, stopping");
-            throw new Exception("Did not get the resource's");
+            throw new Exception("Unable to get the resource from datacore");
         }
 
         String resourceCsvFile = optionalResourceCsvFile.get();

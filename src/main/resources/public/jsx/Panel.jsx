@@ -25,7 +25,8 @@ const Panel = ({log}) =>
         <ul className="list-group">
             <li className="list-group-item"><label className="col-sm-3 control-label">Nom de la ressource</label>{log.dcModelMapping.resourceName}</li>
             <li className="list-group-item"><label className="col-sm-3 control-label">Type DC</label>{log.dcModelMapping.type}</li>
-            <li className="list-group-item"><label className="col-sm-3 control-label">Message</label>{log.synchronizerAuditLog.message}</li>
+            {log.synchronizerAuditLog.succeeded &&
+                <li className="list-group-item"><label className="col-sm-3 control-label">Message</label>{log.synchronizerAuditLog.errorMessage}</li> }
         </ul>
     </div>
 
