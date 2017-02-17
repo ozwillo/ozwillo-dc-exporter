@@ -62,7 +62,7 @@ public class SynchronizerService {
 
     public Boolean sync(DcModelMapping dcModelMapping) {
         Optional<String> optionalResourceCsvFile =
-                datacoreService.exportResourceToCsv(dcModelMapping.getProject(), dcModelMapping.getType());
+                datacoreService.exportResourceToCsv(dcModelMapping.getProject(), dcModelMapping.getType(), dcModelMapping.getExcludedFields());
 
         if (!optionalResourceCsvFile.isPresent()) {
             LOGGER.error("Did not get the resource's CSV file, stopping");
