@@ -6,13 +6,15 @@ import DatasetAutosuggest from './DatasetAutosuggest'
 
 import { TagAutosuggest, Tag } from './TagAutosuggest'
 
+import Checkbox from './Checkbox'
+
 import { Form, FormGroup, Label, SelectField, InputText, Textarea, SubmitButton, Alert } from './Form'
 
 export default class DatasetAdder extends React.Component {
     constructor(props) {
         super(props)
 
-        this.state = { dcId: '', type: '', datasets: [], licenses: {}, project: '', version: '', message: '', success: true}
+        this.state = { dcId: '', type: '', datasets: [], dataset: [], licenses: {}, project: '', version: '', message: '', success: true}
 
         this.onDatasetSelected = this.onDatasetSelected.bind(this)
         this.registerDataset = this.registerDataset.bind(this)
@@ -40,7 +42,8 @@ export default class DatasetAdder extends React.Component {
         const dataset = this.state.datasets.find(function(dataset){
             return dataset['@id'] == dcId
         })
-        this.setState({ type: dataset['dcmo:name'], version: dataset['o:version'], project: dataset['dcmo:pointOfViewAbsoluteName'], dcId: dcId })
+        this.setState({ type: dataset['dcmo:name'], version: dataset['o:version'],
+                        project: dataset['dcmo:pointOfViewAbsoluteName'], dcId: dcId, dataset: dataset })
     }
     registerDataset(fields) {
         fields['dcId'] = this.state.dcId
@@ -79,6 +82,7 @@ export default class DatasetAdder extends React.Component {
                             <Version version={this.state.version} />
                             <DatasetConfigurer onSubmit={this.registerDataset} licenses={this.state.licenses}
                                                datasets={this.state.datasets} projects={this.state.projects}
+                                               dataset={this.state.dataset}
                             />
                         </div>
                     )}
@@ -134,13 +138,30 @@ class DatasetConfigurer extends React.Component {
                 description: '',
                 license: '',
                 source: '',
-                tags: []
+                tags: [],
+                excludedFields: []
             }
         }
         this.onFieldChange = this.onFieldChange.bind(this)
         this.handleAddition = this.handleAddition.bind(this)
         this.handleDelete = this.handleDelete.bind(this)
         this.onNameChange = this.onNameChange.bind(this)
+        this.toggleCheckbox = this.toggleCheckbox.bind(this)
+        this.selectedCheckboxes = new Set();
+    }
+    toggleCheckbox(label){
+        if (this.selectedCheckboxes.has(label)) {
+            const index = this.state.fields.excludedFields.findIndex((excludeField) => {return excludeField==label})
+            let excludeFields = this.state.fields.excludedFields
+            excludeFields.splice(index, 1)
+            this.onFieldChange('excludedFields', excludeFields)
+            this.selectedCheckboxes.delete(label)
+        } else {
+            let excludeFields = this.state.fields.excludedFields
+            excludeFields.push(label)
+            this.onFieldChange('excludedFields', excludeFields)
+            this.selectedCheckboxes.add(label)
+        }
     }
     onFieldChange(id, value) {
         const fields = this.state.fields
@@ -164,8 +185,16 @@ class DatasetConfigurer extends React.Component {
     render() {
         const tags = this.state.fields.tags.map(( tag,key ) =>
             <Tag key={key} keyword={tag.name} remove={this.handleDelete} id={key} />)
+        const fields = this.props.dataset['dcmo:globalFields'].map((field, key) =>
+            <Checkbox label={field['dcmf:name']} handleCheckboxChange={this.toggleCheckbox} key={key} />)
         return (
             <div>
+                <FormGroup>
+                    <Label htmlFor="excludedFields" value="Exclure des champs" />
+                    <div className="col-sm-10">
+                        { fields }
+                    </div>
+                </FormGroup>
                 <FormGroup>
                     <Label htmlFor="name" value="Name"/>
                     <DatasetAutosuggest onSelect={ this.onNameChange }/>

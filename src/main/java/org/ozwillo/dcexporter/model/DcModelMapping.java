@@ -53,27 +53,9 @@ public class DcModelMapping {
 
     private String ckanResourceId;
 
+    private List<String> excludedFields;
+
     public DcModelMapping() {
-    }
-
-    public DcModelMapping(String dcId, String project, String type, String name) {
-        this.dcId = dcId;
-        this.project = project;
-        this.type = type;
-        this.name = name;
-    }
-
-    public DcModelMapping(String dcId, String project, String type, String resourceName, String name, String description, List<CkanTag> tags, String license, String source, String version) {
-        this.dcId = dcId;
-        this.project = project;
-        this.type = type;
-        this.resourceName = resourceName;
-        this.name = name;
-        this.description = description;
-        this.tags = tags;
-        this.license = license;
-        this.source = source;
-        this.version = version;
     }
 
     public String getId() {
@@ -172,6 +154,10 @@ public class DcModelMapping {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public List<String> getExcludedFields() {
+        return excludedFields;
     }
 
     @Override

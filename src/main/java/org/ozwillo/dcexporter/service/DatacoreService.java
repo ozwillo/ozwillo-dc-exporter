@@ -49,12 +49,12 @@ public class DatacoreService {
         return !newResources.isEmpty();
     }
 
-    Optional<String> exportResourceToCsv(String project, String type) {
+    Optional<String> exportResourceToCsv(String project, String type, List<String> excludedFields) {
 
         // Extract all possible columns from the type's model (filtering explicitely excluded ones)
         DCModel model = datacore.findModel(project, type);
         List<String> resourceKeys = model.getFields().stream()
-                .filter(field -> !exportExcludedFields.contains(field.getName()))
+                .filter(field -> !excludedFields.contains(field.getName()))
                 .map(DCModel.DcModelField::getName)
                 .collect(Collectors.toList());
 
