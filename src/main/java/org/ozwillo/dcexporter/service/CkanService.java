@@ -51,19 +51,18 @@ public class CkanService {
         CkanDataset ckanDataset = null;
         try {
             ckanDataset = ckanClient.getDataset(dcModelMapping.getName());
+            LOGGER.debug("Dataset {} already exists", dcModelMapping.getName());
         } catch (CkanException e) {
             // Not Found Error is an « expected » result
             // FIXME : this is a poor way to perform a search
             if (!e.getCkanResponse().getError().getType().equals("Not Found Error")) {
                 throw e;
             }
-
-            LOGGER.debug("Dataset {} already exists", dcModelMapping.getName());
         }
 
         if (ckanDataset == null) {
-            String name = this.slugify(dcModelMapping.getName());
-            LOGGER.debug("Dataset {} creating id", name);
+            String name = slugify(dcModelMapping.getName());
+            LOGGER.debug("Creating dataset with slug name {} ", name);
             CkanOrganization ckanOrganization = ckanClient.getOrganization("ozwillo");
             ckanDataset = new CkanDataset(name);
             ckanDataset.setOrganization(ckanOrganization);
@@ -80,18 +79,11 @@ public class CkanService {
 
             return ckanClient.createDataset(ckanDataset);
         } else {
-            CkanOrganization ckanOrganization = ckanClient.getOrganization("ozwillo");
-            ckanDataset = new CkanDataset(dcModelMapping.getName());
-            ckanDataset.setOrganization(ckanOrganization);
-            ckanDataset.setMaintainer("ozwillo");
-            ckanDataset.setMaintainerEmail("contact@ozwillo.org");
-            ckanDataset.setOpen(true);
-            ckanDataset.setOwnerOrg(ckanOrganization.getId());
+            LOGGER.debug("Updating dataset with slug name {} ", ckanDataset.getName());
             ckanDataset.setLicenseId(dcModelMapping.getLicense());
             ckanDataset.setUrl(dcModelMapping.getSource());
             ckanDataset.setVersion(dcModelMapping.getVersion());
             ckanDataset.setTags(dcModelMapping.getTags());
-            ckanDataset.setPriv(false);
             return ckanClient.updateDataset(ckanDataset);
         }
     }
