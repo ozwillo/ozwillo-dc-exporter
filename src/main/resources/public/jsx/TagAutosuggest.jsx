@@ -2,6 +2,8 @@ import React, {Component} from "react"
 
 import Autosuggest from "react-autosuggest"
 
+import { Label } from './Form'
+
 const getSuggestionValue = suggestion => suggestion.name
 
 const renderSuggestion = suggestion => (
@@ -28,6 +30,7 @@ class TagAutosuggest extends React.Component {
             allSuggestions: {}
 
         }
+        this.onClick = this.onClick.bind(this)
     }
     componentDidMount() {
         fetch('/api/ckan/tags', {credentials: 'same-origin'})
@@ -59,6 +62,10 @@ class TagAutosuggest extends React.Component {
     onSuggestionSelected = (event, { suggestion}) => {
         this.props.onSelect(suggestion)
         this.setState({ value: "" })
+    } 
+    onClick(){ 
+        this.props.onSelect({ name: this.state.value }) 
+        this.setState({ value: "" }) 
     }
     render() {
         const inputProps = {
@@ -66,17 +73,27 @@ class TagAutosuggest extends React.Component {
             onChange: this.onChange
         }
         return (
-            <div className="col-sm-9">
-                <Autosuggest
-                    id={"TagAutosuggest"}
-                    suggestions={this.state.suggestions}
-                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-                    onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-                    onSuggestionSelected={this.onSuggestionSelected}
-                    getSuggestionValue={getSuggestionValue}
-                    renderSuggestion={renderSuggestion}
-                    renderInputComponent={renderInputComponent}
-                    inputProps={inputProps}/>
+            <div>
+                <div className="col-sm-9">
+                    <div className="row">
+                        <div className="col-sm-10 col-xs-10">
+                            <Autosuggest
+                                id={"TagAutosuggest"}
+                                focusFirstSuggestion={true}
+                                suggestions={this.state.suggestions}
+                                onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+                                onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                                onSuggestionSelected={this.onSuggestionSelected}
+                                getSuggestionValue={getSuggestionValue}
+                                renderSuggestion={renderSuggestion}
+                                renderInputComponent={renderInputComponent}
+                                inputProps={inputProps}/>
+                        </div>
+                        <div className="col-sm-2 col-xs-2">
+                            <button type="button" className="btn btn-default" onClick={this.onClick}>Ajouter</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         )
     }
