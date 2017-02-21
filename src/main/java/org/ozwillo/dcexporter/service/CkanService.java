@@ -106,6 +106,18 @@ public class CkanService {
         return ckanClient.createResource(ckanResource);
     }
 
+    public CkanResource updateResource(String resourceId, String packageId, String name,String description) {
+        CkanClient ckanClient = new CkanClient(ckanUrl, ckanApiKey);
+
+        CkanResource ckanResource = ckanClient.getResource(resourceId);
+        ckanResource.setPackageId(packageId);
+        ckanResource.setDescription(description);
+        ckanResource.setName(name);
+        ckanResource.setUrl("upload");
+
+        return ckanClient.updateResource(ckanResource);
+    }
+
     public void updateResourceData(DcModelMapping dcModelMapping, String resource) throws Exception {
         CkanClient ckanClient = new CheckedCkanClient(ckanUrl, ckanApiKey);
 
