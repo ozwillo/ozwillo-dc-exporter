@@ -51,7 +51,7 @@ public class DcModelMappingController {
             return new ResponseEntity<>(HttpStatus.CREATED);
         }
 
-        return new ResponseEntity<>("This dataset is already synchronized", HttpStatus.CONFLICT);
+        return new ResponseEntity<>("Ce jeu de données est déjà configuré", HttpStatus.CONFLICT);
     }
 
     @RequestMapping(value = "/logs", method = RequestMethod.GET)

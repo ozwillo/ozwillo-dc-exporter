@@ -60,7 +60,7 @@ export default class DatasetAdder extends React.Component {
             body: JSON.stringify(fields)
         })
         .then(this.checkStatus)
-        .then(() => this.setState({ updated: true, message: 'Dataset mapping created' }))
+        .then(() => this.setState({ updated: true, message: 'La configuration a bien été créée' }))
         .catch(response => {
             response.text().then(text => this.setState({ message: text }))
         })
@@ -196,7 +196,7 @@ class DatasetConfigurer extends React.Component {
                     </div>
                 </FormGroup>
                 <FormGroup>
-                    <Label htmlFor="name" value="Name"/>
+                    <Label htmlFor="name" value="Nom"/>
                     <DatasetAutosuggest onSelect={ this.onNameChange }/>
                 </FormGroup>
                 <FormGroup>
