@@ -191,7 +191,7 @@ class DatasetConfigurer extends React.Component {
             <div>
                 <FormGroup>
                     <Label htmlFor="excludedFields" value="Exclure des champs" />
-                    <div className="col-sm-10">
+                    <div className="col-sm-9">
                         { fields }
                     </div>
                 </FormGroup>

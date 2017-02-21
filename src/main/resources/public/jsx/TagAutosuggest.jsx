@@ -66,7 +66,7 @@ class TagAutosuggest extends React.Component {
             onChange: this.onChange
         }
         return (
-            <div className="col-sm-10">
+            <div className="col-sm-9">
                 <Autosuggest
                     id={"TagAutosuggest"}
                     suggestions={this.state.suggestions}

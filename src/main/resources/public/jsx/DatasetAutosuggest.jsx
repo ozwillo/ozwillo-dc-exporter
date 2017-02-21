@@ -71,7 +71,7 @@ export default class DatasetAutosuggest extends React.Component {
             required: true
         }
         return (
-            <div className="col-sm-10">
+            <div className="col-sm-9">
                 <Autosuggest
                     id={"DatasetAutosuggest"}
                     suggestions={this.state.suggestions}
