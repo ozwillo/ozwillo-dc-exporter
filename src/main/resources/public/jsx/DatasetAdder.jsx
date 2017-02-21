@@ -196,7 +196,7 @@ class DatasetConfigurer extends React.Component {
                     </div>
                 </FormGroup>
                 <FormGroup>
-                    <Label htmlFor="name" value="Nom"/>
+                    <Label htmlFor="name" value="Nom du jeu de données"/>
                     <DatasetAutosuggest onSelect={ this.onNameChange }/>
                 </FormGroup>
                 <FormGroup>
@@ -243,7 +243,7 @@ const LicenceChooser = ({ licenses, currentLicense, onChange }) => {
     )
     return (
         <FormGroup>
-            <Label htmlForm="license" value="License"/>
+            <Label htmlForm="license" value="Licence"/>
             <SelectField id="license" value={currentLicense} onChange={onChange}>
                 {options}
             </SelectField>
