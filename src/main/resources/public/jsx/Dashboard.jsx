@@ -13,7 +13,7 @@ export default class Dashboard extends React.Component {
     }
     render() {
         const list = this.state.logs.map(log =>
-            <Panel key={log.dcModelMapping.name} log={log}/>
+            <Panel key={log.dcModelMapping.dcId} log={log}/>
         )
         return (
             <div id="container" className="col-sm-10">
