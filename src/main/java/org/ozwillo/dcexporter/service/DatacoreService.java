@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -40,6 +41,7 @@ public class DatacoreService {
     // (because we need to use the DataBinder, which @ConfigurationProperties does, but not @Value)
     private List<String> exportExcludedFields = new ArrayList<>();
 
+    @Cacheable("dc-models")
     public List<DCModel> getModels() {
         // TODO : iterate until we have all
         return datacore.findModels(50).stream()

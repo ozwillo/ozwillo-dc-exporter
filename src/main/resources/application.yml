@@ -1,6 +1,10 @@
 spring:
   output.ansi.enabled: DETECT
   session.store-type: none
+  cache:
+    cache-names: dc-models
+    caffeine.spec: maximumSize=200,expireAfterAccess=3600s
+    type: caffeine
 
 server:
   compression.enabled: true
