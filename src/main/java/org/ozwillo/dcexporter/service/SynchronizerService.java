@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -41,11 +40,11 @@ public class SynchronizerService {
         systemUserService.runAs(() -> {
 
             dcModelMappingRepository.findAll().forEach(dcModelMapping -> {
-                List<SynchronizerAuditLog> auditLogs =
-                        synchronizerAuditLogRepository.findByTypeOrderByDateDesc(dcModelMapping.getType());
+                SynchronizerAuditLog auditLog =
+                        synchronizerAuditLogRepository.findFirstByTypeOrderByDateDesc(dcModelMapping.getType());
 
-                if (!auditLogs.isEmpty() &&
-                        !datacoreService.hasMoreRecentResources(dcModelMapping.getProject(), dcModelMapping.getType(), auditLogs.get(0).getDate())) {
+                if ((auditLog != null && auditLog.isSucceeded()) &&
+                        !datacoreService.hasMoreRecentResources(dcModelMapping.getProject(), dcModelMapping.getType(), auditLog.getDate())) {
                     LOGGER.info("No more recent resources for {}, returning", dcModelMapping.getType());
                     return;
                 }

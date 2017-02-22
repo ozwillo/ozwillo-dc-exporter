@@ -25,13 +25,9 @@ public class DcModelMappingService {
 
     public List<AuditLogWapper> getAllAuditLogWithModel() {
         return dcModelMappingRepository.findAllByOrderByNameAsc().stream().map(dcModelMapping -> {
-            List<SynchronizerAuditLog> auditLogs =
-                    synchronizerAuditLogRepository.findByTypeOrderByDateDesc(dcModelMapping.getType());
-            if (!auditLogs.isEmpty()) {
-                return new AuditLogWapper(dcModelMapping, auditLogs.get(0));
-            } else {
-                return new AuditLogWapper(dcModelMapping, null);
-            }
+            SynchronizerAuditLog auditLog =
+                    synchronizerAuditLogRepository.findFirstByTypeOrderByDateDesc(dcModelMapping.getType());
+            return new AuditLogWapper(dcModelMapping, auditLog);
         }).collect(Collectors.toList());
     }
 }

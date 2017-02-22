@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface SynchronizerAuditLogRepository extends MongoRepository<SynchronizerAuditLog, String> {
 
-    List<SynchronizerAuditLog> findByTypeOrderByDateDesc(String type);
+    SynchronizerAuditLog findFirstByTypeOrderByDateDesc(String type);
 }
