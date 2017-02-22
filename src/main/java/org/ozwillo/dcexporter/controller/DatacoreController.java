@@ -20,6 +20,6 @@ public class DatacoreController {
 
     @RequestMapping(value = "/models", method = RequestMethod.GET)
     public List<DCModel> getModels() {
-        return datacoreService.getModels().stream().sorted().collect(Collectors.toList());
+        return datacoreService.getModels();
     }
 }

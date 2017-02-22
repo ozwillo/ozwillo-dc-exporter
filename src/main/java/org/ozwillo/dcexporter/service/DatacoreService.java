@@ -37,7 +37,8 @@ public class DatacoreService {
 
     public List<DCModel> getModels() {
         // TODO : iterate until we have all
-        return datacore.findModels(50);
+        return datacore.findModels(50).stream()
+            .distinct().sorted().collect(Collectors.toList());
     }
 
     public boolean hasMoreRecentResources(String project, String type, DateTime fromDate) {
