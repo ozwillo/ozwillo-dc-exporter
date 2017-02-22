@@ -5,6 +5,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.oasis_eu.spring.datacore.DatacoreClient;
 import org.oasis_eu.spring.datacore.model.*;
+import org.ozwillo.dcexporter.dao.DcModelMappingRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,10 @@ public class DatacoreService {
     @Autowired
     private DatacoreClient datacore;
 
+    @Autowired
+    @SuppressWarnings("SpringJavaAutowiringInspection")
+    private DcModelMappingRepository dcModelMappingRepository;
+
     private String modifiedField;
 
     // Binded through @ConfigurationProperties on the class
@@ -38,7 +43,10 @@ public class DatacoreService {
     public List<DCModel> getModels() {
         // TODO : iterate until we have all
         return datacore.findModels(50).stream()
-            .distinct().sorted().collect(Collectors.toList());
+            .filter(dcModel -> dcModelMappingRepository.findByDcId(dcModel.getId().toString()) == null)
+            .distinct()
+            .sorted()
+            .collect(Collectors.toList());
     }
 
     public boolean hasMoreRecentResources(String project, String type, DateTime fromDate) {
