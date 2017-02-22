@@ -8,6 +8,7 @@ const autoprefixer = require('autoprefixer');
 const TARGET = process.env.npm_lifecycle_event;
 const PATHS = {
     app: path.join(__dirname, 'src/main/resources/public'),
+    style: path.join(__dirname, 'src/main/resources/public/styles', 'index.css'),
     build: path.join(__dirname, 'src/main/resources/public/build')
 };
 
@@ -15,7 +16,9 @@ const commonEntryPointsLoadersAndServers = ['bootstrap-loader'];
 const devEntryPointsLoadersAndServers = ['webpack-dev-server/client?http://localhost:3000', 'webpack/hot/only-dev-server'];
 
 const common = {
-    entry: [path.join(PATHS.app, 'jsx/App.jsx')].concat(commonEntryPointsLoadersAndServers),
+    entry: [
+        PATHS.style,
+        path.join(PATHS.app, 'jsx/App.jsx')].concat(commonEntryPointsLoadersAndServers),
     output: {
         path: PATHS.build,
         filename: 'bundle.js',
@@ -27,8 +30,7 @@ const common = {
             jQuery: 'jquery',
             'Promise': 'es6-promise', // Thanks Aaron (https://gist.github.com/Couto/b29676dd1ab8714a818f#gistcomment-1584602)
             'fetch': 'imports?this=>global!exports?global.fetch!whatwg-fetch'
-        }),
-        new ExtractTextPlugin('styles.css', { allChunks: true })
+        })
     ],
     resolve: {
         extensions: [ '', '.js', '.jsx' ]
@@ -71,9 +73,9 @@ if(TARGET === 'start' || !TARGET) {
         ],
         module: {
             loaders: [
-                {test: /\.css$/, loaders: ['style', 'css', 'postcss']},
+                {test: /\.css$/, loaders: ['style', 'css', 'postcss'], include: path.join(PATHS.app, 'styles')},
                 /* loaders for Bootstrap */
-                {test: /\.scss$/, loaders: ['style', 'css', 'postcss', 'sass']},
+                {test: /\.scss$/, loaders: ['style', 'css', 'postcss', 'sass'], include: path.join(PATHS.app, 'styles')},
                 {
                     test: /\.scss$/,
                     loader: ExtractTextPlugin.extract('style', 'css!sass?includePaths[]=./node_modules/bootstrap-sass/assets/stylesheets')

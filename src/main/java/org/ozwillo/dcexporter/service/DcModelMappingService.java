@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class DcModelMappingService {
@@ -23,19 +24,14 @@ public class DcModelMappingService {
     private SynchronizerAuditLogRepository synchronizerAuditLogRepository;
 
     public List<AuditLogWapper> getAllAuditLogWithModel() {
-        List<AuditLogWapper> dcModelMappingListWithLog = new ArrayList<>();
-
-        dcModelMappingRepository.findAll().forEach(dcModelMapping -> {
+        return dcModelMappingRepository.findAllByOrderByNameAsc().stream().map(dcModelMapping -> {
             List<SynchronizerAuditLog> auditLogs =
                     synchronizerAuditLogRepository.findByTypeOrderByDateDesc(dcModelMapping.getType());
             if (!auditLogs.isEmpty()) {
-                AuditLogWapper auditLogWapper = new AuditLogWapper(dcModelMapping, auditLogs.get(0));
-                dcModelMappingListWithLog.add(auditLogWapper);
+                return new AuditLogWapper(dcModelMapping, auditLogs.get(0));
             } else {
-                LOGGER.info("Found a mapping without audit logs : {}", dcModelMapping.getName());
+                return new AuditLogWapper(dcModelMapping, null);
             }
-        });
-        Collections.sort(dcModelMappingListWithLog, Collections.reverseOrder());
-        return dcModelMappingListWithLog;
+        }).collect(Collectors.toList());
     }
 }

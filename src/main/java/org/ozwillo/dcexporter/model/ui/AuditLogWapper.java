@@ -1,6 +1,5 @@
 package org.ozwillo.dcexporter.model.ui;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.ozwillo.dcexporter.model.DcModelMapping;
@@ -8,17 +7,17 @@ import org.ozwillo.dcexporter.model.SynchronizerAuditLog;
 
 import javax.validation.constraints.NotNull;
 
-public class AuditLogWapper implements Comparable<AuditLogWapper>{
+public class AuditLogWapper {
 
     @JsonProperty
     @NotNull
     @NotEmpty
-    DcModelMapping dcModelMapping;
+    private DcModelMapping dcModelMapping;
 
     @JsonProperty
     @NotNull
     @NotEmpty
-    SynchronizerAuditLog synchronizerAuditLog;
+    private SynchronizerAuditLog synchronizerAuditLog;
 
     public AuditLogWapper(DcModelMapping dcModelMapping, SynchronizerAuditLog synchronizerAuditLog) {
         this.dcModelMapping = dcModelMapping;
@@ -31,12 +30,5 @@ public class AuditLogWapper implements Comparable<AuditLogWapper>{
 
     public SynchronizerAuditLog getSynchronizerAuditLog() {
         return synchronizerAuditLog;
-    }
-
-    @Override
-    public int compareTo(AuditLogWapper auditLogWapper) {
-        if (this.synchronizerAuditLog.getDate() == null || auditLogWapper.synchronizerAuditLog.getDate() == null)
-            return 0;
-        return this.synchronizerAuditLog.getDate().compareTo(auditLogWapper.synchronizerAuditLog.getDate());
     }
 }
