@@ -1,5 +1,6 @@
 package org.ozwillo.dcexporter.controller;
 
+import eu.trentorise.opendata.jackan.model.CkanDataset;
 import eu.trentorise.opendata.jackan.model.CkanTag;
 import org.ozwillo.dcexporter.service.CkanService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,5 +27,5 @@ public class CkanController {
     public List<CkanTag> getTags() { return ckanService.getTags(); }
 
     @RequestMapping(value = "/datasets", method = RequestMethod.GET)
-    public List<String> getDatasets() { return ckanService.getDatasets(); }
+    public List<CkanDataset> getDatasets() { return ckanService.getDatasets(); }
 }

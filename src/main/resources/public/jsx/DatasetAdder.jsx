@@ -134,6 +134,7 @@ class DatasetConfigurer extends React.Component {
         this.state = {
             fields: {
                 resourceName: '',
+                ckanPackageId: '',
                 name: '',
                 description: '',
                 license: '',
@@ -145,7 +146,7 @@ class DatasetConfigurer extends React.Component {
         this.onFieldChange = this.onFieldChange.bind(this)
         this.handleAddition = this.handleAddition.bind(this)
         this.handleDelete = this.handleDelete.bind(this)
-        this.onNameChange = this.onNameChange.bind(this)
+        this.onDatasetNameChange = this.onDatasetNameChange.bind(this)
         this.toggleCheckbox = this.toggleCheckbox.bind(this)
         this.selectedCheckboxes = new Set();
     }
@@ -178,8 +179,9 @@ class DatasetConfigurer extends React.Component {
         tags.push(tag)
         this.onFieldChange('tags', tags)
     }
-    onNameChange(value){
-        this.onFieldChange("name",value)
+    onDatasetNameChange(dataset) {
+        this.onFieldChange('ckanPackageId', dataset.id)
+        this.onFieldChange('name', dataset.title)
     }
 
     render() {
@@ -197,7 +199,7 @@ class DatasetConfigurer extends React.Component {
                 </FormGroup>
                 <FormGroup>
                     <Label htmlFor="name" value="Nom du jeu de données"/>
-                    <DatasetAutosuggest onSelect={ this.onNameChange }/>
+                    <DatasetAutosuggest onSelect={ this.onDatasetNameChange }/>
                 </FormGroup>
                 <FormGroup>
                     <Label htmlFor="resourceName" value="Nom de la ressource" />

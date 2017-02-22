@@ -29,9 +29,12 @@ public class CkanService {
     @Value("${ckan.apikey:apikey}")
     private String ckanApiKey;
 
-    public List<String> getDatasets() {
+    public List<CkanDataset> getDatasets() {
         CkanClient ckanClient = new CkanClient(ckanUrl);
-        return ckanClient.getDatasetList();
+        List<String> datasets = ckanClient.getDatasetList();
+        return datasets.stream()
+            .map(ckanClient::getDataset)
+            .collect(Collectors.toList());
     }
 
     public Map<String, String> getLicences() {
@@ -50,8 +53,11 @@ public class CkanService {
 
         CkanDataset ckanDataset = null;
         try {
-            ckanDataset = ckanClient.getDataset(dcModelMapping.getName());
-            LOGGER.debug("Dataset {} already exists", dcModelMapping.getName());
+            if (dcModelMapping.getCkanPackageId() != null)
+                ckanDataset = ckanClient.getDataset(dcModelMapping.getCkanPackageId());
+            else
+                ckanDataset = ckanClient.getDataset(dcModelMapping.getName());
+            LOGGER.debug("CKAN dataset {} found for {}", ckanDataset.getId(), dcModelMapping.getDcId());
         } catch (CkanException e) {
             // Not Found Error is an « expected » result
             // FIXME : this is a poor way to perform a search

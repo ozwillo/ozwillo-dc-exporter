@@ -2,16 +2,14 @@ import React, {Component} from "react"
 
 import Autosuggest from "react-autosuggest"
 
-import autosuggestStyles from '../autosuggest.css'
-
-const getSuggestionValue = suggestion => suggestion
+const getSuggestionValue = suggestion => suggestion.title
 
 const renderSuggestion = suggestion => (
-    <span>{suggestion}</span>
+    <span>{suggestion.title}</span>
 )
 
 const renderInputComponent = inputProps => (
-        <input {...inputProps} className="form-control"  />
+    <input {...inputProps} className="form-control"  />
 )
 
 function escapeRegexCharacters(str) {
@@ -47,7 +45,7 @@ export default class DatasetAutosuggest extends React.Component {
 
         const regex = new RegExp('^' + escapedValue, 'i');
 
-        return this.state.allSuggestions.filter(suggestion => regex.test(suggestion));
+        return this.state.allSuggestions.filter(suggestion => regex.test(suggestion.title));
     }
     onChange = (event, { newValue }) => {
         this.setState({ value: newValue })
