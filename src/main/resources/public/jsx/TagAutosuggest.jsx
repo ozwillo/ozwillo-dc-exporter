@@ -8,10 +8,6 @@ const renderSuggestion = suggestion => (
     <span>{suggestion.name}</span>
 )
 
-const renderInputComponent = inputProps => (
-    <input {...inputProps} className="form-control"  />
-)
-
 function escapeRegexCharacters(str) {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -28,6 +24,8 @@ class TagAutosuggest extends React.Component {
             allSuggestions: {}
 
         }
+        this.onClick = this.onClick.bind(this)
+        this.renderInputComponent = this.renderInputComponent.bind(this)
     }
     componentDidMount() {
         fetch('/api/ckan/tags', {credentials: 'same-origin'})
@@ -60,6 +58,21 @@ class TagAutosuggest extends React.Component {
         this.props.onSelect(suggestion)
         this.setState({ value: "" })
     }
+    onClick(){
+
+        this.props.onSelect({ name: this.state.value })
+
+        this.setState({ value: "" })
+
+    }
+    renderInputComponent = (inputProps) => (
+        <div className="input-group">
+            <input {...inputProps} className="form-control" />
+            <span className="input-group-btn">
+                <button className="btn btn-default" type="button" onClick={this.onClick} >Ajouter</button>
+            </span>
+        </div>
+    )
     render() {
         const inputProps = {
             value: this.state.value,
@@ -75,7 +88,7 @@ class TagAutosuggest extends React.Component {
                     onSuggestionSelected={this.onSuggestionSelected}
                     getSuggestionValue={getSuggestionValue}
                     renderSuggestion={renderSuggestion}
-                    renderInputComponent={renderInputComponent}
+                    renderInputComponent={this.renderInputComponent}
                     inputProps={inputProps}/>
             </div>
         )
@@ -87,6 +100,6 @@ TagAutosuggest.PropTypes = {
 }
 
 const Tag = ({ keyword, remove, id }) =>
-    <li id="tag" className="list-group-item">{keyword}<span className="glyphicon glyphicon-remove" onClick={() => remove(id)}></span></li>
+    <li id="tag" className="list-group-item">{keyword}<span className="glyphicon glyphicon-remove remove-tag" onClick={() => remove(id)}></span></li>
 
 module.exports = { TagAutosuggest, Tag }
