@@ -9,20 +9,18 @@ import org.ozwillo.dcexporter.dao.DcModelMappingRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@ConfigurationProperties(prefix = "datacore")
 public class DatacoreService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatacoreService.class);
@@ -34,12 +32,8 @@ public class DatacoreService {
     @SuppressWarnings("SpringJavaAutowiringInspection")
     private DcModelMappingRepository dcModelMappingRepository;
 
+    @Value("${datacore.modifiedField}")
     private String modifiedField;
-
-    // Binded through @ConfigurationProperties on the class
-    // Do not use @Value since it will broke the binding into a list
-    // (because we need to use the DataBinder, which @ConfigurationProperties does, but not @Value)
-    private List<String> exportExcludedFields = new ArrayList<>();
 
     @Cacheable("dc-models")
     public List<DCModel> getModels() {
@@ -65,7 +59,7 @@ public class DatacoreService {
         // Extract all possible columns from the type's model (filtering explicitely excluded ones)
         DCModel model = datacore.findModel(project, type);
         List<String> resourceKeys = model.getFields().stream()
-                .filter(field -> !excludedFields.contains(field.getName()))
+                .filter(field -> excludedFields != null && !excludedFields.contains(field.getName()))
                 .map(DCModel.DcModelField::getName)
                 .collect(Collectors.toList());
 
@@ -191,14 +185,5 @@ public class DatacoreService {
         ).findFirst();
 
         return result.isPresent() ? result.get().asMap().values().toArray()[0].toString() : "";
-    }
-
-    // needed for field binding into a list
-    public List<String> getExportExcludedFields() {
-        return exportExcludedFields;
-    }
-
-    public void setModifiedField(String modifiedField) {
-        this.modifiedField = modifiedField;
     }
 }

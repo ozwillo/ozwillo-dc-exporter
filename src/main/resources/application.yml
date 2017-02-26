@@ -56,44 +56,6 @@ datacore:
   systemAdminUser:  # Get it using Node.js lib / with portal clientId
     refreshToken: refreshToken
     nonce: changeit      #Set it when getting the refreshToken
-  exportExcludedFields:
-    # General rule
-    - "@type"
-    # For organizations
-    - relt:displayName
-    - adrpost:adminUnit
-    - orgpu:officialId
-    - orgtypch:idStat2
-    - orgtypch:mayor
-    - orgtypch:mayorTitle
-    - org:altName
-    - org:displayAltName
-    - org:country
-    - org:vatNumber
-    - org:source
-    # For POIs
-    - org:email
-    - poi:author
-    # For electoral roll registration (CK)
-    - ck_electoral_roll_registration:nom_de_famille
-    - ck_electoral_roll_registration:nom_d_usage
-    - ck_electoral_roll_registration:prenom
-    - ck_electoral_roll_registration:adresse1
-    - ck_electoral_roll_registration:adresse2
-    - ck_electoral_roll_registration:courriel
-    - ck_electoral_roll_registration:telephone
-    - ck_electoral_roll_registration:justificatif_identite
-    - ck_electoral_roll_registration:justificatifs_domicile
-    - ck_electoral_roll_registration:commune_origine
-    - ck_electoral_roll_registration:code_departement_origine
-    - ck_electoral_roll_registration:libelle_territoire_outremer_origine
-    - ck_electoral_roll_registration:ambassade_poste_consulaire_origine
-    - ck_electoral_roll_registration:pays_origine
-    - ck_electoral_roll_registration:date_de_naissance
-    - ck_electoral_roll_registration:commune_de_naissance
-    - ck_electoral_roll_registration:code_departement_de_naissance
-    - ck_electoral_roll_registration:libelle_territoire_de_naissance_outremer
-    - ck_electoral_roll_registration:pays_de_naissance
   modifiedField: "dc:modified"
 
 ckan:
