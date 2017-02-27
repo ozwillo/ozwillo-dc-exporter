@@ -59,7 +59,7 @@ public class DatacoreService {
         // Extract all possible columns from the type's model (filtering explicitely excluded ones)
         DCModel model = datacore.findModel(project, type);
         List<String> resourceKeys = model.getFields().stream()
-                .filter(field -> excludedFields != null && !excludedFields.contains(field.getName()))
+                .filter(field -> excludedFields == null || !excludedFields.contains(field.getName()))
                 .map(DCModel.DcModelField::getName)
                 .collect(Collectors.toList());
 
