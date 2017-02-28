@@ -1,7 +1,7 @@
 import React from 'react'
 
 const ContainerPanel =  ({children}) =>
-    <div className="container">
+    <div>
         {children}
     </div>
 

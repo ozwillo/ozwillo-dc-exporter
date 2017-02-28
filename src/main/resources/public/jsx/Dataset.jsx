@@ -15,16 +15,16 @@ export default class Dataset extends React.Component {
         super(props)
 
         this.state = {
-            dcId: '',
-            type: '',
             datasets: [],
             dataset: [],
             licenses: {},
-            project: '',
-            version: '',
             message: '',
             success: true,
             fields: {
+                dcId: '',
+                type: '',
+                project: '',
+                version: '',
                 resourceName: '',
                 ckanPackageId: '',
                 name: '',
@@ -56,10 +56,11 @@ export default class Dataset extends React.Component {
         }
     }
     componentDidMount() {
-
-        fetch('/api/dc-model-mapping/model', { credentials: 'same-origin' })
-            .then(response => response.json())
-            .then(json => this.setState({datasets: json}))
+        if (this.props.params.id) {
+            fetch('/api/dc-model-mapping/model', { credentials: 'same-origin' })
+                .then(response => response.json())
+                .then(json => this.setState({datasets: json}))
+        }
 
         fetch('/api/dc/models', { credentials: 'same-origin' })
             .then(response => response.json())
@@ -73,14 +74,14 @@ export default class Dataset extends React.Component {
         const dataset = this.state.datasets.find(function(dataset){
             return dataset['@id'] == dcId
         })
-        this.setState({ type: dataset['dcmo:name'], version: dataset['o:version'],
-                        project: dataset['dcmo:pointOfViewAbsoluteName'], dcId: dcId, dataset: dataset })
+        const fields = this.state.fields
+        fields['type'] = dataset['dcmo:name']
+        fields['version'] = dataset['o:version']
+        fields['project'] = dataset['dcmo:pointOfViewAbsoluteName']
+        fields['dcId'] = dcId
+        this.setState({ fields: fields, dataset: dataset })
     }
     registerDataset(fields) {
-        fields['dcId'] = this.state.dcId
-        fields['type'] = this.state.type
-        fields['project'] = this.state.project
-        fields['version'] = this.state.version
         fetch('/api/dc-model-mapping/model', {
             method: 'POST',
             credentials: 'same-origin',
@@ -132,13 +133,13 @@ export default class Dataset extends React.Component {
     render() {
         const tags = this.state.fields.tags.map(( tag,key ) =>
             <Tag key={key} keyword={tag.name} remove={this.handleDelete} id={key} />)
-        const fields = this.state.dcId ?
+        const fields = this.state.fields.dcId ?
             this.state.dataset['dcmo:globalFields'].map((field, key) =>
                 <Checkbox label={field['dcmf:name']} handleCheckboxChange={this.toggleCheckbox} key={key} />)
             : null
 
         return (
-            <div  id="container" className="col-sm-10">
+            <div  id="container" className="container">
                 <h1>Enregistrement d'un jeu de données</h1>
                 <Form>
                     {renderIf(this.state.message)(
@@ -146,49 +147,74 @@ export default class Dataset extends React.Component {
                             <Alert message={this.state.message} success={this.state.success} />
                         </FormGroup>
                     )}
-                    <DatasetChooser dcId={this.state.dcId} onDatasetSelected={this.onDatasetSelected}
-                                    datasets={this.state.datasets} />
-                    {renderIf(this.state.dcId)(
-                        <div>
-                            <Version version={this.state.version} />
-                            <FormGroup>
-                                <Label htmlFor="excludedFields" value="Exclure des champs" />
-                                <div className="col-sm-10">
-                                    { fields }
-                                </div>
-                            </FormGroup>
-                            <FormGroup>
-                                <Label htmlFor="name" value="Name"/>
-                                <DatasetAutosuggest onSelect={ this.onDatasetNameChange }/>
-                            </FormGroup>
-                            <FormGroup>
-                                <Label htmlFor="resourceName" value="Nom de la ressource" />
-                                <InputText id="resourceName" value={this.state.fields.resourceName}
-                                           onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
-                            </FormGroup>
-                            <FormGroup>
-                                <Label htmlFor="description" value="Description" />
-                                <Textarea id="description" value={this.state.fields.description}
-                                          onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
-                            </FormGroup>
-                            <FormGroup>
-                                <Label htmlFor="source" value="Source" />
-                                <InputText id="source" value={this.state.fields.source}
-                                           onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
-                            </FormGroup>
-                            <LicenceChooser licenses={this.state.licenses} currentLicense={this.state.fields['license']}
-                                            onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
-                            <FormGroup>
-                                <Label htmlFor="tags" value="Tags"/>
-                                <TagAutosuggest onSelect={ this.handleAddition }/>
-                                {renderIf(tags.length > 0) (
-                                        <div className="col-sm-10 col-sm-offset-2">
-                                            <ul className="list-group">
-                                                {tags}
-                                            </ul>
+                    <div className="panel panel-default">
+                        <div className="panel-heading">
+                            <h3 className="panel-title">Modèle</h3>
+                        </div>
+                        <div className="panel-body">
+                            <DatasetChooser dcId={this.state.fields.dcId} onDatasetSelected={this.onDatasetSelected}
+                                            datasets={this.state.datasets} />
+                            {renderIf(this.state.fields.dcId)(
+                                <div>
+                                    <Version version={this.state.fields.version} />
+                                    <FormGroup>
+                                        <Label htmlFor="excludedFields" value="Exclure des champs" />
+                                        <div className="col-sm-9">
+                                            { fields }
                                         </div>
-                                )}
-                            </FormGroup>
+                                    </FormGroup>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    {renderIf(this.state.fields.dcId)(
+                        <div>
+                            <div className="panel panel-default">
+                                <div className="panel-heading">
+                                    <h3 className="panel-title">Jeu de données</h3>
+                                </div>
+                                <div className="panel-body">
+                                    <FormGroup>
+                                        <Label htmlFor="name" value="Name"/>
+                                        <DatasetAutosuggest onSelect={ this.onDatasetNameChange }/>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="source" value="Source" />
+                                        <InputText id="source" value={this.state.fields.source}
+                                                   onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
+                                    </FormGroup>
+                                    <LicenceChooser licenses={this.state.licenses} currentLicense={this.state.fields['license']}
+                                                    onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
+                                    <FormGroup>
+                                        <Label htmlFor="tags" value="Tags"/>
+                                        <TagAutosuggest onSelect={ this.handleAddition }/>
+                                        {renderIf(tags.length > 0) (
+                                                <div className="col-sm-10 col-sm-offset-2">
+                                                    <ul className="list-group">
+                                                        {tags}
+                                                    </ul>
+                                                </div>
+                                        )}
+                                    </FormGroup>
+                                </div>
+                            </div>
+                            <div className="panel panel-default">
+                                <div className="panel-heading">
+                                    <h3 className="panel-title">Jeu de données</h3>
+                                </div>
+                                <div className="panel-body">
+                                    <FormGroup>
+                                        <Label htmlFor="resourceName" value="Nom de la ressource" />
+                                        <InputText id="resourceName" value={this.state.fields.resourceName}
+                                                   onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="description" value="Description" />
+                                        <Textarea id="description" value={this.state.fields.description}
+                                                  onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
+                                    </FormGroup>
+                                </div>
+                            </div>
                             <SubmitButton label="Créer" onClick={(event) => this.registerDataset(this.state.fields)} />
                         </div>
                     )}
