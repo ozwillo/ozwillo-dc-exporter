@@ -3,7 +3,7 @@ import renderIf from 'render-if'
 
 import DatasetAutosuggest from './DatasetAutosuggest'
 import { TagAutosuggest, Tag } from './TagAutosuggest'
-import { FormGroup, Label, InputText, SelectField } from './Form'
+import { FormGroup, Label, InputText, SelectField, Textarea } from './Form'
 
 export default class DatasetForm extends React.Component {
     static propTypes = {
@@ -70,7 +70,7 @@ export default class DatasetForm extends React.Component {
                     {existingDataset(
                         <FormGroup>
                             <Label htmlFor="autosuggest-name" value="Name"/>
-                            <DatasetAutosuggest id="autosuggest-name" onSelect={ this.props.onDatasetNameChange }/>
+                            <DatasetAutosuggest id="autosuggest-name" initialValue={this.props.datasetName} onSelect={ this.props.onDatasetNameChange }/>
                         </FormGroup>
                     )}
                     {newDataset(
@@ -78,6 +78,11 @@ export default class DatasetForm extends React.Component {
                             <FormGroup>
                                 <Label htmlFor="name" value="Name" />
                                 <InputText id="name" value={this.props.datasetName}
+                                           onChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}/>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label htmlFor="notes" value="Description" />
+                                <Textarea id="notes" value={this.props.notes}
                                            onChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}/>
                             </FormGroup>
                             <FormGroup>

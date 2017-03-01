@@ -75,6 +75,7 @@ public class CkanService {
             ckanDataset.setOpen(true);
             ckanDataset.setOwnerOrg(ckanOrganization.getId());
             ckanDataset.setTitle(dcModelMapping.getName());
+            ckanDataset.setNotes(dcModelMapping.getNotes());
             ckanDataset.setLicenseId(dcModelMapping.getLicense());
             ckanDataset.setUrl(dcModelMapping.getSource());
             ckanDataset.setVersion(dcModelMapping.getVersion());
@@ -86,6 +87,7 @@ public class CkanService {
             LOGGER.debug("Updating dataset with slug name {} ", ckanDataset.getName());
             ckanDataset.setLicenseId(dcModelMapping.getLicense());
             ckanDataset.setUrl(dcModelMapping.getSource());
+            ckanDataset.setNotes(dcModelMapping.getNotes());
             ckanDataset.setVersion(dcModelMapping.getVersion());
             ckanDataset.setTags(dcModelMapping.getTags());
             return ckanClient.updateDataset(ckanDataset);

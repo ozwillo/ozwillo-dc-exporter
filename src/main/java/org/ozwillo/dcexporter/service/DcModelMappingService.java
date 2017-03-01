@@ -36,7 +36,7 @@ public class DcModelMappingService {
         return dcModelMappingRepository.findById(id);
     }
 
-    public Either<String, Boolean> add(DcModelMapping dcModelMapping) {
+    public Either<String, DcModelMapping> add(DcModelMapping dcModelMapping) {
         CkanDataset ckanDataset;
         try {
             ckanDataset = ckanService.getOrCreateDataset(dcModelMapping);
@@ -52,8 +52,8 @@ public class DcModelMappingService {
         dcModelMapping.setCkanPackageId(ckanDataset.getId());
         dcModelMapping.setCkanResourceId(ckanResource.getId());
 
-        dcModelMappingRepository.save(dcModelMapping);
-        return Either.right(true);
+        dcModelMapping = dcModelMappingRepository.save(dcModelMapping);
+        return Either.right(dcModelMapping);
     }
 
     public Either<String, DcModelMapping> edit(DcModelMapping dcModelMapping) {

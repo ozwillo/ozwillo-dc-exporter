@@ -26,12 +26,18 @@ export default class DatasetAutosuggest extends React.Component {
     state = {
         value: '',
         suggestions: [],
-        allSuggestions: {}
+        allSuggestions: {},
+        isSet: false
     }
     componentDidMount() {
         fetch('/api/ckan/datasets', {credentials: 'same-origin'})
             .then(response => response.json())
             .then(json => this.setState({allSuggestions: json}))
+    }
+    componentWillReceiveProps(nextProps) {
+        if(nextProps.initialValue != null && !this.state.isSet) {
+            this.setState({value: nextProps.initialValue, isSet: true });
+        }
     }
     getSuggestions(value) {
         const escapedValue = escapeRegexCharacters(value.trim());

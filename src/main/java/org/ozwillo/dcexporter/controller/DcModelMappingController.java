@@ -21,10 +21,21 @@ public class DcModelMappingController {
 
     @RequestMapping(value = "/model", method = RequestMethod.POST)
     public ResponseEntity<String> addMapping(@RequestBody DcModelMapping dcModelMapping) {
-        Either<String, Boolean> result = dcModelMappingService.add(dcModelMapping);
+        Either<String, DcModelMapping> result = dcModelMappingService.add(dcModelMapping);
 
         if (result.isRight())
-            return new ResponseEntity<>(HttpStatus.CREATED);
+            return new ResponseEntity<>(result.get().getId(), HttpStatus.CREATED);
+        else
+            return new ResponseEntity<>(result.getLeft(), HttpStatus.CONFLICT);
+
+    }
+
+    @RequestMapping(value = "/model", method = RequestMethod.PUT)
+    public ResponseEntity<String> editMapping(@RequestBody DcModelMapping dcModelMapping) {
+        Either<String, DcModelMapping> result = dcModelMappingService.edit(dcModelMapping);
+
+        if (result.isRight())
+            return new ResponseEntity<>(result.get().getId(), HttpStatus.CREATED);
         else
             return new ResponseEntity<>(result.getLeft(), HttpStatus.CONFLICT);
 

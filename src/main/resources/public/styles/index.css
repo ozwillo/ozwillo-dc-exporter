@@ -17,6 +17,10 @@ span.glyphicon {
   display: inline-block;
 }
 
+.read-only-field {
+    padding-top: 7px;
+}
+
 
 /* React autosuggest */
 
