@@ -53,11 +53,9 @@ public class CkanService {
 
         CkanDataset ckanDataset = null;
         try {
-            if (dcModelMapping.getCkanPackageId() != null)
+            if (dcModelMapping.getCkanPackageId() != null && !dcModelMapping.getCkanPackageId().equals("")) {
                 ckanDataset = ckanClient.getDataset(dcModelMapping.getCkanPackageId());
-            else
-                ckanDataset = ckanClient.getDataset(dcModelMapping.getName());
-            LOGGER.debug("CKAN dataset {} found for {}", ckanDataset.getId(), dcModelMapping.getDcId());
+            }
         } catch (CkanException e) {
             // Not Found Error is an « expected » result
             // FIXME : this is a poor way to perform a search

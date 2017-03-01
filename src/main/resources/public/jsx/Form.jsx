@@ -38,10 +38,15 @@ const SubmitButton = ({ label, onClick }) =>
         </div>
     </div>
 
-const Alert = ({ message, success }) =>
-    <div className="col-sm-9 col-sm-offset-3">
-        <div className={'alert ' + (success ? 'alert-success' : 'alert-danger')} role="alert">
+const Alert = ({ message, success, closeMethod }) =>
+    <div className={'row alert ' + (success ? 'alert-success' : 'alert-danger')} role="alert">
+        <div className="col-sm-11">
             {message}
+        </div>
+        <div className="col-sm-1">
+            <button type="button" className="close" onClick={closeMethod}>
+                <span>&times;</span>
+            </button>
         </div>
     </div>
 

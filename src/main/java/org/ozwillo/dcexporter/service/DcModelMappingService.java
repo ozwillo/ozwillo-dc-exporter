@@ -37,26 +37,23 @@ public class DcModelMappingService {
     }
 
     public Either<String, Boolean> add(DcModelMapping dcModelMapping) {
-        if (dcModelMappingRepository.findByDcId(dcModelMapping.getDcId()) == null) {
-            CkanDataset ckanDataset;
-            try {
-                ckanDataset = ckanService.getOrCreateDataset(dcModelMapping);
-            } catch (CkanException e) {
-                if (e.getCkanResponse() != null && e.getCkanResponse().getError() != null)
-                    return Either.left(e.getCkanResponse().getError().getMessage());
-                else
-                    return Either.left(e.getMessage());
-            }
-
-            CkanResource ckanResource = ckanService.createResource(ckanDataset.getId(), dcModelMapping.getResourceName(), dcModelMapping.getDescription());
-
-            dcModelMapping.setCkanPackageId(ckanDataset.getId());
-            dcModelMapping.setCkanResourceId(ckanResource.getId());
-
-            dcModelMappingRepository.save(dcModelMapping);
-            return Either.right(true);
+        CkanDataset ckanDataset;
+        try {
+            ckanDataset = ckanService.getOrCreateDataset(dcModelMapping);
+        } catch (CkanException e) {
+            if (e.getCkanResponse() != null && e.getCkanResponse().getError() != null)
+                return Either.left(e.getCkanResponse().getError().getMessage());
+            else
+                return Either.left(e.getMessage());
         }
-        return Either.left("Ce jeu de données est déjà configuré");
+
+        CkanResource ckanResource = ckanService.createResource(ckanDataset.getId(), dcModelMapping.getResourceName(), dcModelMapping.getDescription());
+
+        dcModelMapping.setCkanPackageId(ckanDataset.getId());
+        dcModelMapping.setCkanResourceId(ckanResource.getId());
+
+        dcModelMappingRepository.save(dcModelMapping);
+        return Either.right(true);
     }
 
     public Either<String, DcModelMapping> edit(DcModelMapping dcModelMapping) {
