@@ -53,11 +53,9 @@ public class CkanService {
 
         CkanDataset ckanDataset = null;
         try {
-            if (dcModelMapping.getCkanPackageId() != null)
+            if (dcModelMapping.getCkanPackageId() != null && !dcModelMapping.getCkanPackageId().equals("")) {
                 ckanDataset = ckanClient.getDataset(dcModelMapping.getCkanPackageId());
-            else
-                ckanDataset = ckanClient.getDataset(dcModelMapping.getName());
-            LOGGER.debug("CKAN dataset {} found for {}", ckanDataset.getId(), dcModelMapping.getDcId());
+            }
         } catch (CkanException e) {
             // Not Found Error is an « expected » result
             // FIXME : this is a poor way to perform a search
@@ -77,6 +75,7 @@ public class CkanService {
             ckanDataset.setOpen(true);
             ckanDataset.setOwnerOrg(ckanOrganization.getId());
             ckanDataset.setTitle(dcModelMapping.getName());
+            ckanDataset.setNotes(dcModelMapping.getNotes());
             ckanDataset.setLicenseId(dcModelMapping.getLicense());
             ckanDataset.setUrl(dcModelMapping.getSource());
             ckanDataset.setVersion(dcModelMapping.getVersion());
@@ -88,6 +87,7 @@ public class CkanService {
             LOGGER.debug("Updating dataset with slug name {} ", ckanDataset.getName());
             ckanDataset.setLicenseId(dcModelMapping.getLicense());
             ckanDataset.setUrl(dcModelMapping.getSource());
+            ckanDataset.setNotes(dcModelMapping.getNotes());
             ckanDataset.setVersion(dcModelMapping.getVersion());
             ckanDataset.setTags(dcModelMapping.getTags());
             return ckanClient.updateDataset(ckanDataset);
@@ -104,6 +104,18 @@ public class CkanService {
         ckanResource.setUrl("upload");
 
         return ckanClient.createResource(ckanResource);
+    }
+
+    public CkanResource updateResource(String resourceId, String packageId, String name,String description) {
+        CkanClient ckanClient = new CkanClient(ckanUrl, ckanApiKey);
+
+        CkanResource ckanResource = ckanClient.getResource(resourceId);
+        ckanResource.setPackageId(packageId);
+        ckanResource.setDescription(description);
+        ckanResource.setName(name);
+        ckanResource.setUrl("upload");
+
+        return ckanClient.updateResource(ckanResource);
     }
 
     public void updateResourceData(DcModelMapping dcModelMapping, String resource) throws Exception {

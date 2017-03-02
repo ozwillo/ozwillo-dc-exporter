@@ -6,7 +6,7 @@ export default React.createClass({
     render() {
         return (
             <nav className="navbar navbar-default">
-                <div className="container-fluid">
+                <div className="container">
                     <div className="navbar-header">
                         <button type="button" className="navbar-toggle collapsed" data-toggle="collapse"
                                 data-target="#navbar-collapse" aria-expanded="false">
@@ -21,7 +21,7 @@ export default React.createClass({
                     <div className="collapse navbar-collapse" id="navbar-collapse">
                         <ul className="nav navbar-nav">
                             <li><IndexLink to="/">Flux d'activités</IndexLink></li>
-                            <li><Link to="/create-dataset">Ajouter un jeu de données</Link></li>
+                            <li><Link to="/dataset">Ajouter un jeu de données</Link></li>
                         </ul>
                     </div>
                 </div>

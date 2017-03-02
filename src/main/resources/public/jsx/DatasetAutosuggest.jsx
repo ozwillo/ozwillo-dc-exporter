@@ -17,19 +17,17 @@ function escapeRegexCharacters(str) {
 }
 
 export default class DatasetAutosuggest extends React.Component {
-    constructor (props) {
-        super(props)
-
-        this.defaultProps = {
-            required: false
-        }
-
-        this.state = {
-            value: '',
-            suggestions: [],
-            allSuggestions: {}
-
-        }
+    static propTypes = {
+        id: React.PropTypes.string.isRequired
+    }
+    static defaultProps = {
+        required: false
+    }
+    state = {
+        value: '',
+        suggestions: [],
+        allSuggestions: {},
+        isSet: false
     }
     componentDidMount() {
         fetch('/api/ckan/datasets', {credentials: 'same-origin'})
@@ -49,7 +47,7 @@ export default class DatasetAutosuggest extends React.Component {
     }
     onChange = (event, { newValue }) => {
         this.setState({ value: newValue })
-        this.props.onSelect(newValue)
+        this.props.onChange('name', newValue)
     }
     onSuggestionsFetchRequested = ({ value }) => {
         this.setState({
@@ -64,14 +62,14 @@ export default class DatasetAutosuggest extends React.Component {
     }
     render() {
         const inputProps = {
-            value: this.state.value,
+            value: this.props.datasetName,
             onChange: this.onChange,
             required: true
         }
         return (
             <div className="col-sm-9">
                 <Autosuggest
-                    id={"DatasetAutosuggest"}
+                    id={this.props.id}
                     suggestions={this.state.suggestions}
                     onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
                     onSuggestionsClearRequested={this.onSuggestionsClearRequested}

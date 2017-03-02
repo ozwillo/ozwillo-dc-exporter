@@ -1,12 +1,8 @@
 package org.ozwillo.dcexporter.controller;
 
-import eu.trentorise.opendata.jackan.exceptions.CkanException;
-import eu.trentorise.opendata.jackan.model.CkanDataset;
-import eu.trentorise.opendata.jackan.model.CkanResource;
-import org.ozwillo.dcexporter.dao.DcModelMappingRepository;
+import javaslang.control.Either;
 import org.ozwillo.dcexporter.model.ui.AuditLogWapper;
 import org.ozwillo.dcexporter.model.DcModelMapping;
-import org.ozwillo.dcexporter.service.CkanService;
 import org.ozwillo.dcexporter.service.DcModelMappingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,43 +11,39 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 @RequestMapping("/api/dc-model-mapping")
 public class DcModelMappingController {
 
     @Autowired
-    private DcModelMappingRepository dcModelMappingRepository;
-
-    @Autowired
-    private CkanService ckanService;
-    @Autowired
     private DcModelMappingService dcModelMappingService;
 
-    @RequestMapping(value = "/models",method = POST)
+    @RequestMapping(value = "/model", method = RequestMethod.POST)
     public ResponseEntity<String> addMapping(@RequestBody DcModelMapping dcModelMapping) {
-        if (dcModelMappingRepository.findByDcId(dcModelMapping.getDcId()) == null) {
-            CkanDataset ckanDataset;
-            try {
-                ckanDataset = ckanService.getOrCreateDataset(dcModelMapping);
-            } catch (CkanException e) {
-                if (e.getCkanResponse() != null && e.getCkanResponse().getError() != null)
-                   return new ResponseEntity<>(e.getCkanResponse().getError().getMessage(), HttpStatus.CONFLICT);
-                else
-                    return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
-            }
+        Either<String, DcModelMapping> result = dcModelMappingService.add(dcModelMapping);
 
-            CkanResource ckanResource = ckanService.createResource(ckanDataset.getId(), dcModelMapping.getResourceName(), dcModelMapping.getDescription());
+        if (result.isRight())
+            return new ResponseEntity<>(result.get().getId(), HttpStatus.CREATED);
+        else
+            return new ResponseEntity<>(result.getLeft(), HttpStatus.CONFLICT);
 
-            dcModelMapping.setCkanPackageId(ckanDataset.getId());
-            dcModelMapping.setCkanResourceId(ckanResource.getId());
+    }
 
-            dcModelMappingRepository.save(dcModelMapping);
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        }
+    @RequestMapping(value = "/model", method = RequestMethod.PUT)
+    public ResponseEntity<String> editMapping(@RequestBody DcModelMapping dcModelMapping) {
+        Either<String, DcModelMapping> result = dcModelMappingService.edit(dcModelMapping);
 
-        return new ResponseEntity<>("Ce jeu de données est déjà configuré", HttpStatus.CONFLICT);
+        if (result.isRight())
+            return new ResponseEntity<>(result.get().getId(), HttpStatus.CREATED);
+        else
+            return new ResponseEntity<>(result.getLeft(), HttpStatus.CONFLICT);
+
+    }
+
+    @RequestMapping(value = "/model/{id}", method = RequestMethod.GET)
+    public DcModelMapping getMapping(@PathVariable String id) {
+        return dcModelMappingService.getById(id);
     }
 
     @RequestMapping(value = "/logs", method = RequestMethod.GET)

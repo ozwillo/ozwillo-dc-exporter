@@ -1,7 +1,8 @@
 import React from 'react'
+import { Link } from 'react-router'
 
 const ContainerPanel =  ({children}) =>
-    <div className="container">
+    <div>
         {children}
     </div>
 
@@ -15,7 +16,7 @@ const Panel = ({log}) =>
         <div className="panel-heading">
             <div className="row">
                 <div className="col-md-9">
-                    <h3 className="panel-title">{log.dcModelMapping.name}</h3>
+                    <h3 className="panel-title"><Link to={`/dataset/${log.dcModelMapping.id}`}>{log.dcModelMapping.name}</Link></h3>
                 </div>
                 <div className="col-md-3">
                     {log.synchronizerAuditLog &&

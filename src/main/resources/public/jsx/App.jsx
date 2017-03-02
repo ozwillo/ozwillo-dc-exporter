@@ -5,7 +5,7 @@ import { Router, Route, IndexRoute, hashHistory } from 'react-router'
 
 import Navbar from './Navbar'
 import Dashboard from './Dashboard'
-import DatasetAdder from './DatasetAdder'
+import Dataset from './Dataset'
 
 const App = React.createClass({
     getInitialState() {
@@ -44,7 +44,8 @@ render((
     <Router history={hashHistory}>
         <Route path="/" component={App}>
             <IndexRoute component={Dashboard} />
-            <Route path="create-dataset" component={DatasetAdder} />
+            <Route path="dataset" component={Dataset} />
+            <Route path="dataset/:id" component={Dataset}/>
         </Route>
     </Router>
 ), document.getElementById('app'))

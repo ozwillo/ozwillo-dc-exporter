@@ -23,7 +23,12 @@ const SelectField = ({ id, value, onChange, children }) =>
 
 const InputText = ({ id, value, onChange }) =>
     <div className="col-sm-9">
-        <input type="text " name={id} id={id} value={value} className="form-control" onChange={onChange} />
+        <input type="text" name={id} id={id} value={value} className="form-control" onChange={onChange} />
+    </div>
+
+const ReadOnlyField = ({ id, value}) =>
+    <div className="col-sm-9 read-only-field">
+        <span id={id}>{value}</span>
     </div>
 
 const Textarea = ({ id, value, onChange }) =>
@@ -31,18 +36,23 @@ const Textarea = ({ id, value, onChange }) =>
         <textarea name={id} id={id} value={value} className="form-control" onChange={onChange}></textarea>
     </div>
 
-const SubmitButton = ({ label, onClick }) =>
+const SubmitButton = ({ label, onClick, disabled }) =>
     <div className="form-group">
         <div className="col-sm-offset-3 col-sm-7">
-            <button type="button" className="btn btn-default" onClick={onClick}>{label}</button>
+            <button type="button" className="btn btn-default" onClick={onClick} disabled={disabled}>{label}</button>
         </div>
     </div>
 
-const Alert = ({ message, success }) =>
-    <div className="col-sm-9 col-sm-offset-3">
-        <div className={'alert ' + (success ? 'alert-success' : 'alert-danger')} role="alert">
+const Alert = ({ message, success, closeMethod }) =>
+    <div className={'row alert ' + (success ? 'alert-success' : 'alert-danger')} role="alert">
+        <div className="col-sm-11">
             {message}
         </div>
+        <div className="col-sm-1">
+            <button type="button" className="close" onClick={closeMethod}>
+                <span>&times;</span>
+            </button>
+        </div>
     </div>
 
-module.exports = { Form, FormGroup, Label, SelectField, InputText, Textarea, SubmitButton, Alert }
+module.exports = { Form, FormGroup, Label, SelectField, InputText, Textarea, SubmitButton, Alert, ReadOnlyField }

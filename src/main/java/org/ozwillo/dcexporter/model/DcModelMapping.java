@@ -41,6 +41,8 @@ public class DcModelMapping {
 
     private String description;
 
+    private String notes;
+
     private List<CkanTag> tags;
 
     private String license;
@@ -128,6 +130,14 @@ public class DcModelMapping {
         this.description = description;
     }
 
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
     public List<CkanTag> getTags() {
         return tags;
     }
@@ -168,6 +178,7 @@ public class DcModelMapping {
                 ", type='" + type + '\'' +
                 ", resourceName='" + resourceName + '\'' +
                 ", name='" + name + '\'' +
+                ", notes='" + notes + '\'' +
                 ", description='" + description + '\'' +
                 ", tags=" + tags +
                 ", license='" + license + '\'' +

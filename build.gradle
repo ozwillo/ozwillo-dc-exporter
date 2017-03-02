@@ -49,6 +49,7 @@ dependencies {
 	compile('org.springframework.session:spring-session')
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.boot:spring-boot-starter-websocket')
+	compile('io.javaslang:javaslang:2.0.4')
 
     compile project('ozwillo-java-spring-integration')
 
