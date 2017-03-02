@@ -34,11 +34,6 @@ export default class DatasetAutosuggest extends React.Component {
             .then(response => response.json())
             .then(json => this.setState({allSuggestions: json}))
     }
-    componentWillReceiveProps(nextProps) {
-        if(nextProps.initialValue != null && !this.state.isSet) {
-            this.setState({value: nextProps.initialValue, isSet: true });
-        }
-    }
     getSuggestions(value) {
         const escapedValue = escapeRegexCharacters(value.trim());
 
@@ -52,7 +47,7 @@ export default class DatasetAutosuggest extends React.Component {
     }
     onChange = (event, { newValue }) => {
         this.setState({ value: newValue })
-        this.props.onSelect(newValue)
+        this.props.onChange('name', newValue)
     }
     onSuggestionsFetchRequested = ({ value }) => {
         this.setState({
@@ -67,7 +62,7 @@ export default class DatasetAutosuggest extends React.Component {
     }
     render() {
         const inputProps = {
-            value: this.state.value,
+            value: this.props.datasetName,
             onChange: this.onChange,
             required: true
         }

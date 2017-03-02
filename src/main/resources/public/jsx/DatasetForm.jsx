@@ -7,10 +7,14 @@ import { FormGroup, Label, InputText, SelectField, Textarea } from './Form'
 
 export default class DatasetForm extends React.Component {
     static propTypes = {
+        onChange: React.PropTypes.func.onChange,
         onDatasetNameChange: React.PropTypes.func.isRequired,
         onFieldChange: React.PropTypes.func.isRequired,
+        toggleNewDataset: React.PropTypes.func.isRequired,
+        newDataset: React.PropTypes.bool.isRequired,
         tags: React.PropTypes.array.isRequired,
         source: React.PropTypes.string.isRequired,
+        notes: React.PropTypes.string.isRequired,
         licenses: React.PropTypes.object.isRequired,
         license: React.PropTypes.string.isRequired,
         datasetName: React.PropTypes.string.isRequired
@@ -19,12 +23,6 @@ export default class DatasetForm extends React.Component {
         super(props)
         this.handleDelete = this.handleDelete.bind(this)
         this.handleAddition = this.handleAddition.bind(this)
-        this.handleExistingBtn = this.handleExistingBtn.bind(this)
-        this.handleNewBtn = this.handleNewBtn.bind(this)
-    }
-    state = {
-        datasetName: '',
-        newDataset: false
     }
     handleDelete(i) {
         let tags = this.state.fields.tags
@@ -36,24 +34,15 @@ export default class DatasetForm extends React.Component {
         tags.push(tag)
         this.props.onFieldChange('tags', tags)
     }
-    handleExistingBtn() {
-        this.props.onFieldChange('name', '')
-        this.setState({ newDataset: false })
-    }
-    handleNewBtn() {
-        this.props.onFieldChange('name', '')
-        this.props.onFieldChange('ckanPackageId', '')
-        this.setState({ newDataset: true })
-    }
     render() {
         const tags = this.props.tags.map(( tag, key ) =>
             <Tag key={key} keyword={tag.name} remove={this.handleDelete} id={key} />)
 
-        const existingClassName = !this.state.newDataset ? "btn btn-primary" : "btn btn-default"
-        const newClassName = this.state.newDataset ? "btn btn-primary" : "btn btn-default"
+        const existingClassName = !this.props.newDataset ? "btn btn-primary" : "btn btn-default"
+        const newClassName = this.props.newDataset ? "btn btn-primary" : "btn btn-default"
 
-        const existingDataset = renderIf(this.state.newDataset == false)
-        const newDataset = renderIf(this.state.newDataset == true)
+        const existingDataset = renderIf(this.props.newDataset == false)
+        const newDataset = renderIf(this.props.newDataset == true)
 
         return (
             <div className="panel panel-default">
@@ -63,14 +52,17 @@ export default class DatasetForm extends React.Component {
                 <div className="panel-body">
                     <div className="center-outer-div">
                         <div className="btn-group center-inner-div">
-                            <button type="button" className={existingClassName} onClick={this.handleExistingBtn}>Existant</button>
-                            <button type="button" className={newClassName} onClick={this.handleNewBtn}>Nouveau</button>
+                            <button type="button" className={existingClassName} onClick={this.props.toggleNewDataset}>Existant</button>
+                            <button type="button" className={newClassName} onClick={this.props.toggleNewDataset}>Nouveau</button>
                         </div>
                     </div>
                     {existingDataset(
                         <FormGroup>
                             <Label htmlFor="autosuggest-name" value="Name"/>
-                            <DatasetAutosuggest id="autosuggest-name" initialValue={this.props.datasetName} onSelect={ this.props.onDatasetNameChange }/>
+                            <DatasetAutosuggest id="autosuggest-name"
+                                                datasetName={this.props.datasetName}
+                                                onChange={this.props.onChange}
+                                                onSelect={this.props.onDatasetNameChange}/>
                         </FormGroup>
                     )}
                     {newDataset(

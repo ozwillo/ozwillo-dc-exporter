@@ -15,6 +15,7 @@ export default class Dataset extends React.Component {
             datasetsFetched: false,
             dataset: [],
             datasetFetched: false,
+            newDataset: false,
             licenses: {},
             message: '',
             success: true,
@@ -37,12 +38,14 @@ export default class Dataset extends React.Component {
             }
         }
 
+        this.loadMapping = this.loadMapping.bind(this)
         this.onDatasetSelected = this.onDatasetSelected.bind(this)
         this.registerDataset = this.registerDataset.bind(this)
         this.checkStatus = this.checkStatus.bind(this)
         this.onFieldChange = this.onFieldChange.bind(this)
         this.onDatasetNameChange = this.onDatasetNameChange.bind(this)
         this.toggleCheckbox = this.toggleCheckbox.bind(this)
+        this.toggleNewDataset = this.toggleNewDataset.bind(this)
         this.closeNotif = this.closeNotif.bind(this)
         this.selectedCheckboxes = new Set();
     }
@@ -57,9 +60,7 @@ export default class Dataset extends React.Component {
     }
     componentDidMount() {
         if (this.props.params.id) {
-            fetch('/api/dc-model-mapping/model/' + this.props.params.id, { credentials: 'same-origin' })
-                .then(response => response.json())
-                .then(json => this.setState({fields: json, mode: 'update', fieldsFetched: true}))
+            this.loadMapping(this.props.params.id)
         }
 
         fetch('/api/dc/models', { credentials: 'same-origin' })
@@ -78,6 +79,11 @@ export default class Dataset extends React.Component {
             })
             this.setState({ dataset: dataset, datasetFetched: true })
         }
+    }
+    loadMapping(id){
+        fetch('/api/dc-model-mapping/model/' + id, { credentials: 'same-origin' })
+            .then(response => response.json())
+            .then(json => this.setState({fields: json, mode: 'update', fieldsFetched: true, newDataset: false}))
     }
     onDatasetSelected(dcId) {
         const dataset = this.state.datasets.find(function(dataset){
@@ -104,7 +110,8 @@ export default class Dataset extends React.Component {
         .then(response => response.text())
         .then(id => {
             browserHistory.push('/dataset/' + id)
-            this.setState({ mode: 'update', message: 'Jeu de données créé' })
+            this.loadMapping(id)
+            this.setState({ message: 'Jeu de données créé' })
         })
         .catch(text => this.setState({ message: text }))
     }
@@ -137,6 +144,17 @@ export default class Dataset extends React.Component {
             this.onFieldChange('excludedFields', excludeFields)
             this.selectedCheckboxes.add(label)
         }
+    }
+    toggleNewDataset(){
+        const bool = !this.state.newDataset
+        const fields = this.state.fields
+        fields['name'] = ''
+        fields['notes'] = ''
+        fields['source'] = ''
+        fields['tags'] = []
+        fields['license'] = ''
+        fields['ckanPackageId'] = ''
+        this.setState({newDataset: bool, fields: fields})
     }
     onFieldChange(id, value) {
         const fields = this.state.fields
@@ -205,8 +223,11 @@ export default class Dataset extends React.Component {
                     </div>
                     {renderIf(this.state.fields.dcId)(
                         <div>
-                            <DatasetForm onDatasetNameChange={this.onDatasetNameChange}
+                            <DatasetForm onChange={this.onFieldChange}
+                                         onDatasetNameChange={this.onDatasetNameChange}
                                          onFieldChange={this.onFieldChange}
+                                         newDataset={this.state.newDataset}
+                                         toggleNewDataset={this.toggleNewDataset}
                                          source={this.state.fields.source}
                                          notes={this.state.fields.notes}
                                          datasetName={this.state.fields.name}
@@ -232,7 +253,7 @@ export default class Dataset extends React.Component {
                                 </div>
                             </div>
                             {isModeCreate(<SubmitButton label="Créer" onClick={(event) => this.registerDataset(this.state.fields)} disabled={disabled} />)}
-                            {isModeUpdate(<SubmitButton label="Mettre à jour" onClick={(event) => this.registerDataset(this.state.fields)} disabled={disabled} />)}
+                            {isModeUpdate(<SubmitButton label="Mettre à jour" onClick={(event) => this.updateDataset(this.state.fields)} disabled={disabled} />)}
                         </div>
                     )}
                 </Form>
