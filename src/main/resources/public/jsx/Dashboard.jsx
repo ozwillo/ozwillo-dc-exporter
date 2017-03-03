@@ -1,4 +1,5 @@
 import React from 'react'
+import renderIf from 'render-if'
 
 import { ContainerPanel, PanelGroup, Panel } from './Panel'
 
@@ -18,9 +19,16 @@ export default class Dashboard extends React.Component {
         return (
             <div id="container" className="container">
                 <h1>Flux d'activités</h1>
-                <ContainerPanel>
-                    <PanelGroup>{list}</PanelGroup>
-                </ContainerPanel>
+                {renderIf(list.length > 0) (
+                    <ContainerPanel>
+                        <PanelGroup>{list}</PanelGroup>
+                    </ContainerPanel>
+                )}
+                {renderIf(list.length == 0) (
+                    <div className="alert alert-info" role="alert">
+                        <p><i>Aucun jeu de données enregistré</i></p>
+                    </div>
+                )}
             </div>
         )
     }
