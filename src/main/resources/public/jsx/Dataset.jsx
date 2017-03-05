@@ -111,7 +111,7 @@ export default class Dataset extends React.Component {
         .then(id => {
             browserHistory.push('/dataset/' + id)
             this.loadMapping(id)
-            this.setState({ message: 'Jeu de données créé' })
+            this.setState({ message: 'Le jeu de données a été créé' })
         })
         .catch(text => this.setState({ message: text }))
     }
@@ -126,7 +126,7 @@ export default class Dataset extends React.Component {
             body: JSON.stringify(fields)
         })
         .then(this.checkStatus)
-        .then(() => this.setState({ message: 'Jeu de données mis à jour' }))
+        .then(() => this.setState({ message: 'Le jeu de données a été mis à jour' }))
         .catch(response => {
             response.text().then(text => this.setState({ message: text }))
         })
@@ -189,7 +189,7 @@ export default class Dataset extends React.Component {
                 <Form>
                     <div className="panel panel-default">
                         <div className="panel-heading">
-                            <h3 className="panel-title">Coeur de données</h3>
+                            <h3 className="panel-title">Cœur de données</h3>
                         </div>
                         <div className="panel-body">
                             {isModeCreate(
@@ -211,7 +211,7 @@ export default class Dataset extends React.Component {
                                     </FormGroup>
                                     {isModeCreate(
                                         <FormGroup>
-                                            <Label htmlFor="excludedFields" value="Inclure des champs" />
+                                            <Label htmlFor="excludedFields" value="Champs à exporter" />
                                             <div className="col-sm-9">
                                                 { fields }
                                             </div>
