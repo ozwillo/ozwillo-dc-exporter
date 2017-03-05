@@ -45,7 +45,7 @@ const SubmitButton = ({ label, onClick, disabled }) =>
 
 const Alert = ({ message, success, closeMethod }) =>
     <div className={'row alert ' + (success ? 'alert-success' : 'alert-danger')} role="alert">
-        <div className="col-sm-11">
+        <div className="col-sm-11 text-center">
             {message}
         </div>
         <div className="col-sm-1">
