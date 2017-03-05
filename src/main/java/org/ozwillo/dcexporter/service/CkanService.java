@@ -91,13 +91,8 @@ public class CkanService {
 
             return ckanClient.createDataset(ckanDataset);
         } else {
-            LOGGER.debug("Updating dataset with slug name {} ", ckanDataset.getName());
-            ckanDataset.setLicenseId(dcModelMapping.getLicense());
-            ckanDataset.setUrl(dcModelMapping.getSource());
-            ckanDataset.setNotes(dcModelMapping.getNotes());
-            ckanDataset.setVersion(dcModelMapping.getVersion());
-            ckanDataset.setTags(dcModelMapping.getTags());
-            return ckanClient.updateDataset(ckanDataset);
+            LOGGER.debug("Reusing existing dataset with slug name {} ", ckanDataset.getName());
+            return ckanDataset;
         }
     }
 
