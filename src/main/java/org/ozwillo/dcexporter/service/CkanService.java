@@ -134,7 +134,7 @@ public class CkanService {
         ckanResourceBase.setUrl("upload");
         ckanResourceBase.setFormat("CSV");
         ckanResourceBase.setMimetype("text/csv");
-        ckanResourceBase.setName("file.csv");
+        ckanResourceBase.setName(dcModelMapping.getType() + ".csv");
         ckanResourceBase.setDescription(dcModelMapping.getDescription());
         ckanResourceBase.setId(dcModelMapping.getCkanResourceId());
         ckanResourceBase.setUploadByte(resource.getBytes());
