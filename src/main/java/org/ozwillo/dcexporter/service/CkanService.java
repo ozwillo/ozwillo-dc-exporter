@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.text.Normalizer;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,7 +41,13 @@ public class CkanService {
     public Map<String, String> getLicences() {
         CkanClient ckanClient = new CkanClient(ckanUrl);
         List<CkanLicense> licenses = ckanClient.getLicenseList();
-        return licenses.stream().collect(Collectors.toMap(CkanLicense::getId, CkanLicense::getTitle));
+        Map<String, String> unsortedLicences =
+            licenses.stream().collect(Collectors.toMap(CkanLicense::getId, CkanLicense::getTitle));
+        Map<String, String> result = new LinkedHashMap<>();
+        unsortedLicences.entrySet().stream()
+            .sorted(Map.Entry.comparingByValue())
+            .forEachOrdered(x -> result.put(x.getKey(), x.getValue()));
+        return result;
     }
 
     public List<CkanTag> getTags() {
