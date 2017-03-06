@@ -9,7 +9,7 @@ public interface DcModelMappingRepository extends MongoRepository<DcModelMapping
 
     DcModelMapping findByDcId(String dcId);
 
-    List<DcModelMapping> findAllByOrderByNameAsc();
+    List<DcModelMapping> findAllByOrderByResourceNameAsc();
     
     DcModelMapping findById(String id);
 }
