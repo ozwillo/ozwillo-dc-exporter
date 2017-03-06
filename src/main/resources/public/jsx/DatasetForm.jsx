@@ -25,12 +25,12 @@ export default class DatasetForm extends React.Component {
         this.handleAddition = this.handleAddition.bind(this)
     }
     handleDelete(i) {
-        let tags = this.state.fields.tags
+        let tags = this.props.tags
         tags.splice(i, 1)
         this.props.onFieldChange('tags', tags)
     }
     handleAddition(tag) {
-        let tags = this.state.fields.tags
+        let tags = this.props.tags
         tags.push(tag)
         this.props.onFieldChange('tags', tags)
     }
@@ -88,7 +88,7 @@ export default class DatasetForm extends React.Component {
                                 <Label htmlFor="tags" value="Tags"/>
                                 <TagAutosuggest onSelect={ this.handleAddition }/>
                                 {renderIf(tags.length > 0) (
-                                        <div className="col-sm-10 col-sm-offset-2">
+                                        <div className="col-sm-9 col-sm-offset-3">
                                             <ul className="list-group">
                                                 {tags}
                                             </ul>

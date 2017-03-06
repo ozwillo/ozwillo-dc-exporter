@@ -6,6 +6,10 @@ span.glyphicon {
     display: inline-block;
     margin: 5px 5px 0px 0px;
 }
+.remove-tag{
+    cursor: pointer;
+    cursor: hand;
+}
 
 .btn-group {
     padding-bottom: 15px;
