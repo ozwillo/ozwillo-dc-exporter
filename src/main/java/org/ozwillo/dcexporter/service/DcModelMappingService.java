@@ -81,7 +81,7 @@ public class DcModelMappingService {
     }
 
     public List<AuditLogWapper> getAllAuditLogWithModel() {
-        return dcModelMappingRepository.findAllByOrderByNameAsc().stream().map(dcModelMapping -> {
+        return dcModelMappingRepository.findAllByOrderByResourceNameAsc().stream().map(dcModelMapping -> {
             SynchronizerAuditLog auditLog =
                     synchronizerAuditLogRepository.findFirstByTypeOrderByDateDesc(dcModelMapping.getType());
             return new AuditLogWapper(dcModelMapping, auditLog);
