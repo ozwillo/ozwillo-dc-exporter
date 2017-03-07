@@ -18,7 +18,7 @@ export default class Dashboard extends React.Component {
         )
         return (
             <div id="container" className="container">
-                <h1>Flux d'activités</h1>
+                <h1>Tableau de bord</h1>
                 {renderIf(list.length > 0) (
                     <ContainerPanel>
                         <PanelGroup>{list}</PanelGroup>
