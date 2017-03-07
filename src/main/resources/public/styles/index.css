@@ -29,6 +29,15 @@ h1 {
     padding-bottom: 15px;
 }
 
+.wrap-result {
+    padding-top: 10px;
+}
+
+.filter-dropdown > .dropdown {
+    padding-bottom: 0px;
+}
+
+
 
 /* React autosuggest */
 
