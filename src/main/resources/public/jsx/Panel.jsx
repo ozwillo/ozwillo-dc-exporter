@@ -17,7 +17,7 @@ const Panel = ({log}) =>
             <div className="row">
                 <div className="col-md-9">
                     <h3 className="panel-title">
-                        <Link to={`/dataset/${log.dcModelMapping.id}`}>{log.dcModelMapping.resourceName}</Link>
+                        {log.dcModelMapping.resourceName}
                         {log.synchronizerAuditLog &&
                             <span className={'glyphicon' + (log.synchronizerAuditLog.succeeded ? ' glyphicon-ok' : ' glyphicon-warning-sign')} aria-hidden="true"></span>
                         }
@@ -30,7 +30,7 @@ const Panel = ({log}) =>
                     <div className="text-right">
                         <Link to={`/dataset/${log.dcModelMapping.id}`}>
                             <button type="button" className="btn btn-default btn-xs">
-                                Edit <span className="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                                Modifier <span className="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                             </button>
                         </Link>
                     </div>
