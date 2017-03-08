@@ -15,7 +15,7 @@ const Panel = ({log}) =>
     <div className={'panel' + (!log.synchronizerAuditLog ? ' panel-warning' : log.synchronizerAuditLog.succeeded ? ' panel-success' : ' panel-danger')}>
         <div className="panel-heading">
             <div className="row">
-                <div className="col-md-9">
+                <div className="col-md-7">
                     <h3 className="panel-title">
                         {log.dcModelMapping.resourceName}
                         {log.synchronizerAuditLog &&
@@ -26,12 +26,12 @@ const Panel = ({log}) =>
                         }
                     </h3>
                 </div>
-                <div className="col-md-3">
+                <div className="col-md-5">
                     <div className="text-right">
-                        <Link to={`/dataset/${log.dcModelMapping.id}`}>
-                            <button type="button" className="btn btn-default btn-xs">
-                                Modifier <span className="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                            </button>
+                        <DatasetLink datasetName={log.dcModelMapping.name} />
+                        <ResourceLink datasetName={log.dcModelMapping.name} resourceId={log.dcModelMapping.ckanResourceId} />
+                        <Link className="btn btn-default btn-xs panel-btn" to={`/dataset/${log.dcModelMapping.id}`}>
+                            Modifier <span className="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                         </Link>
                     </div>
                 </div>
@@ -57,5 +57,32 @@ const Panel = ({log}) =>
             }
         </ul>
     </div>
+
+
+const DatasetLink = ({ datasetName }) =>
+    <a className="btn btn-default btn-xs panel-btn" target="_blank" href={'https://opendata.sictiam.fr/dataset/' + slugify(datasetName)}>
+        Voir le jeu de données <span className="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+    </a>
+
+const ResourceLink = ({ datasetName, resourceId }) =>
+    <a className="btn btn-default btn-xs panel-btn" target="_blank" href={'https://opendata.sictiam.fr/dataset/' + slugify(datasetName) + '/resource/' + resourceId}>
+        Voir la ressource <span className="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+    </a>
+
+function slugify (text) {
+    const a = 'àáäâèéëêìíïîòóöôùúüûñçßÿœæŕśńṕẃǵǹḿǘẍźḧ·/_,:;'
+    const b = 'aaaaeeeeiiiioooouuuuncsyoarsnpwgnmuxzh------'
+    const p = new RegExp(a.split('').join('|'), 'g')
+
+    return text.toString().toLowerCase()
+        .replace(/\s+/g, '-')           // Replace spaces with -
+        .replace(p, c =>
+            b.charAt(a.indexOf(c)))     // Replace special chars
+        .replace(/&/g, '-and-')         // Replace & with 'and'
+        .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+        .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+        .replace(/^-+/, '')             // Trim - from start of text
+        .replace(/-+$/, '')             // Trim - from end of text
+}
 
 module.exports = { ContainerPanel, PanelGroup, Panel }
