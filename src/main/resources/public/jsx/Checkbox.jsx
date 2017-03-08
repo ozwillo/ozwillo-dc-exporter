@@ -1,6 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 
 class Checkbox extends Component {
+    static propTypes = {
+        isChecked: React.PropTypes.bool.isRequired
+    }
+
     state = {
         isChecked: true,
     }
@@ -15,6 +19,10 @@ class Checkbox extends Component {
         ));
 
         handleCheckboxChange(label);
+    }
+
+    componentDidMount() {
+        this.setState({isChecked: this.props.checked})
     }
 
     render() {
