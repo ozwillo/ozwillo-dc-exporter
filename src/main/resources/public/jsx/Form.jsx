@@ -43,6 +43,14 @@ const SubmitButton = ({ label, onClick, disabled }) =>
         </div>
     </div>
 
+const Checkbox = ({ handleCheckboxChange, label, checked }) =>
+    <div className="checkbox">
+        <label>
+            <input type="checkbox" value={label} checked={checked} onChange={() => handleCheckboxChange(label)} />
+            {label}
+        </label>
+    </div>
+
 const Alert = ({ message, success, closeMethod }) =>
     <div className={'row alert ' + (success ? 'alert-success' : 'alert-danger')} role="alert">
         <div className="col-sm-11 text-center">
@@ -55,4 +63,4 @@ const Alert = ({ message, success, closeMethod }) =>
         </div>
     </div>
 
-module.exports = { Form, FormGroup, Label, SelectField, InputText, Textarea, SubmitButton, Alert, ReadOnlyField }
+module.exports = { Form, FormGroup, Label, SelectField, InputText, Textarea, SubmitButton, Alert, ReadOnlyField, Checkbox}

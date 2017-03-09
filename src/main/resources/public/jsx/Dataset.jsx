@@ -3,8 +3,7 @@ import renderIf from 'render-if'
 import { browserHistory } from 'react-router';
 
 import DatasetForm from './DatasetForm'
-import Checkbox from './Checkbox'
-import { Form, FormGroup, Label, SelectField, InputText, Textarea, SubmitButton, Alert, ReadOnlyField } from './Form'
+import { Form, FormGroup, Label, SelectField, InputText, Textarea, SubmitButton, Alert, ReadOnlyField, Checkbox } from './Form'
 
 export default class Dataset extends React.Component {
     constructor(props) {
@@ -73,17 +72,18 @@ export default class Dataset extends React.Component {
     }
     componentDidUpdate() {
         if(this.props.params.id && this.state.fieldsFetched && this.state.datasetsFetched && !this.state.datasetFetched) {
-            const dcId = this.state.fields.dcId
-            const dataset = this.state.datasets.find(function(dataset){
-                return dataset['@id'] == dcId
-            })
-            this.setState({ dataset: dataset, datasetFetched: true })
+            fetch('/api/dc/model/' + this.state.fields.project + '/' + this.state.fields.type, { credentials: 'same-origin' })
+                .then(response => response.json())
+                .then(json => this.setState({dataset: json, datasetFetched: true}))
         }
     }
     loadMapping(id){
         fetch('/api/dc-model-mapping/model/' + id, { credentials: 'same-origin' })
             .then(response => response.json())
-            .then(json => this.setState({fields: json, mode: 'update', fieldsFetched: true, newDataset: false}))
+            .then(json => {
+                this.setState({fields: json, mode: 'update', fieldsFetched: true, newDataset: false})
+                json.excludedFields.forEach(elem => this.selectedCheckboxes.add(elem))
+            })
     }
     onDatasetSelected(dcId) {
         const dataset = this.state.datasets.find(function(dataset){
@@ -169,9 +169,10 @@ export default class Dataset extends React.Component {
         this.setState({ message: '' })
     }
     render() {
-        const fields = this.state.mode == 'create' && this.state.datasetFetched && this.state.fields.dcId ?
+        const fields = this.state.datasetFetched && this.state.fields.dcId ?
             this.state.dataset['dcmo:globalFields'].map((field, key) =>
-                <Checkbox label={field['dcmf:name']} handleCheckboxChange={this.toggleCheckbox} key={key} />)
+                <Checkbox label={field['dcmf:name']} handleCheckboxChange={this.toggleCheckbox} key={key}
+                          checked={!this.state.fields.excludedFields.includes(field['dcmf:name'])}/>)
             : null
 
         const disabled = this.state.fields.name == null || this.state.fields.name == '' ? true
@@ -209,14 +210,12 @@ export default class Dataset extends React.Component {
                                         {isModeCreate(<InputText id="version" value={this.state.fields.version}/>)}
                                         {isModeUpdate(<ReadOnlyField id="version" value={this.state.fields.version}/>)}
                                     </FormGroup>
-                                    {isModeCreate(
-                                        <FormGroup>
-                                            <Label htmlFor="excludedFields" value="Champs à exporter" />
-                                            <div className="col-sm-9">
-                                                { fields }
-                                            </div>
-                                        </FormGroup>
-                                    )}
+                                    <FormGroup>
+                                        <Label htmlFor="excludedFields" value="Champs à exporter" />
+                                        <div className="col-sm-9">
+                                            { fields }
+                                        </div>
+                                    </FormGroup>
                                 </div>
                             )}
                         </div>

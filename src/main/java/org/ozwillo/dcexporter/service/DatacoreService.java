@@ -45,6 +45,10 @@ public class DatacoreService {
             .collect(Collectors.toList());
     }
 
+    public DCModel getModel(String project, String modelType) {
+        return datacore.findModel(project, modelType);
+    }
+
     public boolean hasMoreRecentResources(String project, String type, DateTime fromDate) {
         DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateTime();
         DCQueryParameters parameters = new DCQueryParameters(modifiedField, DCOperator.GTE, dateTimeFormatter.print(fromDate));
