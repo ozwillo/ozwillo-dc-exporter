@@ -3,8 +3,7 @@ import renderIf from 'render-if'
 import { browserHistory } from 'react-router';
 
 import DatasetForm from './DatasetForm'
-import Checkbox from './Checkbox'
-import { Form, FormGroup, Label, SelectField, InputText, Textarea, SubmitButton, Alert, ReadOnlyField } from './Form'
+import { Form, FormGroup, Label, SelectField, InputText, Textarea, SubmitButton, Alert, ReadOnlyField, Checkbox } from './Form'
 
 export default class Dataset extends React.Component {
     constructor(props) {
