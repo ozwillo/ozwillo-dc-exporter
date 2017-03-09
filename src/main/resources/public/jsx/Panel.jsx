@@ -15,7 +15,7 @@ const Panel = ({log}) =>
     <div className={'panel' + (!log.synchronizerAuditLog ? ' panel-warning' : log.synchronizerAuditLog.succeeded ? ' panel-success' : ' panel-danger')}>
         <div className="panel-heading">
             <div className="row">
-                <div className="col-md-9">
+                <div className="col-md-7">
                     <h3 className="panel-title">
                         {log.dcModelMapping.resourceName}
                         {log.synchronizerAuditLog &&
@@ -26,12 +26,12 @@ const Panel = ({log}) =>
                         }
                     </h3>
                 </div>
-                <div className="col-md-3">
+                <div className="col-md-5">
                     <div className="text-right">
-                        <Link to={`/dataset/${log.dcModelMapping.id}`}>
-                            <button type="button" className="btn btn-default btn-xs">
-                                Modifier <span className="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                            </button>
+                        <PanelUrlBtn url={log.datasetUrl} text="Voir le jeu de données" />
+                        <PanelUrlBtn url={log.resourceUrl} text="Voir la ressource" />
+                        <Link className="btn btn-default btn-xs panel-btn" to={`/dataset/${log.dcModelMapping.id}`}>
+                            Modifier <span className="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                         </Link>
                     </div>
                 </div>
@@ -57,5 +57,11 @@ const Panel = ({log}) =>
             }
         </ul>
     </div>
+
+
+const PanelUrlBtn = ({ url, text }) =>
+    <a className="btn btn-default btn-xs panel-btn" target="_blank" href={url}>
+        {text} <span className="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+    </a>
 
 module.exports = { ContainerPanel, PanelGroup, Panel }

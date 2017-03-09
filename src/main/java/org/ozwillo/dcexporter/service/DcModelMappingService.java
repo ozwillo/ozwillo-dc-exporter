@@ -12,6 +12,7 @@ import org.ozwillo.dcexporter.model.SynchronizerAuditLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -30,6 +31,9 @@ public class DcModelMappingService {
 
     @Autowired
     private SynchronizerAuditLogRepository synchronizerAuditLogRepository;
+
+    @Value("${ckan.url:http://localhost:5000}")
+    private String ckanUrl;
 
 
     public DcModelMapping getById(String id) {
@@ -84,7 +88,9 @@ public class DcModelMappingService {
         return dcModelMappingRepository.findAllByOrderByResourceNameAsc().stream().map(dcModelMapping -> {
             SynchronizerAuditLog auditLog =
                     synchronizerAuditLogRepository.findFirstByTypeOrderByDateDesc(dcModelMapping.getType());
-            return new AuditLogWapper(dcModelMapping, auditLog);
+            String datasetUrl = ckanUrl  + "/dataset/" + ckanService.slugify(dcModelMapping.getName());
+            String resourceUrl = ckanUrl  + "/dataset/" + ckanService.slugify(dcModelMapping.getName()) + "/resource/" + dcModelMapping.getCkanResourceId();
+            return new AuditLogWapper(dcModelMapping, auditLog, datasetUrl, resourceUrl);
         }).collect(Collectors.toList());
     }
 }
