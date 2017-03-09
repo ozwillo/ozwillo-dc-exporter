@@ -28,8 +28,8 @@ const Panel = ({log}) =>
                 </div>
                 <div className="col-md-5">
                     <div className="text-right">
-                        <DatasetLink datasetName={log.dcModelMapping.name} />
-                        <ResourceLink datasetName={log.dcModelMapping.name} resourceId={log.dcModelMapping.ckanResourceId} />
+                        <PanelUrlBtn url={log.datasetUrl} text="Voir le jeu de données" />
+                        <PanelUrlBtn url={log.resourceUrl} text="Voir la ressource" />
                         <Link className="btn btn-default btn-xs panel-btn" to={`/dataset/${log.dcModelMapping.id}`}>
                             Modifier <span className="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                         </Link>
@@ -59,30 +59,9 @@ const Panel = ({log}) =>
     </div>
 
 
-const DatasetLink = ({ datasetName }) =>
-    <a className="btn btn-default btn-xs panel-btn" target="_blank" href={'https://opendata.sictiam.fr/dataset/' + slugify(datasetName)}>
-        Voir le jeu de données <span className="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+const PanelUrlBtn = ({ url, text }) =>
+    <a className="btn btn-default btn-xs panel-btn" target="_blank" href={url}>
+        {text} <span className="glyphicon glyphicon-new-window" aria-hidden="true"></span>
     </a>
-
-const ResourceLink = ({ datasetName, resourceId }) =>
-    <a className="btn btn-default btn-xs panel-btn" target="_blank" href={'https://opendata.sictiam.fr/dataset/' + slugify(datasetName) + '/resource/' + resourceId}>
-        Voir la ressource <span className="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-    </a>
-
-function slugify (text) {
-    const a = 'àáäâèéëêìíïîòóöôùúüûñçßÿœæŕśńṕẃǵǹḿǘẍźḧ·/_,:;'
-    const b = 'aaaaeeeeiiiioooouuuuncsyoarsnpwgnmuxzh------'
-    const p = new RegExp(a.split('').join('|'), 'g')
-
-    return text.toString().toLowerCase()
-        .replace(/\s+/g, '-')           // Replace spaces with -
-        .replace(p, c =>
-            b.charAt(a.indexOf(c)))     // Replace special chars
-        .replace(/&/g, '-and-')         // Replace & with 'and'
-        .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
-        .replace(/\-\-+/g, '-')         // Replace multiple - with single -
-        .replace(/^-+/, '')             // Trim - from start of text
-        .replace(/-+$/, '')             // Trim - from end of text
-}
 
 module.exports = { ContainerPanel, PanelGroup, Panel }

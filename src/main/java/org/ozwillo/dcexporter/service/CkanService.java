@@ -144,7 +144,7 @@ public class CkanService {
         }
     }
 
-    private String slugify(String input) {
+    public String slugify(String input) {
         // Decompose unicode characters
         return Normalizer.normalize(input.toLowerCase(), Normalizer.Form.NFD)
                 // replace all combining diacritical marks and also everything that isn't a word or a whitespace character
