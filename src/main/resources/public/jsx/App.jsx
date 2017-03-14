@@ -1,7 +1,7 @@
 import React from 'react'
 import { render } from 'react-dom'
 
-import { Router, Route, IndexRoute, hashHistory } from 'react-router'
+import { Router, Route, IndexRoute, browserHistory} from 'react-router'
 
 import Navbar from './Navbar'
 import Dashboard from './Dashboard'
@@ -41,7 +41,7 @@ const App = React.createClass({
 })
 
 render((
-    <Router history={hashHistory}>
+    <Router history={browserHistory}>
         <Route path="/" component={App}>
             <IndexRoute component={Dashboard} />
             <Route path="dataset" component={Dataset} />
