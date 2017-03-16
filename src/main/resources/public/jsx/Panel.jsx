@@ -11,11 +11,11 @@ const PanelGroup = ({children}) =>
         {children}
     </div>
 
-const Panel = ({log}) =>
+const Panel = ({log, onClickDelete}) =>
     <div className={'panel' + (!log.synchronizerAuditLog ? ' panel-warning' : log.synchronizerAuditLog.succeeded ? ' panel-success' : ' panel-danger')}>
         <div className="panel-heading">
             <div className="row">
-                <div className="col-md-7">
+                <div className="col-md-6">
                     <h3 className="panel-title">
                         {log.dcModelMapping.resourceName}
                         {log.synchronizerAuditLog &&
@@ -26,13 +26,16 @@ const Panel = ({log}) =>
                         }
                     </h3>
                 </div>
-                <div className="col-md-5">
+                <div className="col-md-6">
                     <div className="text-right">
                         <PanelUrlBtn url={log.datasetUrl} text="Voir le jeu de données" />
                         <PanelUrlBtn url={log.resourceUrl} text="Voir la ressource" />
                         <Link className="btn btn-default btn-xs panel-btn" to={`/dataset/${log.dcModelMapping.id}`}>
                             Modifier <span className="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                         </Link>
+                        <button className="btn btn-default btn-xs panel-btn" onClick={() => onClickDelete(log.dcModelMapping) } >
+                            Supprimer <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                        </button>
                     </div>
                 </div>
             </div>

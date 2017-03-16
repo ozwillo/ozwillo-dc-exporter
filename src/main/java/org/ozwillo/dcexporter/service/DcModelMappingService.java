@@ -93,4 +93,13 @@ public class DcModelMappingService {
             return new AuditLogWapper(dcModelMapping, auditLog, datasetUrl, resourceUrl);
         }).collect(Collectors.toList());
     }
+
+    public Either<String, DcModelMapping> deleteById(String id) {
+        DcModelMapping dcModelMapping = dcModelMappingRepository.findById(id);
+        if ( dcModelMapping == null) return Either.left("Cette synchronisation de ressource n'existe pas");
+        else if (dcModelMappingRepository.deleteById(id) > 0) {
+            return Either.right(dcModelMapping);
+        }
+        else return Either.left("Aucune synchronisation de ressource supprimée");
+    }
 }

@@ -46,6 +46,16 @@ public class DcModelMappingController {
         return dcModelMappingService.getById(id);
     }
 
+    @RequestMapping(value = "/model/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteMapping(@PathVariable String id) {
+        Either<String, DcModelMapping> result = dcModelMappingService.deleteById(id);
+
+        if (result.isRight())
+            return new ResponseEntity<>(result.get().getResourceName(), HttpStatus.OK);
+        else
+            return new ResponseEntity<>(result.getLeft(), HttpStatus.NOT_FOUND);
+    }
+
     @RequestMapping(value = "/logs", method = RequestMethod.GET)
     public @ResponseBody
     List<AuditLogWapper> getLogs() {

@@ -12,4 +12,6 @@ public interface DcModelMappingRepository extends MongoRepository<DcModelMapping
     List<DcModelMapping> findAllByOrderByResourceNameAsc();
     
     DcModelMapping findById(String id);
+
+    Long deleteById(String id);
 }

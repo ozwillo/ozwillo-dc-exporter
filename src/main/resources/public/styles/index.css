@@ -78,3 +78,10 @@ h1 {
 .react-autosuggest__container {
     position: relative;
 }
+
+.modal-container {
+    position: relative;
+}
+.modal-container .modal, .modal-container .modal-backdrop {
+    position: absolute;
+}
