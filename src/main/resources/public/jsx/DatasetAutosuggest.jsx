@@ -41,7 +41,7 @@ export default class DatasetAutosuggest extends React.Component {
             return [];
         }
 
-        const regex = new RegExp('^' + escapedValue, 'i');
+        const regex = new RegExp(escapedValue, 'i');
 
         return this.state.allSuggestions.filter(suggestion => regex.test(suggestion.title));
     }
