@@ -1,5 +1,5 @@
 import React, {Component} from "react"
-import { Modal, Header, Body, Footer, Button } from 'react-bootstrap'
+import { Modal, Button } from 'react-bootstrap'
 
 
 export default class ConfirmActionButton extends React.Component {
@@ -12,14 +12,17 @@ export default class ConfirmActionButton extends React.Component {
     state = {
         show: true
     }
+    constructor(props) {
+        super(props)
+        this.close = this.close.bind(this)
+    }
+    close() {
+        this.setState({show : false})
+        this.props.onHide()
+    }
     render() {
-        const close = () => {
-            this.setState({show : false})
-            this.props.onHide()
-        }
-
         return (
-            <Modal show={this.state.show} onHide={close} >
+            <Modal show={this.state.show} onHide={this.close} >
                 <Modal.Header closeButton>
                     <Modal.Title >{ this.props.confirmLabel }</Modal.Title>
                 </Modal.Header>
@@ -27,7 +30,7 @@ export default class ConfirmActionButton extends React.Component {
                     { this.props.content }
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button onClick={close}>Fermer</Button>
+                    <Button onClick={this.close}>Fermer</Button>
                     <Button onClick={this.props.onConfirm} bsStyle="danger">Confirmer</Button>
                 </Modal.Footer>
             </Modal>
