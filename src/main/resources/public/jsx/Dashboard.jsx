@@ -1,26 +1,46 @@
 import React from 'react'
 import renderIf from 'render-if'
-import {DropdownButton, MenuItem} from 'react-bootstrap'
+import { DropdownButton, MenuItem } from 'react-bootstrap'
 
 import { ContainerPanel, PanelGroup, Panel } from './Panel'
+import { Alert } from './Form'
 
 export default class Dashboard extends React.Component {
     state = {
         logs: [],
         filterKey: '',
-        filterValue: 'Toutes les synchronisations'
+        filterValue: 'Toutes les synchronisations',
+        success: true,
+        message: ''
+    }
+    static contextTypes = {
+        csrfToken: React.PropTypes.string,
+        csrfTokenHeaderName: React.PropTypes.string
     }
     constructor(){
         super()
         this.onChangeFilter = this.onChangeFilter.bind(this)
+        this.fetchMapping = this.fetchMapping.bind(this)
+        this.closeNotif = this.closeNotif.bind(this)
+        this.onChangeNotif = this.onChangeNotif.bind(this)
     }
+
     componentDidMount() {
+        this.fetchMapping()
+    }
+    fetchMapping() {
         fetch('/api/dc-model-mapping/logs', { credentials: 'same-origin'})
             .then(reponse => reponse.json())
             .then(json => this.setState({ logs: json }))
     }
     onChangeFilter(eventKey) {
         this.setState({ filterValue : eventKey[0], filterKey : eventKey[1] })
+    }
+    closeNotif(){
+        this.setState({ message: '' })
+    }
+    onChangeNotif(success, message){
+        this.setState({ success: success, message: message })
     }
     render() {
         const filterKey = this.state.filterKey
@@ -35,12 +55,15 @@ export default class Dashboard extends React.Component {
                 default:
                     return log
             }
-        }).map(log =>
-            <Panel key={log.dcModelMapping.dcId} log={log}/>
+        }).map(log => <Panel key={log.dcModelMapping.dcId} log={log} fetchMapping={() => this.fetchMapping() }
+                   onChangeNotif={ this.onChangeNotif } />
         )
         return (
             <div id="container" className="container">
                 <h1>Flux d'activités</h1>
+                {renderIf(this.state.message)(
+                    <Alert message={this.state.message} success={this.state.success} closeMethod={this.closeNotif}/>
+                )}
                 {renderIf(this.state.logs.length > 0) (
                     <div>
                         <div className="filter-dropdown text-right" >

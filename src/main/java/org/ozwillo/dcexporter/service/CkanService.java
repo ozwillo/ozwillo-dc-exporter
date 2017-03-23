@@ -156,4 +156,10 @@ public class CkanService {
                 // and replace all blanks with a dash
                 .replaceAll("\\s", "-");
     }
+
+    public void deleteResource(String id) {
+        CkanClient ckanClient = new CkanClient(ckanUrl, ckanApiKey);
+
+        ckanClient.deleteResource(id);
+    }
 }

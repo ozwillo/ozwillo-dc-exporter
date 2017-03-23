@@ -57,6 +57,8 @@ public class DcModelMapping {
 
     private List<String> excludedFields;
 
+    private boolean isDeleted;
+
     public DcModelMapping() {
     }
 
@@ -168,6 +170,14 @@ public class DcModelMapping {
 
     public List<String> getExcludedFields() {
         return excludedFields;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
     @Override
