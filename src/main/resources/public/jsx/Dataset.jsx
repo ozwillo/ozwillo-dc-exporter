@@ -45,15 +45,14 @@ export default class Dataset extends React.Component {
         this.onDatasetNameChange = this.onDatasetNameChange.bind(this)
         this.toggleCheckbox = this.toggleCheckbox.bind(this)
         this.toggleNewDataset = this.toggleNewDataset.bind(this)
+        this.onChangeNotif = this.onChangeNotif.bind(this)
         this.closeNotif = this.closeNotif.bind(this)
         this.selectedCheckboxes = new Set();
     }
     checkStatus(response) {
         if (response.status >= 200 && response.status < 300) {
-            this.setState({ success : true })
             return response
         } else {
-            this.setState({ success : false })
             throw response
         }
     }
@@ -67,8 +66,12 @@ export default class Dataset extends React.Component {
             .then(json => this.setState({datasets: json, datasetsFetched: true}))
 
         fetch('/api/ckan/licences', {credentials: 'same-origin'})
+            .then(this.checkStatus)
             .then(response => response.json())
             .then(json => this.setState({licenses: json}))
+            .catch(error => {
+                error.text().then(text => { this.onChangeNotif(false, text) })
+            })
     }
     componentDidUpdate() {
         if(this.props.params.id && this.state.fieldsFetched && this.state.datasetsFetched && !this.state.datasetFetched) {
@@ -111,9 +114,9 @@ export default class Dataset extends React.Component {
         .then(id => {
             browserHistory.push('/dataset/' + id)
             this.loadMapping(id)
-            this.setState({ message: 'Le jeu de données a été créé' })
+            this.setState({ success : true, message: 'Le jeu de données a été créé' })
         })
-        .catch(text => this.setState({ message: text }))
+        .catch(text => this.setState({ success : false, message: text }))
     }
     updateDataset(fields) {
         fetch('/api/dc-model-mapping/model', {
@@ -126,9 +129,9 @@ export default class Dataset extends React.Component {
             body: JSON.stringify(fields)
         })
         .then(this.checkStatus)
-        .then(() => this.setState({ message: 'Le jeu de données a été mis à jour' }))
+        .then(() => this.setState({ success : true, message: 'Le jeu de données a été mis à jour' }))
         .catch(response => {
-            response.text().then(text => this.setState({ message: text }))
+            response.text().then(text => this.setState({ success : false, message: text }))
         })
     }
     toggleCheckbox(label){
@@ -164,6 +167,9 @@ export default class Dataset extends React.Component {
     onDatasetNameChange(dataset) {
         this.onFieldChange('ckanPackageId', dataset.id)
         this.onFieldChange('name', dataset.title)
+    }
+    onChangeNotif(success, message){
+        this.setState({ success: success, message: message })
     }
     closeNotif(){
         this.setState({ message: '' })
@@ -232,7 +238,8 @@ export default class Dataset extends React.Component {
                                          datasetName={this.state.fields.name}
                                          licenses={this.state.licenses}
                                          license={this.state.fields['license']}
-                                         tags={this.state.fields.tags} />
+                                         tags={this.state.fields.tags}
+                                         onChangeNotif={this.onChangeNotif} />
 
                             <div className="panel panel-default">
                                 <div className="panel-heading">
