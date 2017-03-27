@@ -8,7 +8,9 @@ export default class Dashboard extends React.Component {
     state = {
         logs: [],
         filterKey: '',
-        filterValue: 'Toutes les synchronisations'
+        filterValue: 'Tous les exports',
+        success: true,
+        message: ''
     }
     constructor(){
         super()
@@ -40,15 +42,18 @@ export default class Dashboard extends React.Component {
         )
         return (
             <div id="container" className="container">
-                <h1>Flux d'activités</h1>
+                <h1>Tableau de bord</h1>
+                {renderIf(this.state.message)(
+                    <Alert message={this.state.message} success={this.state.success} closeMethod={this.closeNotif}/>
+                )}
                 {renderIf(this.state.logs.length > 0) (
                     <div>
                         <div className="filter-dropdown text-right" >
                             <DropdownButton title={ this.state.filterValue } onSelect={(eventKey) => this.onChangeFilter(eventKey)} id="filter-dropdown" pullRight={true}>
-                                <MenuItem eventKey={[ "Toutes les synchronisations", "" ]} >Toutes les synchronisations</MenuItem>
-                                <MenuItem eventKey={[ "Synchronisations réussies", "valid" ]} >Synchronisations réussies</MenuItem>
-                                <MenuItem eventKey={[ "Synchronisations non réussies", "error" ]}  >Synchronisations non réussies</MenuItem>
-                                <MenuItem eventKey={[ "Synchronisations en cours", "pending" ]} >Synchronisations en cours</MenuItem>
+                                <MenuItem eventKey={[ "Tous les exports", "" ]} >Tous les exports</MenuItem>
+                                <MenuItem eventKey={[ "Exports réussis", "valid" ]} >Exports réussis</MenuItem>
+                                <MenuItem eventKey={[ "Exports en erreur", "error" ]} >Exports en erreur</MenuItem>
+                                <MenuItem eventKey={[ "Exports en cours", "pending" ]} >Exports en cours</MenuItem>
                             </DropdownButton>
                         </div>
                         <div className="wrap-result">
@@ -60,19 +65,21 @@ export default class Dashboard extends React.Component {
                                 </div>
                             )}
                             {renderIf(list.length == 0) (
-                                <div className="alert alert-info" role="alert">
-                                    <p><i>Aucunes <span className="text-lowercase"> { this.state.filterValue } </span></i></p>
-                                </div>
+                                <NoExport />
                             )}
                         </div>
                     </div>
                 )}
                 {renderIf(this.state.logs.length == 0) (
-                    <div className="alert alert-info" role="alert">
-                        <p><i>Aucun jeu de données enregistré</i></p>
-                    </div>
+                    <NoExport />
                 )}
             </div>
         )
     }
 }
+
+const NoExport = () => (
+    <div className="alert alert-info" role="alert">
+        <p><i>Aucun export</i></p>
+    </div>
+)
