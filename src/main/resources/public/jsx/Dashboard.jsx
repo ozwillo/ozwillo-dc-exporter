@@ -8,9 +8,7 @@ export default class Dashboard extends React.Component {
     state = {
         logs: [],
         filterKey: '',
-        filterValue: 'Tous les exports',
-        success: true,
-        message: ''
+        filterValue: 'Tous les exports'
     }
     constructor(){
         super()
@@ -43,9 +41,6 @@ export default class Dashboard extends React.Component {
         return (
             <div id="container" className="container">
                 <h1>Tableau de bord</h1>
-                {renderIf(this.state.message)(
-                    <Alert message={this.state.message} success={this.state.success} closeMethod={this.closeNotif}/>
-                )}
                 {renderIf(this.state.logs.length > 0) (
                     <div>
                         <div className="filter-dropdown text-right" >
