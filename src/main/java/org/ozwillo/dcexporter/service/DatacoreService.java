@@ -36,13 +36,23 @@ public class DatacoreService {
     private String modifiedField;
 
     @Cacheable("dc-models")
-    public List<DCModel> getModels() {
+    public List<DCModel> getAllModels() {
         // TODO : iterate until we have all
         return datacore.findModels(50).stream()
-            .filter(dcModel -> dcModelMappingRepository.findByDcId(dcModel.getId().toString()) == null)
-            .distinct()
-            .sorted()
-            .collect(Collectors.toList());
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    public  List<DCModel> getModels() {
+        return this.getAllModels().stream()
+                .filter((dcModel) ->
+                    dcModelMappingRepository.findByDcId(dcModel.getId().toString()) == null ||
+                    dcModelMappingRepository.findByDcId(dcModel.getId().toString()).isDeleted() == true
+                )
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     public DCModel getModel(String project, String modelType) {
