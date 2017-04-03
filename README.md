@@ -1,10 +1,10 @@
 # DC Exporter
 
-DC Exporter is a data synchronizer between the [Ozwillo data core](https://github.com/ozwillo/ozwillo-datacore)and the open data platform[CKAN](https://github.com/ckan/ckan)
+DC Exporter is a data synchronizer between the [Ozwillo data core](https://github.com/ozwillo/ozwillo-datacore) and the open data platform [CKAN](https://github.com/ckan/ckan)
 
 ### Features 
 
-- Configure data mapping between data core and ckan 
+- Configure model mapping synchronization between data core and ckan 
 - Dashboard of following and modify mapping 
 
 ### Prerequisites
