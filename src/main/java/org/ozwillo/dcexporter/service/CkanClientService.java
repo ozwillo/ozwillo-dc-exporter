@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.jackson.JacksonConverterFactory;
 import retrofit2.http.*;
 
 import java.io.IOException;
@@ -213,7 +213,7 @@ public class CkanClientService {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(ckanUrl)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(JacksonConverterFactory.create())
                 .build();
 
         return retrofit.create(CkanAPI.class);

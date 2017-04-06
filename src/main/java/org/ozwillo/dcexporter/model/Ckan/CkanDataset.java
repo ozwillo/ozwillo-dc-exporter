@@ -1,59 +1,58 @@
 package org.ozwillo.dcexporter.model.Ckan;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
 public class CkanDataset {
 
-    @SerializedName("license_title")
-    @Expose private String licenseTitle;
-    @Expose private String maintainer;
-    @SerializedName("relationships_as_object")
-    @Expose private List<Object> relationshipsAsObject;
-    @SerializedName("private")
-    @Expose private boolean _private;
-    @SerializedName("maintainer_email")
-    @Expose private String maintainerEmail;
-    @SerializedName("num_tags")
-    @Expose private int numTags;
-    @Expose private String id;
-    @SerializedName("metadata_created")
-    @Expose private String metadataCreated;
-    @SerializedName("metadata_modified")
-    @Expose private String metadataModified;
-    @Expose private String author;
-    @SerializedName("author_email")
-    @Expose private String authorEmail;
-    @Expose private String state;
-    @Expose private String version;
-    @SerializedName("creator_user_id")
-    @Expose private String creatorUserId;
-    @Expose private String type;
-    @Expose private List<CkanResource> resources;
-    @SerializedName("num_resources")
-    @Expose private int numResources;
-    @Expose private List<CkanTag> tags;
-    @Expose private List<CkanOrganization> groups;
-    @SerializedName("license_id")
-    @Expose private String licenseId;
-    @SerializedName("relationships_as_subject")
-    @Expose private List<Object> relationshipsAsSubject;
-    @Expose private CkanOrganization organization;
-    @Expose private String name;
-    @SerializedName("isopen")
-    @Expose private boolean open;
-    @Expose private String url;
-    @Expose private String notes;
-    @SerializedName("owner_org")
-    @Expose private String ownerOrg;
-    @Expose private List<CkanExtra> extras;
-    @SerializedName("license_url")
-    @Expose private String licenseUrl;
-    @Expose private String title;
-    @SerializedName("revision_id")
-    @Expose private String revisionId;
+    @JsonProperty("license_title")
+    private String licenseTitle;
+    private String maintainer;
+    @JsonProperty("relationships_as_object")
+    private List<Object> relationshipsAsObject;
+    @JsonProperty("private")
+    private boolean _private;
+    @JsonProperty("maintainer_email")
+    private String maintainerEmail;
+    @JsonProperty("num_tags")
+    private int numTags;
+    private String id;
+    @JsonProperty("metadata_created")
+    private String metadataCreated;
+    @JsonProperty("metadata_modified")
+    private String metadataModified;
+    private String author;
+    @JsonProperty("author_email")
+    private String authorEmail;
+    private String state;
+    private String version;
+    @JsonProperty("creator_user_id")
+    private String creatorUserId;
+    private String type;
+    private List<CkanResource> resources;
+    @JsonProperty("num_resources")
+    private int numResources;
+    private List<CkanTag> tags;
+    private List<CkanOrganization> groups;
+    @JsonProperty("license_id")
+    private String licenseId;
+    @JsonProperty("relationships_as_subject")
+    private List<Object> relationshipsAsSubject;
+    private CkanOrganization organization;
+    private String name;
+    @JsonProperty("isopen")
+    private boolean open;
+    private String url;
+    private String notes;
+    @JsonProperty("owner_org")
+    private String ownerOrg;
+    private List<CkanExtra> extras;
+    @JsonProperty("license_url")
+    private String licenseUrl;
+    private String title;
+    @JsonProperty("revision_id")
+    private String revisionId;
 
 
     public CkanDataset() {

@@ -1,40 +1,39 @@
 package org.ozwillo.dcexporter.model.Ckan;
 
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
 public class CkanOrganization {
 
-    @Expose private List<Object> users = null;
-    @SerializedName("display_name")
-    @Expose private String displayName;
-    @Expose private String description;
-    @SerializedName("image_display_url")
-    @Expose private String imageDisplayUrl;
-    @SerializedName("package_count")
-    @Expose private int packageCount;
-    @Expose private String created;
-    @Expose private String name;
-    @SerializedName("is_organization")
-    @Expose private boolean isOrganization;
-    @Expose private String state;
-    @Expose private List<CkanExtra> extras = null;
-    @SerializedName("image_url")
-    @Expose private String imageUrl;
-    @Expose private List<CkanOrganization> groups = null;
-    @Expose private String type;
-    @Expose private String title;
-    @SerializedName("revision_id")
-    @Expose private String revisionId;
-    @SerializedName("num_followers")
-    @Expose private int numFollowers;
-    @Expose private String id;
-    @Expose private List<CkanTag> tags = null;
-    @SerializedName("approval_status")
-    @Expose private String approvalStatus;
+    private List<Object> users = null;
+    @JsonProperty("display_name")
+    private String displayName;
+    private String description;
+    @JsonProperty("image_display_url")
+    private String imageDisplayUrl;
+    @JsonProperty("package_count")
+    private int packageCount;
+    private String created;
+    private String name;
+    @JsonProperty("is_organization")
+    private boolean isOrganization;
+    private String state;
+    private List<CkanExtra> extras = null;
+    @JsonProperty("image_url")
+    private String imageUrl;
+    private List<CkanOrganization> groups = null;
+    private String type;
+    private String title;
+    @JsonProperty("revision_id")
+    private String revisionId;
+    @JsonProperty("num_followers")
+    private int numFollowers;
+    private String id;
+    private List<CkanTag> tags = null;
+    @JsonProperty("approval_status")
+    private String approvalStatus;
 
 
     public CkanOrganization() {

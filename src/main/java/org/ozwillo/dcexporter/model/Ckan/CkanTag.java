@@ -1,26 +1,27 @@
 package org.ozwillo.dcexporter.model.Ckan;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class CkanTag {
 
-    @Expose private String id;
-    @Expose private String name;
-    @SerializedName("vocabulary_id")
-    @Expose private String vocabularyId;
-    @SerializedName("display_name")
-    @Expose private String displayName;
+    private String id;
+    private String name;
+    @JsonProperty("vocabulary_id")
+    private String vocabularyId;
+    @JsonProperty("display_name")
+    private String displayName;
+    private String state;
 
 
     public CkanTag() {
     }
 
-    public CkanTag(String id, String name, String vocabularyId, String displayName) {
+    public CkanTag(String id, String name, String vocabularyId, String displayName, String state) {
         this.id = id;
         this.name = name;
         this.vocabularyId = vocabularyId;
         this.displayName = displayName;
+        this.state = state;
     }
 
 
@@ -47,5 +48,11 @@ public class CkanTag {
     }
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+    public String getState() {
+        return state;
+    }
+    public void setState(String state) {
+        this.state = state;
     }
 }

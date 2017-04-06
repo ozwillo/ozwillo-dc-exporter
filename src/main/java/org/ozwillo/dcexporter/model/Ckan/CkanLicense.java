@@ -1,19 +1,29 @@
 package org.ozwillo.dcexporter.model.Ckan;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class CkanLicense {
 
     private String status;
     private String maintainer;
+    @JsonProperty("od_conformance")
     private String odConformance;
     private String family;
+    @JsonProperty("osd_conformance")
     private String osdConformance;
+    @JsonProperty("domain_data")
     private String domainData;
     private String title;
     private String url;
+    @JsonProperty("is_generic")
     private String isGeneric;
+    @JsonProperty("is_okd_compliant")
     private boolean isOkdCompliant;
+    @JsonProperty("is_osi_compliant")
     private boolean isOsiCompliant;
+    @JsonProperty("domain_content")
     private String domainContent;
+    @JsonProperty("domain_software")
     private String domainSoftware;
     private String id;
 

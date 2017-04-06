@@ -61,9 +61,9 @@ dependencies {
     // TODO : quite a fat dependency for a configuration file
     runtime('org.codehaus.groovy:groovy:2.4.7')
 
-	compile 'com.google.code.gson:gson:2.8.0'
 	compile 'com.squareup.retrofit2:retrofit:2.2.0'
-	compile 'com.squareup.retrofit2:converter-gson:2.2.0'
+	compile 'com.squareup.retrofit2:converter-jackson:2.2.0'
+
 }
 
 bootRun {

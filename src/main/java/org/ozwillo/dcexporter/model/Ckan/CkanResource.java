@@ -1,5 +1,7 @@
 package org.ozwillo.dcexporter.model.Ckan;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -7,47 +9,49 @@ import java.sql.Timestamp;
 
 public class CkanResource {
 
-    @SerializedName("cache_last_updated")
-    @Expose private String cacheLastUpdated;
-    @SerializedName("package_id")
-    @Expose private String packageId;
-    @SerializedName("webstore_last_updated")
-    @Expose private Timestamp webstoreLastUpdated;
-    @SerializedName("datastore_active")
-    @Expose private boolean datastoreActive;
-    @Expose private String id;
-    @Expose private String size;
-    @Expose private String state;
-    @Expose private String hash;
-    @Expose private String description;
-    @Expose private String format;
-    @Expose private String lastModified;
-    @SerializedName("url_type")
-    @Expose private String urlType;
-    @Expose private String mimetype;
-    @SerializedName("cache_url")
-    @Expose private String cacheUrl;
-    @Expose private String name;
-    @Expose private String created;
-    @Expose private String url;
-    @SerializedName("webstore_url")
-    @Expose private String webstoreUrl;
-    @SerializedName("mimetype_inner")
-    @Expose private String mimetypeInner;
-    @Expose private int position;
-    @SerializedName("revision_id")
-    @Expose private String revisionId;
-    @SerializedName("resource_type")
-    @Expose private String resourceType;
-    @SerializedName("openspending_hint")
-    @Expose private String openspendingHint;
+    @JsonProperty("cache_last_updated")
+    private String cacheLastUpdated;
+    @JsonProperty("package_id")
+    private String packageId;
+    @JsonProperty("webstore_last_updated")
+    private String webstoreLastUpdated;
+    @JsonProperty("datastore_active")
+    private boolean datastoreActive;
+    private String id;
+    private String size;
+    private String state;
+    private String hash;
+    private String description;
+    private String format;
+    @JsonProperty("last_modified")
+    private String lastModified;
+    @JsonProperty("url_type")
+    private String urlType;
+    private String mimetype;
+    @JsonProperty("cache_url")
+    private String cacheUrl;
+    private String name;
+    private String created;
+    private String url;
+    @JsonProperty("webstore_url")
+    private String webstoreUrl;
+    @JsonProperty("mimetype_inner")
+    private String mimetypeInner;
+    private int position;
+    @JsonProperty("revision_id")
+    private String revisionId;
+    @JsonProperty("resource_type")
+    private String resourceType;
+    @JsonProperty("openspending_hint")
+    private String openspendingHint;
+    @JsonIgnore
     private byte[] upload;
 
 
     public CkanResource() {
     }
 
-    public CkanResource(String cacheLastUpdated, String packageId, Timestamp webstoreLastUpdated, boolean datastoreActive, String id, String size, String state, String hash, String description, String format, String lastModified, String urlType, String mimetype, String cacheUrl, String name, String created, String url, String webstoreUrl, String mimetypeInner, int position, String revisionId, String resourceType, String openspendingHint, byte[] upload) {
+    public CkanResource(String cacheLastUpdated, String packageId, String webstoreLastUpdated, boolean datastoreActive, String id, String size, String state, String hash, String description, String format, String lastModified, String urlType, String mimetype, String cacheUrl, String name, String created, String url, String webstoreUrl, String mimetypeInner, int position, String revisionId, String resourceType, String openspendingHint, byte[] upload) {
         this.cacheLastUpdated = cacheLastUpdated;
         this.packageId = packageId;
         this.webstoreLastUpdated = webstoreLastUpdated;
@@ -87,10 +91,10 @@ public class CkanResource {
     public void setPackageId(String packageId) {
         this.packageId = packageId;
     }
-    public Timestamp getWebstoreLastUpdated() {
+    public String getWebstoreLastUpdated() {
         return webstoreLastUpdated;
     }
-    public void setWebstoreLastUpdated(Timestamp webstoreLastUpdated) {
+    public void setWebstoreLastUpdated(String webstoreLastUpdated) {
         this.webstoreLastUpdated = webstoreLastUpdated;
     }
     public boolean isDatastoreActive() {
