@@ -17,7 +17,8 @@ export default class DatasetForm extends React.Component {
         notes: React.PropTypes.string.isRequired,
         licenses: React.PropTypes.object.isRequired,
         license: React.PropTypes.string.isRequired,
-        datasetName: React.PropTypes.string.isRequired
+        datasetName: React.PropTypes.string.isRequired,
+        onChangeNotif: React.PropTypes.func.isRequired
     }
     constructor(props) {
         super(props)
@@ -62,6 +63,7 @@ export default class DatasetForm extends React.Component {
                             <DatasetAutosuggest id="autosuggest-name"
                                                 datasetName={this.props.datasetName}
                                                 onChange={this.props.onChange}
+                                                onChangeNotif={this.props.onChange}
                                                 onSelect={this.props.onDatasetNameChange}/>
                         </FormGroup>
                     )}
@@ -86,7 +88,7 @@ export default class DatasetForm extends React.Component {
                                             onChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}/>
                             <FormGroup>
                                 <Label htmlFor="tags" value="Tags"/>
-                                <TagAutosuggest onSelect={ this.handleAddition }/>
+                                <TagAutosuggest onSelect={this.handleAddition} onChangeNotif={this.props.onChangeNotif} />
                                 {renderIf(tags.length > 0) (
                                         <div className="col-sm-9 col-sm-offset-3">
                                             <ul className="list-group">

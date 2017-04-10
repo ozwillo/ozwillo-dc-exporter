@@ -13,6 +13,10 @@ function escapeRegexCharacters(str) {
 }
 
 class TagAutosuggest extends React.Component {
+    static propTypes = {
+        onSelect: React.PropTypes.func.isRequired,
+        onChangeNotif: React.PropTypes.func.isRequired
+    }
     constructor (props) {
         super(props)
         this.defaultProps = {
@@ -27,10 +31,21 @@ class TagAutosuggest extends React.Component {
         this.onClick = this.onClick.bind(this)
         this.renderInputComponent = this.renderInputComponent.bind(this)
     }
+    checkStatus(response) {
+        if (response.status >= 200 && response.status < 300) {
+            return response
+        } else {
+            throw response
+        }
+    }
     componentDidMount() {
         fetch('/api/ckan/tags', {credentials: 'same-origin'})
+            .then(this.checkStatus)
             .then(response => response.json())
             .then(json => this.setState({allSuggestions: json}))
+            .catch(error => {
+                error.text().then(text => { this.props.onChangeNotif(false, text) })
+            })
     }
     getSuggestions(value) {
         const escapedValue = escapeRegexCharacters(value.trim());

@@ -1,14 +1,13 @@
 package org.ozwillo.dcexporter.service;
 
-import eu.trentorise.opendata.jackan.exceptions.CkanException;
-import eu.trentorise.opendata.jackan.model.CkanDataset;
-import eu.trentorise.opendata.jackan.model.CkanResource;
 import javaslang.control.Either;
 import org.ozwillo.dcexporter.dao.DcModelMappingRepository;
 import org.ozwillo.dcexporter.dao.SynchronizerAuditLogRepository;
+import org.ozwillo.dcexporter.model.Ckan.CkanResource;
 import org.ozwillo.dcexporter.model.DcModelMapping;
 import org.ozwillo.dcexporter.model.ui.AuditLogWapper;
 import org.ozwillo.dcexporter.model.SynchronizerAuditLog;
+import org.ozwillo.dcexporter.model.Ckan.CkanDataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,17 +40,13 @@ public class DcModelMappingService {
     }
 
     public Either<String, DcModelMapping> add(DcModelMapping dcModelMapping) {
-        CkanDataset ckanDataset;
-        try {
-            ckanDataset = ckanService.getOrCreateDataset(dcModelMapping);
-        } catch (CkanException e) {
-            if (e.getCkanResponse() != null && e.getCkanResponse().getError() != null)
-                return Either.left(e.getCkanResponse().getError().getMessage());
-            else
-                return Either.left(e.getMessage());
-        }
+        Either<String, CkanDataset> eitherDataset = ckanService.getOrCreateDataset(dcModelMapping);
+        if(eitherDataset.isLeft()) return Either.left(eitherDataset.getLeft());
+        CkanDataset ckanDataset = eitherDataset.get();
 
-        CkanResource ckanResource = ckanService.createResource(ckanDataset.getId(), dcModelMapping.getResourceName(), dcModelMapping.getDescription());
+        Either<String, CkanResource> eitherResource = ckanService.createResource(ckanDataset.getId(), dcModelMapping.getResourceName(), dcModelMapping.getDescription());
+        if(eitherDataset.isLeft()) return Either.left(eitherDataset.getLeft());
+        CkanResource ckanResource = eitherResource.get();
 
         dcModelMapping.setCkanPackageId(ckanDataset.getId());
         dcModelMapping.setCkanResourceId(ckanResource.getId());
@@ -65,17 +60,13 @@ public class DcModelMappingService {
 
         if (dcModelMappingRepository.findByDcId(dcModelMapping.getDcId()) == null) return Either.left("Ce jeu de données n'existe pas");
 
-        CkanDataset ckanDataset;
-        try {
-            ckanDataset = ckanService.getOrCreateDataset(dcModelMapping);
-        } catch (CkanException e) {
-            if (e.getCkanResponse() != null && e.getCkanResponse().getError() != null)
-                return Either.left(e.getCkanResponse().getError().getMessage());
-            else
-                return Either.left(e.getMessage());
-        }
+        Either<String, CkanDataset> eitherDataset = ckanService.getOrCreateDataset(dcModelMapping);
+        if(eitherDataset.isLeft()) return Either.left(eitherDataset.getLeft());
+        CkanDataset ckanDataset = eitherDataset.get();
 
-        CkanResource ckanResource = ckanService.updateResource(dcModelMapping.getCkanResourceId(), ckanDataset.getId(), dcModelMapping.getResourceName(), dcModelMapping.getDescription());
+        Either<String, CkanResource> eitherResource = ckanService.updateResource(dcModelMapping.getCkanResourceId(), ckanDataset.getId(), dcModelMapping.getResourceName(), dcModelMapping.getDescription());
+        if(eitherDataset.isLeft()) return Either.left(eitherDataset.getLeft());
+        CkanResource ckanResource = eitherResource.get();
 
         dcModelMapping.setCkanPackageId(ckanDataset.getId());
         dcModelMapping.setCkanResourceId(ckanResource.getId());

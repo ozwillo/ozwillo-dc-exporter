@@ -53,7 +53,6 @@ dependencies {
 
     compile project('ozwillo-java-spring-integration')
 
-	compile('eu.trentorise.opendata:jackan:0.4.3-SNAPSHOT')
 	compile('com.github.ben-manes.caffeine:caffeine:2.3.5')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
@@ -61,6 +60,10 @@ dependencies {
     // required to parse logback-spring.groovy
     // TODO : quite a fat dependency for a configuration file
     runtime('org.codehaus.groovy:groovy:2.4.7')
+
+	compile 'com.squareup.retrofit2:retrofit:2.2.0'
+	compile 'com.squareup.retrofit2:converter-jackson:2.2.0'
+
 }
 
 bootRun {
