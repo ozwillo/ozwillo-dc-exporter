@@ -44,12 +44,20 @@ public class DcModelMappingService {
         if(eitherDataset.isLeft()) return Either.left(eitherDataset.getLeft());
         CkanDataset ckanDataset = eitherDataset.get();
 
-        Either<String, CkanResource> eitherResource = ckanService.createResource(ckanDataset.getId(), dcModelMapping.getResourceName(), dcModelMapping.getDescription());
-        if(eitherDataset.isLeft()) return Either.left(eitherDataset.getLeft());
-        CkanResource ckanResource = eitherResource.get();
+        Either<String, CkanResource> eitherResourceCsv = ckanService.createResource(ckanDataset.getId(), dcModelMapping.getResourceName(), dcModelMapping.getDescription());
+        if(eitherResourceCsv.isLeft()) return Either.left(eitherResourceCsv.getLeft());
+        CkanResource ckanResourceCsv = eitherResourceCsv.get();
+
+        Either<String, CkanResource> eitherResourceJson = ckanService.createResource(ckanDataset.getId(), dcModelMapping.getResourceName(), dcModelMapping.getDescription());
+        if(eitherResourceJson.isLeft()) return Either.left(eitherResourceJson.getLeft());
+        CkanResource ckanResourceJson = eitherResourceJson.get();
+
+        Map<String,String> ckanResourcesId = new HashMap<String,String>();
+        ckanResourcesId.put("csv", ckanResourceCsv.getId());
+        ckanResourcesId.put("json", ckanResourceJson.getId());
 
         dcModelMapping.setCkanPackageId(ckanDataset.getId());
-        dcModelMapping.setCkanResourceId(ckanResource.getId());
+        dcModelMapping.setCkanResourceId(ckanResourcesId);
         dcModelMapping.setDeleted(false);
 
         dcModelMapping = dcModelMappingRepository.save(dcModelMapping);
@@ -64,12 +72,20 @@ public class DcModelMappingService {
         if(eitherDataset.isLeft()) return Either.left(eitherDataset.getLeft());
         CkanDataset ckanDataset = eitherDataset.get();
 
-        Either<String, CkanResource> eitherResource = ckanService.updateResource(dcModelMapping.getCkanResourceId(), ckanDataset.getId(), dcModelMapping.getResourceName(), dcModelMapping.getDescription());
-        if(eitherDataset.isLeft()) return Either.left(eitherDataset.getLeft());
-        CkanResource ckanResource = eitherResource.get();
+        Either<String, CkanResource> eitherResourceCsv = ckanService.updateResource(dcModelMapping.getCkanResourceId().get("csv"), ckanDataset.getId(), dcModelMapping.getResourceName(), dcModelMapping.getDescription(), "csv");
+        if(eitherResourceCsv.isLeft()) return Either.left(eitherResourceCsv.getLeft());
+        CkanResource ckanResourceCsv = eitherResourceCsv.get();
+
+        Either<String, CkanResource> eitherResourceJson = ckanService.updateResource(dcModelMapping.getCkanResourceId().get("json"), ckanDataset.getId(), dcModelMapping.getResourceName(), dcModelMapping.getDescription(), "json");
+        if(eitherResourceJson.isLeft()) return Either.left(eitherResourceJson.getLeft());
+        CkanResource ckanResourceJson = eitherResourceJson.get();
+
+        Map<String,String> ckanResourcesId = new HashMap<String,String>();
+        ckanResourcesId.put("csv", ckanResourceCsv.getId());
+        ckanResourcesId.put("json", ckanResourceJson.getId());
 
         dcModelMapping.setCkanPackageId(ckanDataset.getId());
-        dcModelMapping.setCkanResourceId(ckanResource.getId());
+        dcModelMapping.setCkanResourceId(ckanResourcesId);
 
         dcModelMapping = dcModelMappingRepository.save(dcModelMapping);
         return Either.right(dcModelMapping);
@@ -81,8 +97,7 @@ public class DcModelMappingService {
             SynchronizerAuditLog auditLog =
                     synchronizerAuditLogRepository.findFirstByTypeOrderByDateDesc(dcModelMapping.getType());
             String datasetUrl = ckanUrl  + "/dataset/" + ckanService.slugify(dcModelMapping.getName());
-            String resourceUrl = ckanUrl  + "/dataset/" + ckanService.slugify(dcModelMapping.getName()) + "/resource/" + dcModelMapping.getCkanResourceId();
-            return new AuditLogWapper(dcModelMapping, auditLog, datasetUrl, resourceUrl);
+            return new AuditLogWapper(dcModelMapping, auditLog, datasetUrl);
         }).collect(Collectors.toList());
     }
 
@@ -90,7 +105,9 @@ public class DcModelMappingService {
         DcModelMapping dcModelMapping = dcModelMappingRepository.findById(id);
         if ( dcModelMapping == null ) return Either.left("dataset.notif.not_exist");
         else if ( dcModelMapping.isDeleted() ) return Either.left("dataset.notif.not_synchronized");
-        ckanService.deleteResource(dcModelMapping.getCkanResourceId());
+        dcModelMapping.getCkanResourceId().forEach((key,resourceId) -> {
+            ckanService.deleteResource(resourceId);
+        });
         dcModelMapping.setDeleted(true);
         dcModelMappingRepository.save(dcModelMapping);
         return Either.right(dcModelMapping);

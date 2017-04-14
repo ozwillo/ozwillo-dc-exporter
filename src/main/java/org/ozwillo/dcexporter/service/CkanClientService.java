@@ -132,7 +132,7 @@ public class CkanClientService {
                 .addFormDataPart("mimetype", ckanResource.getMimetype())
                 .addFormDataPart("last_modified", ckanResource.getLastModified())
                 .addFormDataPart("upload", ckanResource.getName(),
-                        RequestBody.create(MediaType.parse("application/octet-stream"), ckanResource.getUpload()))
+                        RequestBody.create(MediaType.parse("application/octet-stream; charset=utf-8"), ckanResource.getUpload()))
                 .build();
 
         CkanAPI ckanAPI = getCkanAPI(ckanUrl);
