@@ -1,0 +1,79 @@
+{
+    "action": {
+        "delete": "Delete",
+        "edit": "Edit",
+        "close": "Close",
+        "confirm": "Confirm",
+        "new": "New",
+        "existing": "Existing",
+        "add": "Add",
+        "create": "Create",
+        "update": "Update"
+    },
+
+    "data": {
+        "message": "Message",
+        "synchronisation": "synchronization"
+    },
+
+    "menu": {
+        "dashboard": "Dashboard",
+        "add_dataset": "Add dataset"
+    },
+
+    "dashboard": {
+        "title": "Dashboard",
+
+        "notif": {
+            "no_data": "No dataset",
+            "no_data_sort": "No dataset",
+            "is_deleted": "Resource is deleted"
+        },
+
+        "sort": {
+            "all": "All",
+            "valid": "Valid",
+            "error": "Error",
+            "pending": "Pending"
+        },
+
+        "panel": {
+            "to_dataset_link": "Voir le jeu de données",
+            "to_resource_link": "Voir la ressource",
+            "dataset_name": "Dataset name",
+            "dcmodel_name": "Datacore Model",
+            "synchronization_date": "Synchronization date"
+        }
+    },
+
+    "delete_confirmation" : {
+        "title": "Deletion",
+        "message" : "You will delete this resource synchronization :"
+    },
+
+    "dataset":{
+        "title": "Dataser register",
+        "notif": {
+            "is_created": "Dataset is created",
+            "not_exist": "This dataset does not exist",
+            "not_synchronized": "This dataset is not synchronized",
+            "is_updated": "Dataset is updated"
+        },
+        "panel": {
+            "datacore": "Data core",
+            "dataset": "Dataset",
+            "resource": "Resource"
+        },
+        "label": {
+            "model": "Model",
+            "version": "Version",
+            "export_fields": "Export fields",
+            "name": "Name",
+            "description": "Description",
+            "source": "Source",
+            "license": "License",
+            "tags": "Tags",
+            "resource_name": "Resource Name"
+        }
+    }
+}

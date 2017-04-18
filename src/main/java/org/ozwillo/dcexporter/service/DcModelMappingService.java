@@ -58,7 +58,7 @@ public class DcModelMappingService {
 
     public Either<String, DcModelMapping> edit(DcModelMapping dcModelMapping) {
 
-        if (dcModelMappingRepository.findByDcId(dcModelMapping.getDcId()) == null) return Either.left("Ce jeu de données n'existe pas");
+        if (dcModelMappingRepository.findByDcId(dcModelMapping.getDcId()) == null) return Either.left("dataset.notif.not_exist");
 
         Either<String, CkanDataset> eitherDataset = ckanService.getOrCreateDataset(dcModelMapping);
         if(eitherDataset.isLeft()) return Either.left(eitherDataset.getLeft());
@@ -88,8 +88,8 @@ public class DcModelMappingService {
 
     public Either<String, DcModelMapping> deleteById(String id) {
         DcModelMapping dcModelMapping = dcModelMappingRepository.findById(id);
-        if ( dcModelMapping == null ) return Either.left("Ce jeu de données n'existe pas");
-        else if ( dcModelMapping.isDeleted() ) return Either.left("Ce jeu de données n'est pas synchronisé");
+        if ( dcModelMapping == null ) return Either.left("dataset.notif.not_exist");
+        else if ( dcModelMapping.isDeleted() ) return Either.left("dataset.notif.not_synchronized");
         ckanService.deleteResource(dcModelMapping.getCkanResourceId());
         dcModelMapping.setDeleted(true);
         dcModelMappingRepository.save(dcModelMapping);
