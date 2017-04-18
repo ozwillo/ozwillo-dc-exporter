@@ -38,8 +38,8 @@
         },
 
         "panel": {
-            "to_dataset_link": "Voir le jeu de données",
-            "to_resource_link": "Voir la ressource",
+            "to_dataset_link": "Open dataset",
+            "to_resource_link": "Open resource",
             "dataset_name": "Dataset name",
             "dcmodel_name": "Datacore Model",
             "synchronization_date": "Synchronization date"
@@ -57,7 +57,15 @@
             "is_created": "Dataset is created",
             "not_exist": "This dataset does not exist",
             "not_synchronized": "This dataset is not synchronized",
-            "is_updated": "Dataset is updated"
+            "is_updated": "Dataset is updated",
+            "error": {
+                "fetch_datasets": "Error while trying to fetch datasets from CKAN",
+                "fetch_licences": "Error while trying to fetch licenses from CKAN",
+                "fetch_tags": "Error while trying to fetch tags from CKAN",
+                "create_dataset": "Error while trying to create dataset to CKAN",
+                "create_resource": "Error while trying to create resource to CKAN",
+                "update_resource": "Error while trying to update resource to CKAN"
+            }
         },
         "panel": {
             "datacore": "Data core",

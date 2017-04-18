@@ -6,7 +6,8 @@ i18n
     .use(XHR)
     .use(LanguageDetector)
     .init({
-        whitelist: ['en'],
+        whitelist: ['fr', 'en'],
+        fallbackLng: 'en',
 
         // have a common namespace used around the full app
         ns: ['dc-exporter'],

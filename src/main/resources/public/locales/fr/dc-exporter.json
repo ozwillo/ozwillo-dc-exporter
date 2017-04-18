@@ -57,7 +57,15 @@
             "is_create": "Le jeu de données a été créé",
             "not_exist": "Ce jeu de données n'existe pas",
             "not_synchronized": "Ce jeu de données n'est pas synchronisé",
-            "is_updated": "Le jeu de données a été mis à jour"
+            "is_updated": "Le jeu de données a été mis à jour",
+            "error": {
+                "fetch_datasets": "Erreur lors de l'extraction des jeux de données du CKAN",
+                "fetch_licences": "Erreur lors de l'extraction des licences du CKAN",
+                "fetch_tags": "Erreur lors de l'extraction des tags du CKAN",
+                "create_dataset": "Erreur lors de la création du jeu de données dans CKAN",
+                "create_resource": "Erreur lors de la création de la ressource dans CKAN",
+                "update_resource": "Erreur lors de la mise à jour due la ressource dans CKAN"
+            }
         },
         "panel": {
             "datacore": "Cœur de données",
