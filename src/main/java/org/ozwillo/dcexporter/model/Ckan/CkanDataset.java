@@ -2,6 +2,7 @@ package org.ozwillo.dcexporter.model.Ckan;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CkanDataset {
@@ -60,6 +61,10 @@ public class CkanDataset {
 
     public CkanDataset(String name) {
         this.name = name;
+        this.resources = new ArrayList<>();
+        this.relationshipsAsObject = new ArrayList<>();
+        this.relationshipsAsSubject = new ArrayList<>();
+        this.extras = new ArrayList<>();
     }
 
     public CkanDataset(String licenseTitle, String maintainer, List<Object> relationshipsAsObject, boolean _private, String maintainerEmail, int numTags, String id, String metadataCreated, String metadataModified, String author, String authorEmail, String state, String version, String creatorUserId, String type, List<CkanResource> resources, int numResources, List<CkanTag> tags, List<CkanOrganization> groups, String licenseId, List<Object> relationshipsAsSubject, CkanOrganization organization, String name, boolean open, String url, String notes, String ownerOrg, List<CkanExtra> extras, String licenseUrl, String title, String revisionId) {
