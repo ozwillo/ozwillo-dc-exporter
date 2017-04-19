@@ -80,6 +80,7 @@ public class CkanService {
             ckanDataset.setMaintainerEmail("contact@ozwillo.org");
             ckanDataset.setOpen(true);
             ckanDataset.setOwnerOrg(ckanOrganization.getId());
+            ckanDataset.setGroups(ckanOrganization.getGroups());
             ckanDataset.setTitle(dcModelMapping.getName());
             ckanDataset.setNotes(dcModelMapping.getNotes());
             ckanDataset.setLicenseId(dcModelMapping.getLicense());
