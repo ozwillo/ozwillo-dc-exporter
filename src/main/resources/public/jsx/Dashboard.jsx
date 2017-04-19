@@ -1,24 +1,26 @@
 import React from 'react'
 import renderIf from 'render-if'
 import { DropdownButton, MenuItem } from 'react-bootstrap'
+import { translate } from 'react-i18next'
 
 import { ContainerPanel, PanelGroup, Panel } from './Panel'
 import { Alert } from './Form'
 
-export default class Dashboard extends React.Component {
+class Dashboard extends React.Component {
     state = {
         logs: [],
         filterKey: '',
-        filterValue: 'Toutes les synchronisations',
+        filterValue: 'dashboard.sort.all',
         success: true,
         message: ''
     }
     static contextTypes = {
         csrfToken: React.PropTypes.string,
-        csrfTokenHeaderName: React.PropTypes.string
+        csrfTokenHeaderName: React.PropTypes.string,
+        t: React.PropTypes.func
     }
-    constructor(){
-        super()
+    constructor(context){
+        super(context)
         this.onChangeFilter = this.onChangeFilter.bind(this)
         this.fetchMapping = this.fetchMapping.bind(this)
         this.closeNotif = this.closeNotif.bind(this)
@@ -43,6 +45,7 @@ export default class Dashboard extends React.Component {
         this.setState({ success: success, message: message })
     }
     render() {
+        const { t } = this.context
         const filterKey = this.state.filterKey
         const list = this.state.logs.filter(function(log) {
             switch (filterKey) {
@@ -60,18 +63,18 @@ export default class Dashboard extends React.Component {
         )
         return (
             <div id="container" className="container">
-                <h1>Flux d'activités</h1>
+                <h1>{ t('dashboard.title') }</h1>
                 {renderIf(this.state.message)(
-                    <Alert message={this.state.message} success={this.state.success} closeMethod={this.closeNotif}/>
+                    <Alert message={ t(this.state.message) } success={this.state.success} closeMethod={this.closeNotif}/>
                 )}
                 {renderIf(this.state.logs.length > 0) (
                     <div>
                         <div className="filter-dropdown text-right" >
-                            <DropdownButton title={ this.state.filterValue } onSelect={(eventKey) => this.onChangeFilter(eventKey)} id="filter-dropdown" pullRight={true}>
-                                <MenuItem eventKey={[ "Toutes les synchronisations", "" ]} >Toutes les synchronisations</MenuItem>
-                                <MenuItem eventKey={[ "Synchronisations réussies", "valid" ]} >Synchronisations réussies</MenuItem>
-                                <MenuItem eventKey={[ "Synchronisations non réussies", "error" ]}  >Synchronisations non réussies</MenuItem>
-                                <MenuItem eventKey={[ "Synchronisations en cours", "pending" ]} >Synchronisations en cours</MenuItem>
+                            <DropdownButton title={ t(this.state.filterValue) } onSelect={(eventKey) => this.onChangeFilter(eventKey)} id="filter-dropdown" pullRight={true}>
+                                <MenuItem eventKey={[ "dashboard.sort.all", "" ]} >{ t('dashboard.sort.all') }</MenuItem>
+                                <MenuItem eventKey={[ "dashboard.sort.valid", "valid" ]} >{ t('dashboard.sort.valid') }</MenuItem>
+                                <MenuItem eventKey={[ "dashboard.sort.error", "error" ]}  >{ t('dashboard.sort.error') }</MenuItem>
+                                <MenuItem eventKey={[ "dashboard.sort.pending", "pending" ]} >{ t('dashboard.sort.pending') }</MenuItem>
                             </DropdownButton>
                         </div>
                         <div className="wrap-result">
@@ -84,7 +87,7 @@ export default class Dashboard extends React.Component {
                             )}
                             {renderIf(list.length == 0) (
                                 <div className="alert alert-info" role="alert">
-                                    <p><i>Aucunes <span className="text-lowercase"> { this.state.filterValue } </span></i></p>
+                                    <p><i>{ t('dashboard.notif.no_data_sort') }<span className="text-lowercase"> { t(this.state.filterValue) } </span></i></p>
                                 </div>
                             )}
                         </div>
@@ -92,10 +95,12 @@ export default class Dashboard extends React.Component {
                 )}
                 {renderIf(this.state.logs.length == 0) (
                     <div className="alert alert-info" role="alert">
-                        <p><i>Aucun jeu de données enregistré</i></p>
+                        <p><i>{ t('dashboard.notif.no_data') }</i></p>
                     </div>
                 )}
             </div>
         )
     }
 }
+
+export default translate(['dc-exporter'])(Dashboard)

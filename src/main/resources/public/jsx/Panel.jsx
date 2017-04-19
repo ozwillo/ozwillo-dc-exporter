@@ -12,13 +12,14 @@ class Panel extends Component {
     }
     static contextTypes = {
         csrfToken: React.PropTypes.string,
-        csrfTokenHeaderName: React.PropTypes.string
+        csrfTokenHeaderName: React.PropTypes.string,
+        t: React.PropTypes.func
     }
     state = {
         showActionButton: false
     }
-    constructor(props) {
-        super(props)
+    constructor(props, context) {
+        super(props, context)
         this.checkStatus = this.checkStatus.bind(this)
         this.onClickDelete = this.onClickDelete.bind(this)
         this.deleteMapping = this.deleteMapping.bind(this)
@@ -45,7 +46,7 @@ class Panel extends Component {
         })
         .then(this.checkStatus)
         .then(response => {
-            this.props.onChangeNotif(true, "La ressource a été supprimée")
+            this.props.onChangeNotif(true, 'dashboard.notif.is_deleted')
             this.props.fetchMapping()
         })
         .catch(response => {
@@ -58,6 +59,7 @@ class Panel extends Component {
     }
 
     render() {
+        const { t } = this.context
         const log = this.props.log
         return (
             <div className={'panel' + (!log.synchronizerAuditLog ? ' panel-warning' : log.synchronizerAuditLog.succeeded ? ' panel-success' : ' panel-danger')}>
@@ -76,13 +78,13 @@ class Panel extends Component {
                         </div>
                         <div className="col-md-6">
                             <div className="text-right">
-                                <PanelUrlBtn url={log.datasetUrl} text="Voir le jeu de données" />
-                                <PanelUrlBtn url={log.resourceUrl} text="Voir la ressource" />
+                                <PanelUrlBtn url={log.datasetUrl} text={ t('dashboard.panel.to_dataset_link') } />
+                                <PanelUrlBtn url={log.resourceUrl} text={ t('dashboard.panel.to_resource_link') } />
                                 <Link className="btn btn-default btn-xs panel-btn" to={`/dataset/${log.dcModelMapping.id}`}>
-                                    Modifier <span className="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                                    { t('action.edit') } <span className="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                                 </Link>
                                 <button className="btn btn-default btn-xs panel-btn" onClick={ this.onClickDelete } >
-                                    Supprimer <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                    { t('action.delete') } <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                                 </button>
                             </div>
                         </div>
@@ -90,28 +92,28 @@ class Panel extends Component {
                 </div>
                 <ul className="list-group">
                     <li className="list-group-item">
-                        <label className="col-sm-3 control-label">Nom du jeu de données</label>{log.dcModelMapping.name}
+                        <label className="col-sm-3 control-label">{ t('dashboard.panel.dataset_name') }</label>{log.dcModelMapping.name}
                     </li>
                     <li className="list-group-item">
-                        <label className="col-sm-3 control-label">Modèle du cœur de données</label>{log.dcModelMapping.type}
+                        <label className="col-sm-3 control-label">{ t('dashboard.panel.dcmodel_name') }</label>{log.dcModelMapping.type}
                     </li>
                     {(log.synchronizerAuditLog) &&
                     <li className="list-group-item">
-                        <label className="col-sm-3 control-label">Date de
-                            synchronisation</label>{new Date(log.synchronizerAuditLog.date).toLocaleString()}
+                        <label className="col-sm-3 control-label">{ t('dashboard.panel.synchronization_date') }
+                            </label>{new Date(log.synchronizerAuditLog.date).toLocaleString()}
                     </li>
                     }
                     {(log.synchronizerAuditLog && !log.synchronizerAuditLog.succeeded) &&
                     <li className="list-group-item">
-                        <label className="col-sm-3 control-label">Message</label>{log.synchronizerAuditLog.errorMessage}
+                        <label className="col-sm-3 control-label">{ t('data.message') }</label>{log.synchronizerAuditLog.errorMessage}
                     </li>
                     }
                 </ul>
                 {renderIf(this.state.showActionButton) (
                     <ConfirmActionButton
-                        content={"Vous êtes sur le point de supprimer la synchronisation de la ressource : " + log.dcModelMapping.resourceName}
+                        content={t('delete_confirmation.message') + log.dcModelMapping.resourceName}
                         onConfirm={ this.deleteMapping }
-                        confirmLabel="Suppression"
+                        confirmLabel={ t('delete_confirmation.title') }
                         onHide={ this.returnConfirmAction }/>
                 )}
             </div>

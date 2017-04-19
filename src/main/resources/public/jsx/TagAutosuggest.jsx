@@ -1,5 +1,4 @@
 import React, {Component} from "react"
-
 import Autosuggest from "react-autosuggest"
 
 const getSuggestionValue = suggestion => suggestion.name
@@ -12,13 +11,12 @@ function escapeRegexCharacters(str) {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-class TagAutosuggest extends React.Component {
-    static propTypes = {
-        onSelect: React.PropTypes.func.isRequired,
-        onChangeNotif: React.PropTypes.func.isRequired
+class TagAutosuggest extends Component {
+    static contextTypes = {
+        t: React.PropTypes.func
     }
-    constructor (props) {
-        super(props)
+    constructor (props, context) {
+        super(props, context)
         this.defaultProps = {
             required: false
         }
@@ -80,14 +78,17 @@ class TagAutosuggest extends React.Component {
         this.setState({ value: "" })
 
     }
-    renderInputComponent = (inputProps) => (
-        <div className="input-group">
-            <input {...inputProps} className="form-control" />
-            <span className="input-group-btn">
-                <button className="btn btn-default" type="button" onClick={this.onClick} >Ajouter</button>
-            </span>
-        </div>
-    )
+    renderInputComponent(inputProps) {
+        const { t } = this.context
+        return (
+            <div className="input-group">
+                <input {...inputProps} className="form-control"/>
+                <span className="input-group-btn">
+                    <button className="btn btn-default" type="button" onClick={this.onClick}>{ t('action.add') }</button>
+                </span>
+            </div>
+        )
+    }
     render() {
         const inputProps = {
             value: this.state.value,

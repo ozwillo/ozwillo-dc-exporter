@@ -35,7 +35,7 @@ public class CkanService {
 
     public Either<String, List<CkanDataset>> getDatasets() {
         Optional<List<String>> opt = ckanClientService.getDatasetList(ckanUrl);
-        if(!opt.isPresent()) return Either.left("Error while trying to fetch datasets from CKAN");
+        if(!opt.isPresent()) return Either.left("dataset.notif.error.fetch_datasets");
 
         List<String> datasets = opt.get();
         return Either.right(datasets.stream()
@@ -45,7 +45,7 @@ public class CkanService {
 
     public Either<String, Map<String, String>> getLicences() {
         Optional<List<CkanLicense>> opt = ckanClientService.getLicenseList(ckanUrl);
-        if(!opt.isPresent()) return Either.left("Error while trying to fetch licenses from CKAN");
+        if(!opt.isPresent()) return Either.left("dataset.notif.error.fetch_licences");
 
         List<CkanLicense> licenses = opt.get();
         Map<String, String> unsortedLicences =
@@ -59,7 +59,7 @@ public class CkanService {
 
     public Either<String, List<CkanTag>> getTags() {
         Optional<List<CkanTag>> opt = ckanClientService.getTagList(ckanUrl);
-        if(!opt.isPresent()) return Either.left("Error while trying to fetch tags from CKAN");
+        if(!opt.isPresent()) return Either.left("dataset.notif.error.fetch_tags");
 
         return Either.right(opt.get());
     }
@@ -90,7 +90,7 @@ public class CkanService {
             ckanDataset.setPrivate(false);
 
             Optional<CkanDataset> optCreate = ckanClientService.createDataset(ckanUrl, ckanApiKey, ckanDataset);
-            if(!optCreate.isPresent()) return Either.left("Error while trying to create dataset to CKAN");
+            if(!optCreate.isPresent()) return Either.left("dataset.notif.error.create_dataset");
             return Either.right(optCreate.get());
         } else {
             LOGGER.debug("Reusing existing dataset with slug name {} ", optGet.get().getName());
@@ -106,7 +106,7 @@ public class CkanService {
         ckanResource.setUrl("upload");
 
         Optional<CkanResource> opt = ckanClientService.createResource(ckanUrl, ckanApiKey, ckanResource);
-        if(!opt.isPresent()) return Either.left("Error while trying to create resource to CKAN");
+        if(!opt.isPresent()) return Either.left("dataset.notif.error.create_resource");
         return Either.right(opt.get());
     }
 
@@ -118,7 +118,7 @@ public class CkanService {
         ckanResource.setUrl("upload");
 
         Optional<CkanResource> opt = ckanClientService.updateResource(ckanUrl, ckanApiKey, ckanResource);
-        if(!opt.isPresent()) return Either.left("Error while trying to update resource to CKAN");
+        if(!opt.isPresent()) return Either.left("dataset.notif.error.update_resource");
         return Either.right(opt.get());
     }
 

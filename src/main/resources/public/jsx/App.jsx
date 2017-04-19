@@ -1,11 +1,12 @@
 import React from 'react'
 import { render } from 'react-dom'
-
+import { I18nextProvider } from 'react-i18next'
 import { Router, Route, IndexRoute, browserHistory} from 'react-router'
 
 import Navbar from './Navbar'
 import Dashboard from './Dashboard'
 import Dataset from './Dataset'
+import i18n from './util/i18n'
 
 const App = React.createClass({
     getInitialState() {
@@ -16,12 +17,14 @@ const App = React.createClass({
     },
     childContextTypes: {
         csrfToken: React.PropTypes.string,
-        csrfTokenHeaderName: React.PropTypes.string
+        csrfTokenHeaderName: React.PropTypes.string,
+        t : React.PropTypes.func
     },
     getChildContext() {
         return {
             csrfToken: this.state.csrfToken,
-            csrfTokenHeaderName: this.state.csrfTokenHeaderName
+            csrfTokenHeaderName: this.state.csrfTokenHeaderName,
+            t: this.t
         };
     },
     componentDidMount() {
@@ -40,12 +43,14 @@ const App = React.createClass({
     }
 })
 
-render((
-    <Router history={browserHistory}>
-        <Route path="/" component={App}>
-            <IndexRoute component={Dashboard} />
-            <Route path="dataset" component={Dataset} />
-            <Route path="dataset/:id" component={Dataset}/>
-        </Route>
-    </Router>
-), document.getElementById('app'))
+render(
+    <I18nextProvider i18n={ i18n }>
+        <Router history={browserHistory}>
+            <Route path="/" component={App}>
+                <IndexRoute component={Dashboard} />
+                <Route path="dataset" component={Dataset} />
+                <Route path="dataset/:id" component={Dataset}/>
+            </Route>
+        </Router>
+    </I18nextProvider>
+, document.getElementById('app'))
