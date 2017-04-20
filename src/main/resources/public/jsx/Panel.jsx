@@ -79,7 +79,6 @@ class Panel extends Component {
                         <div className="col-md-6">
                             <div className="text-right">
                                 <PanelUrlBtn url={log.datasetUrl} text={ t('dashboard.panel.to_dataset_link') } />
-                                <PanelUrlBtn url={log.resourceUrl} text={ t('dashboard.panel.to_resource_link') } />
                                 <Link className="btn btn-default btn-xs panel-btn" to={`/dataset/${log.dcModelMapping.id}`}>
                                     { t('action.edit') } <span className="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                                 </Link>

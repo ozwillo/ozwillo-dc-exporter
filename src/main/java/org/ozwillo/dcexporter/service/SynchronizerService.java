@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -65,15 +66,19 @@ public class SynchronizerService {
     }
 
     private void sync(DcModelMapping dcModelMapping) throws Exception {
-        Optional<String> optionalResourceCsvFile =
-                datacoreService.exportResourceToCsv(dcModelMapping.getProject(), dcModelMapping.getType(), dcModelMapping.getExcludedFields());
+        Map<String, Optional<String>> optionalResourceFiles =
+                datacoreService.exportResource(dcModelMapping.getProject(), dcModelMapping.getType(), dcModelMapping.getExcludedFields());
 
-        if (!optionalResourceCsvFile.isPresent()) {
+        if (!optionalResourceFiles.get("csv").isPresent()) {
             LOGGER.error("Did not get the resource's CSV file, stopping");
             throw new Exception("Unable to get the resource from datacore");
         }
 
-        String resourceCsvFile = optionalResourceCsvFile.get();
-        ckanService.updateResourceData(dcModelMapping, resourceCsvFile);
+        if (!optionalResourceFiles.get("json").isPresent()) {
+            LOGGER.error("Did not get the resource's CSV file, stopping");
+            throw new Exception("Unable to get the resource from datacore");
+        }
+
+        ckanService.updateResourceData(dcModelMapping, optionalResourceFiles);
     }
 }

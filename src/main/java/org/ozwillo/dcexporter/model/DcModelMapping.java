@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 public class DcModelMapping {
 
@@ -40,7 +41,7 @@ public class DcModelMapping {
     private String source;
     private String version;
     private String ckanPackageId;
-    private String ckanResourceId;
+    private Map<String, String> ckanResourceId;
     private List<String> excludedFields;
     private boolean isDeleted;
 
@@ -89,10 +90,10 @@ public class DcModelMapping {
     public void setCkanPackageId(String ckanPackageId) {
         this.ckanPackageId = ckanPackageId;
     }
-    public String getCkanResourceId() {
+    public Map<String, String> getCkanResourceId() {
         return ckanResourceId;
     }
-    public void setCkanResourceId(String ckanResourceId) {
+    public void setCkanResourceId(Map<String, String> ckanResourceId) {
         this.ckanResourceId = ckanResourceId;
     }
     public String getDescription() {
@@ -153,7 +154,6 @@ public class DcModelMapping {
                 ", source='" + source + '\'' +
                 ", version='" + version + '\'' +
                 ", ckanPackageId='" + ckanPackageId + '\'' +
-                ", ckanResourceId='" + ckanResourceId + '\'' +
                 '}';
     }
 }

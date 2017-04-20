@@ -110,11 +110,11 @@ public class CkanService {
         return Either.right(opt.get());
     }
 
-    public Either<String, CkanResource> updateResource(String resourceId, String packageId, String name,String description) {
+    public Either<String, CkanResource> updateResource(String resourceId, String packageId, String name,String description, String type) {
         CkanResource ckanResource = ckanClientService.getResource(ckanUrl, resourceId).get();
         ckanResource.setPackageId(packageId);
         ckanResource.setDescription(description);
-        ckanResource.setName(name + ".csv");
+        ckanResource.setName(name + "." + type);
         ckanResource.setUrl("upload");
 
         Optional<CkanResource> opt = ckanClientService.updateResource(ckanUrl, ckanApiKey, ckanResource);
@@ -122,21 +122,23 @@ public class CkanService {
         return Either.right(opt.get());
     }
 
-    public void updateResourceData(DcModelMapping dcModelMapping, String resource) throws Exception {
-        CkanResource ckanResource = new CkanResource();
-        ckanResource.setPackageId(dcModelMapping.getCkanPackageId());
-        ckanResource.setUrl("upload");
-        ckanResource.setFormat("CSV");
-        ckanResource.setMimetype("text/csv");
-        ckanResource.setName(dcModelMapping.getResourceName() + ".csv");
-        ckanResource.setDescription(dcModelMapping.getDescription());
-        ckanResource.setId(dcModelMapping.getCkanResourceId());
-        ckanResource.setUpload(resource.getBytes());
+    public void updateResourceData(DcModelMapping dcModelMapping, Map<String, Optional<String>> optionalResourceFiles ) throws Exception {
+        optionalResourceFiles.forEach((key, optionalResource) -> {
+            CkanResource ckanResource = new CkanResource();
+            ckanResource.setPackageId(dcModelMapping.getCkanPackageId());
+            ckanResource.setUrl("upload");
+            ckanResource.setFormat(key);
+            ckanResource.setMimetype(key == "csv" ? "text/csv" : "application/json");
+            ckanResource.setName(dcModelMapping.getResourceName() + "." + key);
+            ckanResource.setDescription(dcModelMapping.getDescription());
+            ckanResource.setId(dcModelMapping.getCkanResourceId().get(key));
+            ckanResource.setUpload(optionalResource.get().getBytes());
 
-        DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateHourMinuteSecondMillis();
-        ckanResource.setLastModified(dateTimeFormatter.print(LocalDateTime.now()));
+            DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateHourMinuteSecondMillis();
+            ckanResource.setLastModified(dateTimeFormatter.print(LocalDateTime.now()));
 
-        ckanClientService.updateResourceFile(ckanUrl, ckanApiKey, ckanResource);
+            ckanClientService.updateResourceFile(ckanUrl, ckanApiKey, ckanResource);
+        });
     }
 
     public void deleteResource(String id) {
