@@ -71,18 +71,14 @@ public class DcModelMappingService {
         Either<String, CkanDataset> eitherDataset = ckanService.getOrCreateDataset(dcModelMapping);
         if(eitherDataset.isLeft()) return Either.left(eitherDataset.getLeft());
         CkanDataset ckanDataset = eitherDataset.get();
-
-        Either<String, CkanResource> eitherResourceCsv = ckanService.updateResource(dcModelMapping.getCkanResourceId().get("csv"), ckanDataset.getId(), dcModelMapping.getResourceName(), dcModelMapping.getDescription(), "csv");
-        if(eitherResourceCsv.isLeft()) return Either.left(eitherResourceCsv.getLeft());
-        CkanResource ckanResourceCsv = eitherResourceCsv.get();
-
-        Either<String, CkanResource> eitherResourceJson = ckanService.updateResource(dcModelMapping.getCkanResourceId().get("json"), ckanDataset.getId(), dcModelMapping.getResourceName(), dcModelMapping.getDescription(), "json");
-        if(eitherResourceJson.isLeft()) return Either.left(eitherResourceJson.getLeft());
-        CkanResource ckanResourceJson = eitherResourceJson.get();
-
         Map<String,String> ckanResourcesId = new HashMap<String,String>();
-        ckanResourcesId.put("csv", ckanResourceCsv.getId());
-        ckanResourcesId.put("json", ckanResourceJson.getId());
+
+        for(Map.Entry<String, String> entry : dcModelMapping.getCkanResourceId().entrySet()) {
+            Either<String, CkanResource> eitherResource = ckanService.updateResource(entry.getValue(), ckanDataset.getId(), dcModelMapping.getResourceName(), dcModelMapping.getDescription(), entry.getKey());
+            if(eitherResource.isLeft()) return Either.left(eitherResource.getLeft());
+            CkanResource ckanResource = eitherResource.get();
+            ckanResourcesId.put(entry.getKey(), ckanResource.getId());
+        }
 
         dcModelMapping.setCkanPackageId(ckanDataset.getId());
         dcModelMapping.setCkanResourceId(ckanResourcesId);
