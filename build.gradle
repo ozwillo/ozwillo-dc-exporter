@@ -19,7 +19,7 @@ apply plugin: 'spring-boot'
 
 jar {
 	baseName = 'ozwillo-dc-exporter'
-	version = '0.8.0-rc2'
+	version = '0.10.0-rc1'
 }
 
 sourceCompatibility = 1.8
