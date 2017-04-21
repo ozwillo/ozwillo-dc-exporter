@@ -75,7 +75,7 @@ public class SynchronizerService {
         }
 
         if (!optionalResourceFiles.get("json").isPresent()) {
-            LOGGER.error("Did not get the resource's CSV file, stopping");
+            LOGGER.error("Did not get the resource's JSON file, stopping");
             throw new Exception("Unable to get the resource from datacore");
         }
 
