@@ -103,7 +103,7 @@ public class CkanService {
         ckanResource.setPackageId(packageId);
         ckanResource.setDescription(description);
         ckanResource.setName(name);
-        ckanResource.setUrl("upload");
+        ckanResource.setUrl("_datastore_only_resource");
 
         Optional<CkanResource> opt = ckanClientService.createResource(ckanUrl, ckanApiKey, ckanResource);
         if(!opt.isPresent()) return Either.left("dataset.notif.error.create_resource");

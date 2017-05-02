@@ -126,7 +126,7 @@ public class CkanClientService {
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("id", ckanResource.getId())
                 .addFormDataPart("size", ckanResource.getSize())
-                .addFormDataPart("url", "upload")
+                .addFormDataPart("url", ckanResource.getUrl())
                 .addFormDataPart("package_id", ckanResource.getPackageId())
                 .addFormDataPart("format", ckanResource.getFormat())
                 .addFormDataPart("mimetype", ckanResource.getMimetype())
