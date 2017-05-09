@@ -54,7 +54,7 @@
     "dataset":{
         "title": "Enregistrement d'un jeu de données",
         "notif": {
-            "is_create": "Le jeu de données a été créé",
+            "is_created": "Le jeu de données a été créé",
             "not_exist": "Ce jeu de données n'existe pas",
             "not_synchronized": "Ce jeu de données n'est pas synchronisé",
             "is_updated": "Le jeu de données a été mis à jour",
