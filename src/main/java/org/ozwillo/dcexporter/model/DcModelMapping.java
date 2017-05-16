@@ -44,6 +44,7 @@ public class DcModelMapping {
     private Map<String, String> ckanResourceId;
     private List<String> excludedFields;
     private boolean isDeleted;
+    private String url;
 
 
     public DcModelMapping() {
@@ -137,7 +138,12 @@ public class DcModelMapping {
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
     }
-
+    public String getUrl() {
+        return url;
+    }
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
     @Override
     public String toString() {

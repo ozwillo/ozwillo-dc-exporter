@@ -17,6 +17,7 @@ application:
   security:
     fetchUserInfo: true
   syncDelay: 10000
+  syncDatasetUrl: 3600000
 
 # TODO : Copied pasted from portal configuration, check if we really need all of them
 kernel:
