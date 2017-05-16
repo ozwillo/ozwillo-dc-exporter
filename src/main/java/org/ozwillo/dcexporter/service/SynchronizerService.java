@@ -1,8 +1,10 @@
 package org.ozwillo.dcexporter.service;
 
+import javaslang.control.Either;
 import org.joda.time.DateTime;
 import org.ozwillo.dcexporter.dao.DcModelMappingRepository;
 import org.ozwillo.dcexporter.dao.SynchronizerAuditLogRepository;
+import org.ozwillo.dcexporter.model.Ckan.CkanDataset;
 import org.ozwillo.dcexporter.model.DcModelMapping;
 import org.ozwillo.dcexporter.model.SynchronizerAuditLog;
 import org.slf4j.Logger;
@@ -60,6 +62,25 @@ public class SynchronizerService {
                 } catch (Exception exception) {
                     newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), false, exception.getMessage(),  DateTime.now());
                     synchronizerAuditLogRepository.save(newAuditLog);
+                }
+            });
+        });
+    }
+
+    @Scheduled(fixedDelayString = "${application.syncDatasetUrl}")
+    public void synchronizeDatasetUrl() {
+        systemUserService.runAs(() -> {
+            dcModelMappingRepository.findAll().forEach(dcModelMapping -> {
+                if(!dcModelMapping.isDeleted()) {
+                    Either<String, CkanDataset> datasetOpt = ckanService.getOrCreateDataset(dcModelMapping);
+                    if(datasetOpt.isRight()) {
+                        LOGGER.info("Updating URL for dataset {}", dcModelMapping.getCkanPackageId());
+                        // CKAN store the url in the name attribute
+                        dcModelMapping.setUrl(datasetOpt.get().getName());
+                        dcModelMappingRepository.save(dcModelMapping);
+                    } else {
+                        LOGGER.warn("Dataset not available for DCModelMapping: {}", dcModelMapping.getDcId());
+                    }
                 }
             });
         });
