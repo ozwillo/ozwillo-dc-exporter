@@ -1,6 +1,6 @@
 {
   "name": "ozwillo-dc-exporter",
-  "version": "0.10.0-rc3",
+  "version": "0.10.0",
   "description": "Ozwillo datacore exporter",
   "private": true,
   "scripts": {

@@ -57,6 +57,7 @@ public class DcModelMappingService {
         ckanResourcesId.put("json", ckanResourceJson.getId());
 
         dcModelMapping.setCkanPackageId(ckanDataset.getId());
+        dcModelMapping.setUrl(ckanDataset.getName());
         dcModelMapping.setCkanResourceId(ckanResourcesId);
         dcModelMapping.setDeleted(false);
 
@@ -81,6 +82,7 @@ public class DcModelMappingService {
         }
 
         dcModelMapping.setCkanPackageId(ckanDataset.getId());
+        dcModelMapping.setUrl(ckanDataset.getName());
         dcModelMapping.setCkanResourceId(ckanResourcesId);
 
         dcModelMapping = dcModelMappingRepository.save(dcModelMapping);
@@ -92,7 +94,7 @@ public class DcModelMappingService {
         return dcModelMappingRepository.findAllByOrderByResourceNameAsc().stream().map(dcModelMapping -> {
             SynchronizerAuditLog auditLog =
                     synchronizerAuditLogRepository.findFirstByTypeOrderByDateDesc(dcModelMapping.getType());
-            String datasetUrl = ckanUrl  + "/dataset/" + ckanService.slugify(dcModelMapping.getName());
+            String datasetUrl = ckanUrl  + "/dataset/" + dcModelMapping.getUrl();
             return new AuditLogWapper(dcModelMapping, auditLog, datasetUrl);
         }).collect(Collectors.toList());
     }
