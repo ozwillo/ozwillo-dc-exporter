@@ -18,7 +18,8 @@ function escapeRegexCharacters(str) {
 
 export default class DatasetAutosuggest extends React.Component {
     static propTypes = {
-        id: React.PropTypes.string.isRequired
+        id: React.PropTypes.string.isRequired,
+        onChangeNotif: React.PropTypes.func.isRequired
     }
     static defaultProps = {
         required: false
@@ -29,10 +30,21 @@ export default class DatasetAutosuggest extends React.Component {
         allSuggestions: {},
         isSet: false
     }
+    checkStatus(response) {
+        if (response.status >= 200 && response.status < 300) {
+            return response
+        } else {
+            throw response
+        }
+    }
     componentDidMount() {
         fetch('/api/ckan/datasets', {credentials: 'same-origin'})
+            .then(this.checkStatus)
             .then(response => response.json())
             .then(json => this.setState({allSuggestions: json}))
+            .catch(error => {
+                error.text().then(text => { this.props.onChangeNotif(false, text) })
+            })
     }
     getSuggestions(value) {
         const escapedValue = escapeRegexCharacters(value.trim());
@@ -41,7 +53,7 @@ export default class DatasetAutosuggest extends React.Component {
             return [];
         }
 
-        const regex = new RegExp('^' + escapedValue, 'i');
+        const regex = new RegExp(escapedValue, 'i');
 
         return this.state.allSuggestions.filter(suggestion => regex.test(suggestion.title));
     }

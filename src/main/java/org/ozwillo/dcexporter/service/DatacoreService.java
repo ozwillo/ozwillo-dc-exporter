@@ -1,5 +1,9 @@
 package org.ozwillo.dcexporter.service;
 
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -13,11 +17,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.io.StringWriter;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,6 +46,10 @@ public class DatacoreService {
             .collect(Collectors.toList());
     }
 
+    public DCModel getModel(String project, String modelType) {
+        return datacore.findModel(project, modelType);
+    }
+
     public boolean hasMoreRecentResources(String project, String type, DateTime fromDate) {
         DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateTime();
         DCQueryParameters parameters = new DCQueryParameters(modifiedField, DCOperator.GTE, dateTimeFormatter.print(fromDate));
@@ -54,7 +59,7 @@ public class DatacoreService {
         return !newResources.isEmpty();
     }
 
-    Optional<String> exportResourceToCsv(String project, String type, List<String> excludedFields) {
+    Map<String,Optional<String>> exportResource(String project, String type, List<String> excludedFields) {
 
         // Extract all possible columns from the type's model (filtering explicitely excluded ones)
         DCModel model = datacore.findModel(project, type);
@@ -67,24 +72,16 @@ public class DatacoreService {
         resourceKeys.add("fake-weight");
 
         StringWriter resourceCsv = new StringWriter();
+        StringWriter resourceJson = new StringWriter();
 
-        try {
-            writeCsvFileHeader( resourceCsv, resourceKeys);
-        } catch (IOException e) {
-            LOGGER.error("Error while writing CSV file header", e);
-            return Optional.empty();
-        }
+        writeCsvFileHeader( resourceCsv, resourceKeys);
 
         DCQueryParameters parameters = new DCQueryParameters("@id", DCOrdering.DESCENDING);
         int count = 0;
         while (true) {
             List<DCResource> intermediateResult = datacore.findResources(project, type, parameters, 0, 100);
-            try {
-                writeCsvFileLines( resourceCsv, resourceKeys, intermediateResult);
-            } catch (IOException e) {
-                LOGGER.error("Error while writing data to temp file", e);
-                return Optional.empty();
-            }
+            writeCsvFileLines( resourceCsv, resourceKeys, intermediateResult);
+            writeJsonFileLines( resourceJson, excludedFields, intermediateResult);
             count += intermediateResult.size();
 
             if (intermediateResult.size() < 100) {
@@ -96,13 +93,17 @@ public class DatacoreService {
                 parameters = new DCQueryParameters("@id", DCOrdering.DESCENDING, DCOperator.LT, lastResultId);
             }
         }
+        Map<String, Optional<String>> resourceFiles = new HashMap<>();
+
+        resourceFiles.put("csv", Optional.of(resourceCsv.toString()));
+        resourceFiles.put("json", Optional.of(resourceJson.toString()));
 
         LOGGER.debug("Got {} resources to export", count);
 
-        return Optional.of(resourceCsv.toString());
+        return resourceFiles;
     }
 
-    private void writeCsvFileLines( StringWriter resourceCsv, List<String> resourceKeys, List<DCResource> resources) throws IOException {
+    private void writeCsvFileLines( StringWriter resourceCsv, List<String> resourceKeys, List<DCResource> resources){
 
         resources.forEach(resource -> {
             LOGGER.debug("Resource : {}", resource);
@@ -152,20 +153,14 @@ public class DatacoreService {
                     resourceCsv.write(resourceRow.get());
                     resourceCsv.write("\n");
         });
-
-        resourceCsv.flush();
-        resourceCsv.close();
     }
 
-    private void writeCsvFileHeader( StringWriter resourceCsv, List<String> resourceKeys) throws IOException {
+    private void writeCsvFileHeader( StringWriter resourceCsv, List<String> resourceKeys) {
         Optional<String> header = resourceKeys.stream().reduce((result, key) -> result + "," + key);
         if (header.isPresent()) {
             resourceCsv.write(header.get());
             resourceCsv.write("\n");
         }
-
-        resourceCsv.flush();
-        resourceCsv.close();
     }
 
     private String getI18nFieldValue(Map<String, String> field, String lang) {
@@ -186,4 +181,54 @@ public class DatacoreService {
 
         return result.isPresent() ? result.get().asMap().values().toArray()[0].toString() : "";
     }
+
+    private void writeJsonFileLines( StringWriter resourceJson, List<String> excludedFields, List<DCResource> resources){
+        ObjectMapper mapper = new ObjectMapper();
+
+        ArrayNode arrayResource = mapper.createArrayNode();
+
+        resources.forEach(resource -> {
+            excludedFields.forEach(key -> {
+                resource.getValues().remove(key);
+            });
+            ObjectNode objectResource = writeDCResource(resource.getValues());
+            arrayResource.add(objectResource);
+        });
+        resourceJson.write(arrayResource.toString());
+    }
+
+    private ObjectNode writeDCResource(Map<String,DCResource.Value> values){
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode objectResource = mapper.createObjectNode();
+        values.forEach((key,value) ->{
+            if (value == null ) {
+                LOGGER.debug("No value for this key, skipping");
+                objectResource.put(key, "");
+            } else if (value.isString()) {
+                objectResource.put(key, value.asString());
+            } else if (value.isMap()) {
+                objectResource.putPOJO(key,value.asMap());
+            } else if (value.isArray()) {
+                ArrayNode resourceArray = mapper.createArrayNode();
+                List<DCResource.Value> resourceRowInnerValues = value.asArray();
+                if (resourceRowInnerValues.isEmpty())
+                    resourceArray.add("");
+                else if (resourceRowInnerValues.get(0).isString()) {
+                    resourceRowInnerValues.forEach(resourceRowInnerValue -> resourceArray.add(resourceRowInnerValue.asString()));
+                }
+                else if (resourceRowInnerValues.get(0).isMap()) {
+                    resourceRowInnerValues.forEach(resourceRowInnerValue -> {
+                        ObjectNode objectInnerValue = writeDCResource(resourceRowInnerValue.asMap());
+                        resourceArray.add(objectInnerValue);
+                    });
+                } else {
+                    LOGGER.warn("Inner row value not managed for {}", resourceRowInnerValues);
+                    resourceArray.add("");
+                }
+                objectResource.put(key,resourceArray);
+            }
+        });
+        return objectResource;
+    }
+
 }

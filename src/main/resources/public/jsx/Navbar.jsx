@@ -1,9 +1,17 @@
 import React from 'react'
+import { translate } from 'react-i18next'
 
 import { Link, IndexLink } from 'react-router'
 
-export default React.createClass({
+class Navbar extends React.Component{
+    static contextTypes = {
+        t: React.PropTypes.func
+    }
+    constructor(context){
+        super(context)
+    }
     render() {
+        const { t } = this.context
         return (
             <nav className="navbar navbar-default">
                 <div className="container">
@@ -20,12 +28,13 @@ export default React.createClass({
 
                     <div className="collapse navbar-collapse" id="navbar-collapse">
                         <ul className="nav navbar-nav">
-                            <li><IndexLink to="/">Flux d'activités</IndexLink></li>
-                            <li><Link to="/dataset">Ajouter un jeu de données</Link></li>
+                            <li><IndexLink to="/">{ t('menu.dashboard') }</IndexLink></li>
+                            <li><Link to="/dataset">{ t('menu.add_dataset') }</Link></li>
                         </ul>
                     </div>
                 </div>
             </nav>
         )
     }
-})
+}
+export default translate(['dc-exporter'])(Navbar)

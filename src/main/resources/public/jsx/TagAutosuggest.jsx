@@ -1,5 +1,4 @@
 import React, {Component} from "react"
-
 import Autosuggest from "react-autosuggest"
 
 const getSuggestionValue = suggestion => suggestion.name
@@ -8,17 +7,16 @@ const renderSuggestion = suggestion => (
     <span>{suggestion.name}</span>
 )
 
-const renderInputComponent = inputProps => (
-    <input {...inputProps} className="form-control"  />
-)
-
 function escapeRegexCharacters(str) {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-class TagAutosuggest extends React.Component {
-    constructor (props) {
-        super(props)
+class TagAutosuggest extends Component {
+    static contextTypes = {
+        t: React.PropTypes.func
+    }
+    constructor (props, context) {
+        super(props, context)
         this.defaultProps = {
             required: false
         }
@@ -28,11 +26,24 @@ class TagAutosuggest extends React.Component {
             allSuggestions: {}
 
         }
+        this.onClick = this.onClick.bind(this)
+        this.renderInputComponent = this.renderInputComponent.bind(this)
+    }
+    checkStatus(response) {
+        if (response.status >= 200 && response.status < 300) {
+            return response
+        } else {
+            throw response
+        }
     }
     componentDidMount() {
         fetch('/api/ckan/tags', {credentials: 'same-origin'})
+            .then(this.checkStatus)
             .then(response => response.json())
             .then(json => this.setState({allSuggestions: json}))
+            .catch(error => {
+                error.text().then(text => { this.props.onChangeNotif(false, text) })
+            })
     }
     getSuggestions(value) {
         const escapedValue = escapeRegexCharacters(value.trim());
@@ -60,6 +71,24 @@ class TagAutosuggest extends React.Component {
         this.props.onSelect(suggestion)
         this.setState({ value: "" })
     }
+    onClick(){
+
+        this.props.onSelect({ name: this.state.value })
+
+        this.setState({ value: "" })
+
+    }
+    renderInputComponent(inputProps) {
+        const { t } = this.context
+        return (
+            <div className="input-group">
+                <input {...inputProps} className="form-control"/>
+                <span className="input-group-btn">
+                    <button className="btn btn-default" type="button" onClick={this.onClick}>{ t('action.add') }</button>
+                </span>
+            </div>
+        )
+    }
     render() {
         const inputProps = {
             value: this.state.value,
@@ -75,7 +104,7 @@ class TagAutosuggest extends React.Component {
                     onSuggestionSelected={this.onSuggestionSelected}
                     getSuggestionValue={getSuggestionValue}
                     renderSuggestion={renderSuggestion}
-                    renderInputComponent={renderInputComponent}
+                    renderInputComponent={this.renderInputComponent}
                     inputProps={inputProps}/>
             </div>
         )
@@ -87,6 +116,6 @@ TagAutosuggest.PropTypes = {
 }
 
 const Tag = ({ keyword, remove, id }) =>
-    <li id="tag" className="list-group-item">{keyword}<span className="glyphicon glyphicon-remove" onClick={() => remove(id)}></span></li>
+    <li id="tag" className="list-group-item">{keyword}<span className="glyphicon glyphicon-remove remove-tag" onClick={() => remove(id)}></span></li>
 
 module.exports = { TagAutosuggest, Tag }

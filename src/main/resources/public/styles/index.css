@@ -6,6 +6,10 @@ span.glyphicon {
     display: inline-block;
     margin: 5px 5px 0px 0px;
 }
+.remove-tag{
+    cursor: pointer;
+    cursor: hand;
+}
 
 .btn-group {
     padding-bottom: 15px;
@@ -23,6 +27,18 @@ span.glyphicon {
 
 h1 {
     padding-bottom: 15px;
+}
+
+.wrap-result {
+    padding-top: 10px;
+}
+
+.filter-dropdown > .dropdown {
+    padding-bottom: 0px;
+}
+
+.panel-btn {
+    margin-left: 5px;
 }
 
 
@@ -61,4 +77,11 @@ h1 {
 
 .react-autosuggest__container {
     position: relative;
+}
+
+.modal-container {
+    position: relative;
+}
+.modal-container .modal, .modal-container .modal-backdrop {
+    position: absolute;
 }
