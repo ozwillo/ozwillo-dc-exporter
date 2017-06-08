@@ -4,6 +4,7 @@ import { browserHistory } from 'react-router';
 import { translate } from 'react-i18next'
 
 import DatasetForm from './DatasetForm'
+import GeocodingForm from './GeocodingForm'
 import { Form, FormGroup, Label, SelectField, InputText, Textarea, SubmitButton, Alert, ReadOnlyField, Checkbox } from './Form'
 
 class Dataset extends React.Component {
@@ -34,7 +35,10 @@ class Dataset extends React.Component {
                 license: '',
                 source: '',
                 tags: [],
-                excludedFields: []
+                excludedFields: [],
+                addressField: '',
+                postalCodeField: '',
+                cityField: ''
             }
         }
 
@@ -230,6 +234,12 @@ class Dataset extends React.Component {
                     </div>
                     {renderIf(this.state.fields.dcId)(
                         <div>
+                            <GeocodingForm onFieldChange={this.onFieldChange}
+                                           globalFields={this.state.dataset['dcmo:globalFields']}
+                                           addressField={this.state.fields.addressField}
+                                           postalCodeField={this.state.fields.postalCodeField}
+                                           cityField={this.state.fields.cityField} />
+
                             <DatasetForm onChange={this.onFieldChange}
                                          onDatasetNameChange={this.onDatasetNameChange}
                                          onFieldChange={this.onFieldChange}

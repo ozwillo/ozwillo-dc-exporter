@@ -62,3 +62,6 @@ datacore:
 ckan:
   url: https://opendata.ozwillo.com
   apikey: your-ckan-api-key
+
+geocoding:
+  url: http://api-adresse.data.gouv.fr

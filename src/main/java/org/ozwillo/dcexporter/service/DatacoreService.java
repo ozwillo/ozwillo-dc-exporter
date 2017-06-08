@@ -10,6 +10,7 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.oasis_eu.spring.datacore.DatacoreClient;
 import org.oasis_eu.spring.datacore.model.*;
 import org.ozwillo.dcexporter.dao.DcModelMappingRepository;
+import org.ozwillo.dcexporter.model.Geocoding.GeocodingResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,12 @@ public class DatacoreService {
     @Value("${datacore.modifiedField}")
     private String modifiedField;
 
+    @Value("${geocoding.url}")
+    private String geocodingUrl;
+
+    @Autowired
+    private GeocodingClientService geocodingClientService;
+
     @Cacheable("dc-models")
     public List<DCModel> getModels() {
         // TODO : iterate until we have all
@@ -59,7 +66,8 @@ public class DatacoreService {
         return !newResources.isEmpty();
     }
 
-    Map<String,Optional<String>> exportResource(String project, String type, List<String> excludedFields) {
+    Map<String,Optional<String>> exportResource(String project, String type, List<String> excludedFields,
+                                                String addressField, String postalCodeField, String cityField) {
 
         // Extract all possible columns from the type's model (filtering explicitely excluded ones)
         DCModel model = datacore.findModel(project, type);
@@ -68,6 +76,12 @@ public class DatacoreService {
                 .map(DCModel.DcModelField::getName)
                 .collect(Collectors.toList());
 
+        boolean geocoding = false;
+        if(isNotEmpty(addressField) || isNotEmpty(postalCodeField) || isNotEmpty(cityField)){
+            resourceKeys.add("lon");
+            resourceKeys.add("lat");
+            geocoding = true;
+        }
         // And add a fake column to allow for easier charting in CKAN
         resourceKeys.add("fake-weight");
 
@@ -80,6 +94,44 @@ public class DatacoreService {
         int count = 0;
         while (true) {
             List<DCResource> intermediateResult = datacore.findResources(project, type, parameters, 0, 100);
+            if(geocoding) {
+                intermediateResult.forEach(resource -> {
+                    String address = "";
+                    if(isNotEmpty(addressField) && resource.getValues().get(addressField) != null) {
+                        if (resource.getValues().get(addressField).isString()) address += resource.getAsString(addressField).concat(",");
+                    }
+                    if(isNotEmpty(cityField) && resource.getValues().get(cityField) != null) {
+                        DCResource.Value resourceValue = resource.getValues().get(cityField);
+                        if(resourceValue.isString()) address += resource.getAsString(cityField).concat(",");
+                        if(resourceValue.isArray()) {
+                            List<DCResource.Value> resourceRowInnerValues = resourceValue.asArray();
+                            if (resourceRowInnerValues.get(0).isString()) {
+                                Optional<String> reducedValue =
+                                        resource.getAsStringList(cityField).stream().reduce((result, value) -> result + "," + value);
+                                address += reducedValue.get().concat(",");
+                            } else if (resourceRowInnerValues.get(0).isMap()) {
+                                address += getI18nFieldValueFromList(resourceRowInnerValues, "fr").concat(",");
+                            }
+                        }
+                    }
+                    if(isNotEmpty(postalCodeField) && resource.getValues().get(postalCodeField) != null) {
+                        if(resource.getValues().get(postalCodeField).isString()) address += resource.getAsString(postalCodeField);
+                    }
+
+                    if(isNotEmpty(address)){
+                        Optional<GeocodingResponse> bnaResponse = geocodingClientService.getFeatures(geocodingUrl, address);
+                        if (bnaResponse.isPresent()) {
+                            LOGGER.debug("Address {} geocoding in coordinates {}", address, bnaResponse.get().getFeatures().get(0).getGeometry().getCoordinates());
+                            resource.set("lon", bnaResponse.get().getFeatures().get(0).getGeometry().getCoordinates().get(0).toString());
+                            resource.set("lat", bnaResponse.get().getFeatures().get(0).getGeometry().getCoordinates().get(1).toString());
+                        } else {
+                            LOGGER.info("No geocoding results for this address {}", address);
+                        }
+                    } else {
+                        LOGGER.debug("Address field it's empty or null");
+                    }
+                });
+            }
             writeCsvFileLines( resourceCsv, resourceKeys, intermediateResult);
             writeJsonFileLines( resourceJson, excludedFields, intermediateResult);
             count += intermediateResult.size();
@@ -231,4 +283,11 @@ public class DatacoreService {
         return objectResource;
     }
 
+    private boolean isNotEmpty(String field) {
+        if(field == null || field.isEmpty() || field.trim().isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 }
