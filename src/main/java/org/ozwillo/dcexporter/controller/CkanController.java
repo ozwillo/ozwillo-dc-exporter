@@ -41,4 +41,11 @@ public class CkanController {
         if(either.isRight()) return new ResponseEntity<>(either.get(), HttpStatus.OK);
         else return new ResponseEntity<>(either.getLeft(), HttpStatus.SERVICE_UNAVAILABLE);
     }
+
+    @RequestMapping(value = "/organizations", method = RequestMethod.GET)
+    public ResponseEntity<Object> getOrganizations() {
+        Either<String, List <String>> either = ckanService.getOrganizations();
+        if(either.isRight()) return new ResponseEntity<>(either.get(), HttpStatus.OK);
+        else return new ResponseEntity<>(either.getLeft(), HttpStatus.SERVICE_UNAVAILABLE);
+    }
 }

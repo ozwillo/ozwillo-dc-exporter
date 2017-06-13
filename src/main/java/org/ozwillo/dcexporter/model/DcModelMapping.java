@@ -38,6 +38,7 @@ public class DcModelMapping {
     private String notes;
     private List<CkanTag> tags;
     private String license;
+    private String organization;
     private String source;
     private String version;
     private String ckanPackageId;
@@ -164,6 +165,12 @@ public class DcModelMapping {
     }
     public void setCityField(String cityField) {
         this.cityField = cityField;
+    }
+    public String getOrganization() {
+        return organization;
+    }
+    public void setOrganization(String organization) {
+        this.organization = organization;
     }
 
     @Override

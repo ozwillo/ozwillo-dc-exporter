@@ -18,6 +18,7 @@ class Dataset extends React.Component {
             datasetFetched: false,
             newDataset: false,
             licenses: {},
+            organizations:{},
             message: '',
             success: true,
             mode: 'create',
@@ -31,6 +32,7 @@ class Dataset extends React.Component {
                 ckanPackageId: '',
                 name: '',
                 notes: '',
+                organization:'',
                 description: '',
                 license: '',
                 source: '',
@@ -74,6 +76,13 @@ class Dataset extends React.Component {
             .then(this.checkStatus)
             .then(response => response.json())
             .then(json => this.setState({licenses: json}))
+            .catch(error => {
+                error.text().then(text => { this.onChangeNotif(false, text) })
+            })
+        fetch('/api/ckan/organizations', {credentials: 'same-origin'})
+            .then(this.checkStatus)
+            .then(response => response.json())
+            .then(json => this.setState({organizations: json}))
             .catch(error => {
                 error.text().then(text => { this.onChangeNotif(false, text) })
             })
@@ -251,6 +260,8 @@ class Dataset extends React.Component {
                                          licenses={this.state.licenses}
                                          license={this.state.fields['license']}
                                          tags={this.state.fields.tags}
+                                         organizations={this.state.organizations}
+                                         organization={this.state.fields['organization']}
                                          onChangeNotif={this.onChangeNotif} />
 
                             <div className="panel panel-default">
@@ -312,5 +323,18 @@ Dataset.PropTypes = {
     onSubmit: React.PropTypes.func.isRequired
 }
 
+const OrganiszationChooser = ({ organizations, currentOrganization, onChange, t }) => {
+    const options = Object.keys(organizations).map(key =>
+        <option key={key} value={key}>{organizations[key]}</option>
+    )
+    return (
+        <FormGroup>
+            <Label htmlForm="organization" value={ t('dataset.label.organization') }/>
+            <SelectField id="license" value={currentOrganization} onChange={onChange}>
+                {options}
+            </SelectField>
+        </FormGroup>
+    )
+}
 
 export default translate(['dc-exporter'])(Dataset)

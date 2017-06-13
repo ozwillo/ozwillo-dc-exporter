@@ -18,6 +18,8 @@ class DatasetForm extends React.Component {
         notes: React.PropTypes.string.isRequired,
         licenses: React.PropTypes.object.isRequired,
         license: React.PropTypes.string.isRequired,
+        organization:React.PropTypes.string.isRequired,
+        organizations:React.PropTypes.object.isRequired,
         datasetName: React.PropTypes.string.isRequired,
         onChangeNotif: React.PropTypes.func.isRequired
     }
@@ -28,6 +30,19 @@ class DatasetForm extends React.Component {
         super(props, context)
         this.handleDelete = this.handleDelete.bind(this)
         this.handleAddition = this.handleAddition.bind(this)
+    }
+    componentDidMount() {
+        if (this.props.params.id) {
+            this.loadMapping(this.props.params.id)
+        }
+
+        fetch('/api/ckan/organizations', {credentials: 'same-origin'})
+            .then(this.checkStatus)
+            .then(response => response.json())
+            .then(json => this.setState({organizations: json}))
+            .catch(error => {
+                error.text().then(text => { this.onChangeNotif(false, text) })
+            })
     }
     handleDelete(i) {
         let tags = this.props.tags
@@ -92,6 +107,9 @@ class DatasetForm extends React.Component {
                             <LicenceChooser licenses={this.props.licenses} currentLicense={this.props.license}
                                             onChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}
                                             t={ t }/>
+                            <OrganizationChooser organizations={this.props.organizations} currentOrganization={this.props.organization}
+                                                  onChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}
+                                                  t={ t }/>
                             <FormGroup>
                                 <Label htmlFor="tags" value={ t('dataset.label.tags') }/>
                                 <TagAutosuggest onSelect={ this.handleAddition }/>
@@ -103,6 +121,7 @@ class DatasetForm extends React.Component {
                                         </div>
                                 )}
                             </FormGroup>
+
                         </div>
                     )}
                 </div>
@@ -119,6 +138,20 @@ const LicenceChooser = ({ licenses, currentLicense, onChange, t }) => {
         <FormGroup>
             <Label htmlForm="license" value={ t('dataset.label.license') }/>
             <SelectField id="license" value={currentLicense} onChange={onChange}>
+                {options}
+            </SelectField>
+        </FormGroup>
+    )
+}
+
+const OrganizationChooser = ({ organizations, currentOrganization, onChange, t }) => {
+    const options = Object.keys(organizations).map(key =>
+        <option key={key} value={organizations[key]}>{organizations[key]}</option>
+    )
+    return (
+        <FormGroup>
+            <Label htmlForm="organization" value={ t('dataset.label.organization') }/>
+            <SelectField id="organization" value={currentOrganization} onChange={onChange}>
                 {options}
             </SelectField>
         </FormGroup>

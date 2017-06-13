@@ -57,6 +57,13 @@ public class CkanService {
         return Either.right(result);
     }
 
+    public Either<String, List<String>> getOrganizations() {
+        Optional<List<String>> opt = ckanClientService.getOrganizationList(ckanUrl);
+        if(!opt.isPresent()) return Either.left("dataset.notif.error.fetch_organizations");
+
+        return Either.right(opt.get());
+    }
+
     public Either<String, List<CkanTag>> getTags() {
         Optional<List<CkanTag>> opt = ckanClientService.getTagList(ckanUrl);
         if(!opt.isPresent()) return Either.left("dataset.notif.error.fetch_tags");
@@ -72,8 +79,12 @@ public class CkanService {
 
         if (optGet == null || !optGet.isPresent()) {
             String name = slugify(dcModelMapping.getName());
+            String orga = slugify(dcModelMapping.getOrganization());
             LOGGER.debug("Creating dataset with slug name {} ", name);
-            CkanOrganization ckanOrganization = ckanClientService.getOrganization(ckanUrl, "ozwillo").get() ;
+            LOGGER.debug("Creating dataset with slug orga {} ", orga);
+            //CkanOrganization ckanOrganization = ckanClientService.getOrganization(ckanUrl, "ozwillo").get() ;
+            //CkanOrganization ckanOrganization = ckanClientService.getOrganization(ckanUrl, dcModelMapping.getOrganization()).get() ;
+            CkanOrganization ckanOrganization = ckanClientService.getOrganization(ckanUrl, orga).get() ;
             CkanDataset ckanDataset = new CkanDataset(name);
             ckanDataset.setOrganization(ckanOrganization);
             ckanDataset.setMaintainer("ozwillo");

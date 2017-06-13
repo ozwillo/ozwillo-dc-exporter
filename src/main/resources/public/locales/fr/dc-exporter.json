@@ -62,6 +62,7 @@
                 "fetch_datasets": "Erreur lors de l'extraction des jeux de données du CKAN",
                 "fetch_licences": "Erreur lors de l'extraction des licences du CKAN",
                 "fetch_tags": "Erreur lors de l'extraction des tags du CKAN",
+                "fetch_organizations": "Erreur lors de l'extraction des organisations du CKAN",
                 "create_dataset": "Erreur lors de la création du jeu de données dans CKAN",
                 "create_resource": "Erreur lors de la création de la ressource dans CKAN",
                 "update_resource": "Erreur lors de la mise à jour due la ressource dans CKAN"
@@ -71,7 +72,8 @@
             "datacore": "Cœur de données",
             "dataset": "Jeu de données",
             "resource": "Ressource",
-            "geocoding": "Géocodage"
+            "geocoding": "Géocodage",
+            "organization": "Organisation de rattachement"
         },
         "label": {
             "model": "Modèle",
@@ -81,6 +83,7 @@
             "description": "Description",
             "source": "Source",
             "license": "License",
+            "organization": "Organisation",
             "tags": "Tags",
             "resource_name": "Nom de la ressource",
             "address_field": "Champ adresse",

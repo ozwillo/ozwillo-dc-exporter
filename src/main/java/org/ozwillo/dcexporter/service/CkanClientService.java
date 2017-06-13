@@ -208,6 +208,19 @@ public class CkanClientService {
         }
     }
 
+    public Optional<List<String>> getOrganizationList(String ckanUrl) {
+        if(!isValid(ckanUrl, "CKAN URL")) return Optional.empty();
+
+        CkanAPI ckanAPI = getCkanAPI(ckanUrl);
+        Call<OrganizationListResponse> call = ckanAPI.getOrganizations();
+
+        try {
+            return Optional.ofNullable(call.execute().body().result);
+        } catch (IOException e) {
+            LOGGER.error("Error while trying to fetch organiszations from CKAN: {}", e);
+            return Optional.empty();
+        }
+    }
 
     private CkanAPI getCkanAPI(String ckanUrl) {
 
@@ -272,6 +285,10 @@ interface CkanAPI {
 
     @GET("/api/3/action/tag_list")
     Call<TagListResponse> getTags(@Query("all_fields") boolean all_fields);
+
+    @GET("/api/3/action/organization_list")
+    Call<OrganizationListResponse> getOrganizations();
+
 }
 
 
@@ -292,4 +309,7 @@ class ResourceResponse extends CkanResponse {
 }
 class OrganizationResponse extends CkanResponse {
     public CkanOrganization result;
+}
+class OrganizationListResponse extends CkanResponse {
+    public List<String> result;
 }
