@@ -26,15 +26,15 @@
 
         "notif": {
             "no_data": "No dataset",
-            "no_data_sort": "No dataset",
             "is_deleted": "Resource is deleted"
         },
 
         "sort": {
             "all": "All",
-            "valid": "Valid",
-            "error": "Error",
-            "pending": "Pending"
+            "SUCCEEDED": "Succeeded",
+            "FAILED": "Failed",
+            "PENDING": "Pending",
+            "MODIFIED": "Modified"
         },
 
         "panel": {
@@ -82,6 +82,21 @@
             "license": "License",
             "tags": "Tags",
             "resource_name": "Resource Name"
+        }
+    },
+
+    "css_class": {
+        "panel": {
+            "SUCCEEDED": "panel-success",
+            "FAILED": "panel-danger",
+            "PENDING": "panel-warning",
+            "MODIFIED": "panel-warning"
+        },
+        "glyphicon": {
+            "SUCCEEDED": "glyphicon-ok",
+            "FAILED": "glyphicon-warning-sign",
+            "PENDING": "glyphicon-time",
+            "MODIFIED": "glyphicon-time"
         }
     }
 }

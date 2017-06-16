@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.text.Normalizer;
 import java.util.LinkedHashMap;
@@ -66,8 +67,10 @@ public class CkanService {
 
     public Either<String, CkanDataset> getOrCreateDataset(DcModelMapping dcModelMapping) {
         Optional<CkanDataset> optGet = null;
-        if (dcModelMapping.getCkanPackageId() != null && !dcModelMapping.getCkanPackageId().equals("")) {
+        if (!StringUtils.isEmpty(dcModelMapping.getCkanPackageId())) {
             optGet = ckanClientService.getDataset(ckanUrl, dcModelMapping.getCkanPackageId());
+        } else if (!StringUtils.isEmpty(dcModelMapping.getName())) {
+            optGet = ckanClientService.getDataset(ckanUrl, slugify(dcModelMapping.getName()));
         }
 
         if (optGet == null || !optGet.isPresent()) {

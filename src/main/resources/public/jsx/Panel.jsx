@@ -62,18 +62,13 @@ class Panel extends Component {
         const { t } = this.context
         const log = this.props.log
         return (
-            <div className={'panel' + (!log.synchronizerAuditLog ? ' panel-warning' : log.synchronizerAuditLog.succeeded ? ' panel-success' : ' panel-danger')}>
+            <div className={'panel ' + t('css_class.panel.' + log.synchronizerAuditLog.status)}>
                 <div className="panel-heading">
                     <div className="row">
                         <div className="col-md-6">
                             <h3 className="panel-title">
                                 {log.dcModelMapping.resourceName}
-                                {log.synchronizerAuditLog &&
-                                <span className={'glyphicon' + (log.synchronizerAuditLog.succeeded ? ' glyphicon-ok' : ' glyphicon-warning-sign')} aria-hidden="true"></span>
-                                }
-                                {!log.synchronizerAuditLog &&
-                                <span className="text-right glyphicon glyphicon-time"></span>
-                                }
+                                <span className={'glyphicon ' + t('css_class.glyphicon.' + log.synchronizerAuditLog.status)} aria-hidden="true"></span>
                             </h3>
                         </div>
                         <div className="col-md-6">
@@ -102,7 +97,7 @@ class Panel extends Component {
                             </label>{new Date(log.synchronizerAuditLog.date).toLocaleString()}
                     </li>
                     }
-                    {(log.synchronizerAuditLog && !log.synchronizerAuditLog.succeeded) &&
+                    {(log.synchronizerAuditLog.status == "FAILED" && log.synchronizerAuditLog.errorMessage) &&
                     <li className="list-group-item">
                         <label className="col-sm-3 control-label">{ t('data.message') }</label>{log.synchronizerAuditLog.errorMessage}
                     </li>
