@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.StringWriter;
 import java.util.*;
@@ -77,7 +78,7 @@ public class DatacoreService {
                 .collect(Collectors.toList());
 
         boolean geocoding = false;
-        if(isNotEmpty(addressField) || isNotEmpty(postalCodeField) || isNotEmpty(cityField)){
+        if(!StringUtils.isEmpty(addressField) || !StringUtils.isEmpty(postalCodeField) || !StringUtils.isEmpty(cityField)){
             resourceKeys.add("lon");
             resourceKeys.add("lat");
             geocoding = true;
@@ -95,42 +96,7 @@ public class DatacoreService {
         while (true) {
             List<DCResource> intermediateResult = datacore.findResources(project, type, parameters, 0, 100);
             if(geocoding) {
-                intermediateResult.forEach(resource -> {
-                    String address = "";
-                    if(isNotEmpty(addressField) && resource.getValues().get(addressField) != null) {
-                        if (resource.getValues().get(addressField).isString()) address += resource.getAsString(addressField).concat(",");
-                    }
-                    if(isNotEmpty(cityField) && resource.getValues().get(cityField) != null) {
-                        DCResource.Value resourceValue = resource.getValues().get(cityField);
-                        if(resourceValue.isString()) address += resource.getAsString(cityField).concat(",");
-                        if(resourceValue.isArray()) {
-                            List<DCResource.Value> resourceRowInnerValues = resourceValue.asArray();
-                            if (resourceRowInnerValues.get(0).isString()) {
-                                Optional<String> reducedValue =
-                                        resource.getAsStringList(cityField).stream().reduce((result, value) -> result + "," + value);
-                                address += reducedValue.get().concat(",");
-                            } else if (resourceRowInnerValues.get(0).isMap()) {
-                                address += getI18nFieldValueFromList(resourceRowInnerValues, "fr").concat(",");
-                            }
-                        }
-                    }
-                    if(isNotEmpty(postalCodeField) && resource.getValues().get(postalCodeField) != null) {
-                        if(resource.getValues().get(postalCodeField).isString()) address += resource.getAsString(postalCodeField);
-                    }
-
-                    if(isNotEmpty(address)){
-                        Optional<GeocodingResponse> bnaResponse = geocodingClientService.getFeatures(geocodingUrl, address);
-                        if (bnaResponse.isPresent()) {
-                            LOGGER.debug("Address {} geocoding in coordinates {}", address, bnaResponse.get().getFeatures().get(0).getGeometry().getCoordinates());
-                            resource.set("lon", bnaResponse.get().getFeatures().get(0).getGeometry().getCoordinates().get(0).toString());
-                            resource.set("lat", bnaResponse.get().getFeatures().get(0).getGeometry().getCoordinates().get(1).toString());
-                        } else {
-                            LOGGER.info("No geocoding results for this address {}", address);
-                        }
-                    } else {
-                        LOGGER.debug("Address field it's empty or null");
-                    }
-                });
+                addGeocodingToResource(intermediateResult, addressField, postalCodeField, cityField);
             }
             writeCsvFileLines( resourceCsv, resourceKeys, intermediateResult);
             writeJsonFileLines( resourceJson, excludedFields, intermediateResult);
@@ -283,11 +249,42 @@ public class DatacoreService {
         return objectResource;
     }
 
-    private boolean isNotEmpty(String field) {
-        if(field == null || field.isEmpty() || field.trim().isEmpty()) {
-            return false;
-        } else {
-            return true;
-        }
+    private void addGeocodingToResource(List<DCResource> intermediateResult, String addressField, String postalCodeField, String cityField) {
+        intermediateResult.forEach(resource -> {
+            String address = "";
+            if(!StringUtils.isEmpty(addressField) && resource.getValues().get(addressField) != null) {
+                if (resource.getValues().get(addressField).isString()) address += resource.getAsString(addressField).concat(",");
+            }
+            if(!StringUtils.isEmpty(cityField) && resource.getValues().get(cityField) != null) {
+                DCResource.Value resourceValue = resource.getValues().get(cityField);
+                if(resourceValue.isString()) address += resource.getAsString(cityField).concat(",");
+                if(resourceValue.isArray()) {
+                    List<DCResource.Value> resourceRowInnerValues = resourceValue.asArray();
+                    if (resourceRowInnerValues.get(0).isString()) {
+                        Optional<String> reducedValue =
+                                resource.getAsStringList(cityField).stream().reduce((result, value) -> result + "," + value);
+                        address += reducedValue.get().concat(",");
+                    } else if (resourceRowInnerValues.get(0).isMap()) {
+                        address += getI18nFieldValueFromList(resourceRowInnerValues, "fr").concat(",");
+                    }
+                }
+            }
+            if(!StringUtils.isEmpty(postalCodeField) && resource.getValues().get(postalCodeField) != null) {
+                if(resource.getValues().get(postalCodeField).isString()) address += resource.getAsString(postalCodeField);
+            }
+
+            if(!StringUtils.isEmpty(address)){
+                Optional<GeocodingResponse> bnaResponse = geocodingClientService.getFeatures(geocodingUrl, address);
+                if (bnaResponse.isPresent()) {
+                    LOGGER.debug("Address {} geocoding in coordinates {}", address, bnaResponse.get().getFeatures().get(0).getGeometry().getCoordinates());
+                    resource.set("lon", bnaResponse.get().getFeatures().get(0).getGeometry().getCoordinates().get(0).toString());
+                    resource.set("lat", bnaResponse.get().getFeatures().get(0).getGeometry().getCoordinates().get(1).toString());
+                } else {
+                    LOGGER.info("No geocoding results for this address {}", address);
+                }
+            } else {
+                LOGGER.debug("Address field it's empty or null");
+            }
+        });
     }
 }
