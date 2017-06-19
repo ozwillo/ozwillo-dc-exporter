@@ -45,6 +45,9 @@ public class DcModelMapping {
     private List<String> excludedFields;
     private boolean isDeleted;
     private String url;
+    private String addressField;
+    private String postalCodeField;
+    private String cityField;
 
 
     public DcModelMapping() {
@@ -144,6 +147,24 @@ public class DcModelMapping {
     public void setUrl(String url) {
         this.url = url;
     }
+    public String getAddressField() {
+        return addressField;
+    }
+    public void setAddressField(String addressField) {
+        this.addressField = addressField;
+    }
+    public String getPostalCodeField() {
+        return postalCodeField;
+    }
+    public void setPostalCodeField(String postalCodeField) {
+        this.postalCodeField = postalCodeField;
+    }
+    public String getCityField() {
+        return cityField;
+    }
+    public void setCityField(String cityField) {
+        this.cityField = cityField;
+    }
 
     @Override
     public String toString() {
@@ -160,6 +181,9 @@ public class DcModelMapping {
                 ", source='" + source + '\'' +
                 ", version='" + version + '\'' +
                 ", ckanPackageId='" + ckanPackageId + '\'' +
+                ", adressField='" + addressField + '\'' +
+                ", adressField='" + postalCodeField + '\'' +
+                ", adressField='" + cityField + '\'' +
                 '}';
     }
 }

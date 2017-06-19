@@ -70,7 +70,8 @@
         "panel": {
             "datacore": "Cœur de données",
             "dataset": "Jeu de données",
-            "resource": "Ressource"
+            "resource": "Ressource",
+            "geocoding": "Géocodage"
         },
         "label": {
             "model": "Modèle",
@@ -81,7 +82,10 @@
             "source": "Source",
             "license": "License",
             "tags": "Tags",
-            "resource_name": "Nom de la ressource"
+            "resource_name": "Nom de la ressource",
+            "address_field": "Champ adresse",
+            "city_field": "Champ ville",
+            "postal_code_field": "Champ code postal"
         }
     }
 }

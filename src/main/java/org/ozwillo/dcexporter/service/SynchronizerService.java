@@ -88,7 +88,8 @@ public class SynchronizerService {
 
     private void sync(DcModelMapping dcModelMapping) throws Exception {
         Map<String, Optional<String>> optionalResourceFiles =
-                datacoreService.exportResource(dcModelMapping.getProject(), dcModelMapping.getType(), dcModelMapping.getExcludedFields());
+                datacoreService.exportResource( dcModelMapping.getProject(), dcModelMapping.getType(), dcModelMapping.getExcludedFields(),
+                                                dcModelMapping.getAddressField(), dcModelMapping.getPostalCodeField(), dcModelMapping.getCityField());
 
         if (!optionalResourceFiles.get("csv").isPresent()) {
             LOGGER.error("Did not get the resource's CSV file, stopping");

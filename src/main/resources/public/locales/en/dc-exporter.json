@@ -70,7 +70,8 @@
         "panel": {
             "datacore": "Data core",
             "dataset": "Dataset",
-            "resource": "Resource"
+            "resource": "Resource",
+            "geocoding": "Geocoding"
         },
         "label": {
             "model": "Model",
@@ -81,7 +82,10 @@
             "source": "Source",
             "license": "License",
             "tags": "Tags",
-            "resource_name": "Resource Name"
+            "resource_name": "Resource Name",
+            "address_field": "Address field",
+            "city_field": "City field",
+            "postal_code_field": "Postal code field"
         }
     }
 }
