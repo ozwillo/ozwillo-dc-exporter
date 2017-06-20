@@ -2,6 +2,7 @@ package org.ozwillo.dcexporter.controller;
 
 import javaslang.control.Either;
 import org.ozwillo.dcexporter.model.Ckan.CkanDataset;
+import org.ozwillo.dcexporter.model.Ckan.CkanOrganization;
 import org.ozwillo.dcexporter.model.Ckan.CkanTag;
 import org.ozwillo.dcexporter.service.CkanService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class CkanController {
 
     @RequestMapping(value = "/organizations", method = RequestMethod.GET)
     public ResponseEntity<Object> getOrganizations() {
-        Either<String, List <String>> either = ckanService.getOrganizations();
+        Either<String, List <CkanOrganization>> either = ckanService.getOrganizations();
         if(either.isRight()) return new ResponseEntity<>(either.get(), HttpStatus.OK);
         else return new ResponseEntity<>(either.getLeft(), HttpStatus.SERVICE_UNAVAILABLE);
     }

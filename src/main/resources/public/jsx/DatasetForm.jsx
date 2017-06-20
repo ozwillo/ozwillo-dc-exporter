@@ -31,19 +31,7 @@ class DatasetForm extends React.Component {
         this.handleDelete = this.handleDelete.bind(this)
         this.handleAddition = this.handleAddition.bind(this)
     }
-    componentDidMount() {
-        if (this.props.params.id) {
-            this.loadMapping(this.props.params.id)
-        }
 
-        fetch('/api/ckan/organizations', {credentials: 'same-origin'})
-            .then(this.checkStatus)
-            .then(response => response.json())
-            .then(json => this.setState({organizations: json}))
-            .catch(error => {
-                error.text().then(text => { this.onChangeNotif(false, text) })
-            })
-    }
     handleDelete(i) {
         let tags = this.props.tags
         tags.splice(i, 1)
@@ -146,7 +134,7 @@ const LicenceChooser = ({ licenses, currentLicense, onChange, t }) => {
 
 const OrganizationChooser = ({ organizations, currentOrganization, onChange, t }) => {
     const options = Object.keys(organizations).map(key =>
-        <option key={key} value={organizations[key]}>{organizations[key]}</option>
+        <option key={key} value={organizations[key].name}>{organizations[key].display_name}</option>
     )
     return (
         <FormGroup>

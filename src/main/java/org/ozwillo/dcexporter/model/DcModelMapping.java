@@ -38,6 +38,9 @@ public class DcModelMapping {
     private String notes;
     private List<CkanTag> tags;
     private String license;
+    @JsonProperty
+    @NotNull
+    @NotEmpty
     private String organization;
     private String source;
     private String version;

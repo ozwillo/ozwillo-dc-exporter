@@ -1,8 +1,10 @@
 package org.ozwillo.dcexporter.service;
 
 import javaslang.control.Either;
+import org.oasis_eu.spring.kernel.model.Organization;
 import org.ozwillo.dcexporter.dao.DcModelMappingRepository;
 import org.ozwillo.dcexporter.dao.SynchronizerAuditLogRepository;
+import org.ozwillo.dcexporter.model.Ckan.CkanOrganization;
 import org.ozwillo.dcexporter.model.Ckan.CkanResource;
 import org.ozwillo.dcexporter.model.DcModelMapping;
 import org.ozwillo.dcexporter.model.ui.AuditLogWapper;
@@ -27,6 +29,9 @@ public class DcModelMappingService {
 
     @Autowired
     private CkanService ckanService;
+
+    @Autowired
+    private CkanClientService ckanClientService;
 
     @Autowired
     private SynchronizerAuditLogRepository synchronizerAuditLogRepository;
@@ -60,6 +65,7 @@ public class DcModelMappingService {
         dcModelMapping.setUrl(ckanDataset.getName());
         dcModelMapping.setCkanResourceId(ckanResourcesId);
         dcModelMapping.setDeleted(false);
+        dcModelMapping.setOrganization(ckanDataset.getOrganization().getId());
 
         dcModelMapping = dcModelMappingRepository.save(dcModelMapping);
         return Either.right(dcModelMapping);
@@ -84,6 +90,7 @@ public class DcModelMappingService {
         dcModelMapping.setCkanPackageId(ckanDataset.getId());
         dcModelMapping.setUrl(ckanDataset.getName());
         dcModelMapping.setCkanResourceId(ckanResourcesId);
+        dcModelMapping.setOrganization(ckanDataset.getOrganization().getId());
 
         dcModelMapping = dcModelMappingRepository.save(dcModelMapping);
         return Either.right(dcModelMapping);
@@ -95,7 +102,16 @@ public class DcModelMappingService {
             SynchronizerAuditLog auditLog =
                     synchronizerAuditLogRepository.findFirstByTypeOrderByDateDesc(dcModelMapping.getType());
             String datasetUrl = ckanUrl  + "/dataset/" + dcModelMapping.getUrl();
-            return new AuditLogWapper(dcModelMapping, auditLog, datasetUrl);
+            String orgaName = "";
+            if (dcModelMapping.getOrganization() != ""  && dcModelMapping.getOrganization() != null) {
+                Optional<CkanOrganization> optorga = ckanClientService.getOrganization(ckanUrl,dcModelMapping.getOrganization());
+                if (optorga.isPresent()) {
+                    CkanOrganization orga = optorga.get();
+                    orgaName = orga.getDisplayName();
+                }
+            }
+
+            return new AuditLogWapper(dcModelMapping, auditLog, datasetUrl, orgaName);
         }).collect(Collectors.toList());
     }
 

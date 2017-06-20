@@ -42,6 +42,7 @@
             "to_resource_link": "Voir la ressource",
             "dataset_name": "Nom du jeu de données",
             "dcmodel_name": "Modèle du cœur de données",
+            "organization_name": "Oragnization de rattachement",
             "synchronization_date": "Date de synchronisation"
         }
     },

@@ -323,18 +323,4 @@ Dataset.PropTypes = {
     onSubmit: React.PropTypes.func.isRequired
 }
 
-const OrganiszationChooser = ({ organizations, currentOrganization, onChange, t }) => {
-    const options = Object.keys(organizations).map(key =>
-        <option key={key} value={key}>{organizations[key]}</option>
-    )
-    return (
-        <FormGroup>
-            <Label htmlForm="organization" value={ t('dataset.label.organization') }/>
-            <SelectField id="license" value={currentOrganization} onChange={onChange}>
-                {options}
-            </SelectField>
-        </FormGroup>
-    )
-}
-
 export default translate(['dc-exporter'])(Dataset)

@@ -57,8 +57,8 @@ public class CkanService {
         return Either.right(result);
     }
 
-    public Either<String, List<String>> getOrganizations() {
-        Optional<List<String>> opt = ckanClientService.getOrganizationList(ckanUrl);
+    public Either<String, List<CkanOrganization>> getOrganizations() {
+        Optional<List<CkanOrganization>> opt = ckanClientService.getOrganizationList(ckanUrl);
         if(!opt.isPresent()) return Either.left("dataset.notif.error.fetch_organizations");
 
         return Either.right(opt.get());
