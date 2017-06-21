@@ -42,7 +42,7 @@
             "to_resource_link": "Voir la ressource",
             "dataset_name": "Nom du jeu de données",
             "dcmodel_name": "Modèle du cœur de données",
-            "organization_name": "Oragnization de rattachement",
+            "organization_name": "Organisation",
             "synchronization_date": "Date de synchronisation"
         }
     },
@@ -73,8 +73,7 @@
             "datacore": "Cœur de données",
             "dataset": "Jeu de données",
             "resource": "Ressource",
-            "geocoding": "Géocodage",
-            "organization": "Organisation de rattachement"
+            "geocoding": "Géocodage"
         },
         "label": {
             "model": "Modèle",

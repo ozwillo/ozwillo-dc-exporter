@@ -18,8 +18,8 @@ class DatasetForm extends React.Component {
         notes: React.PropTypes.string.isRequired,
         licenses: React.PropTypes.object.isRequired,
         license: React.PropTypes.string.isRequired,
-        organization:React.PropTypes.string.isRequired,
-        organizations:React.PropTypes.object.isRequired,
+        organizationId:React.PropTypes.string.isRequired,
+        organizations:React.PropTypes.array.isRequired,
         datasetName: React.PropTypes.string.isRequired,
         onChangeNotif: React.PropTypes.func.isRequired
     }
@@ -95,7 +95,7 @@ class DatasetForm extends React.Component {
                             <LicenceChooser licenses={this.props.licenses} currentLicense={this.props.license}
                                             onChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}
                                             t={ t }/>
-                            <OrganizationChooser organizations={this.props.organizations} currentOrganization={this.props.organization}
+                            <OrganizationChooser organizations={this.props.organizations} currentOrganizationId={this.props.organizationId}
                                                   onChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}
                                                   t={ t }/>
                             <FormGroup>
@@ -132,14 +132,16 @@ const LicenceChooser = ({ licenses, currentLicense, onChange, t }) => {
     )
 }
 
-const OrganizationChooser = ({ organizations, currentOrganization, onChange, t }) => {
-    const options = Object.keys(organizations).map(key =>
-        <option key={key} value={organizations[key].name}>{organizations[key].display_name}</option>
-    )
+const OrganizationChooser = ({ organizations, currentOrganizationId, onChange, t }) => {
+    const options = Object.keys(organizations).
+        filter(key => organizations[key].display_name != '')
+        .map(key =>
+            <option key={key} value={organizations[key].name}>{organizations[key].display_name}</option>
+        )
     return (
         <FormGroup>
-            <Label htmlForm="organization" value={ t('dataset.label.organization') }/>
-            <SelectField id="organization" value={currentOrganization} onChange={onChange}>
+            <Label htmlForm="organizationId" value={ t('dataset.label.organization') }/>
+            <SelectField id="organizationId" value={currentOrganizationId} onChange={onChange} required="false">
                 {options}
             </SelectField>
         </FormGroup>

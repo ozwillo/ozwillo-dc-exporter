@@ -217,7 +217,7 @@ public class CkanClientService {
         try {
             return Optional.ofNullable(call.execute().body().result);
         } catch (IOException e) {
-            LOGGER.error("Error while trying to fetch organiszations from CKAN: {}", e);
+            LOGGER.error("Error while trying to fetch organizations from CKAN: {}", e);
             return Optional.empty();
         }
     }

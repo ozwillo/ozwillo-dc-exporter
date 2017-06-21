@@ -96,9 +96,9 @@ class Panel extends Component {
                     <li className="list-group-item">
                         <label className="col-sm-4 control-label">{ t('dashboard.panel.dcmodel_name') }</label>{log.dcModelMapping.type}
                     </li>
-                    {renderIf(log.dcModelMapping.organization > '') (
+                    {renderIf(log.dcModelMapping.organizationId != '' && log.dcModelMapping.organizationId != null) (
                     <li className="list-group-item">
-                        <label className="col-sm-4 control-label">{ t('dashboard.panel.organization_name') }</label>{log.orgaName}
+                        <label className="col-sm-4 control-label">{ t('dashboard.panel.organization_name') }</label>{log.organizationName}
                     </li> )}
                     {(log.synchronizerAuditLog) &&
                     <li className="list-group-item">

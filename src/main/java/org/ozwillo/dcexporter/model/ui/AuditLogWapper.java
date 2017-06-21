@@ -22,19 +22,13 @@ public class AuditLogWapper {
     @JsonProperty
     private String datasetUrl;
     @JsonProperty
-    private String orgaName;
+    private String organizationName;
 
-    public AuditLogWapper(DcModelMapping dcModelMapping, SynchronizerAuditLog synchronizerAuditLog, String datasetUrl) {
+    public AuditLogWapper(DcModelMapping dcModelMapping, SynchronizerAuditLog synchronizerAuditLog, String datasetUrl, String organizationName) {
         this.dcModelMapping = dcModelMapping;
         this.synchronizerAuditLog = synchronizerAuditLog;
         this.datasetUrl = datasetUrl;
-    }
-
-    public AuditLogWapper(DcModelMapping dcModelMapping, SynchronizerAuditLog synchronizerAuditLog, String datasetUrl, String orgaName) {
-        this.dcModelMapping = dcModelMapping;
-        this.synchronizerAuditLog = synchronizerAuditLog;
-        this.datasetUrl = datasetUrl;
-        this.orgaName = orgaName;
+        this.organizationName = organizationName;
     }
 
     public DcModelMapping getDcModelMapping() {

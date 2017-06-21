@@ -18,7 +18,7 @@ class Dataset extends React.Component {
             datasetFetched: false,
             newDataset: false,
             licenses: {},
-            organizations:{},
+            organizations:[],
             message: '',
             success: true,
             mode: 'create',
@@ -32,7 +32,7 @@ class Dataset extends React.Component {
                 ckanPackageId: '',
                 name: '',
                 notes: '',
-                organization:'',
+                organizationId:'',
                 description: '',
                 license: '',
                 source: '',
@@ -261,7 +261,7 @@ class Dataset extends React.Component {
                                          license={this.state.fields['license']}
                                          tags={this.state.fields.tags}
                                          organizations={this.state.organizations}
-                                         organization={this.state.fields['organization']}
+                                         organizationId={this.state.fields['organizationId']}
                                          onChangeNotif={this.onChangeNotif} />
 
                             <div className="panel panel-default">
