@@ -18,7 +18,7 @@ class DatasetForm extends React.Component {
         notes: React.PropTypes.string.isRequired,
         licenses: React.PropTypes.object.isRequired,
         license: React.PropTypes.string.isRequired,
-        organizationId:React.PropTypes.string.isRequired,
+        organizationId:React.PropTypes.string,
         organizations:React.PropTypes.array.isRequired,
         datasetName: React.PropTypes.string.isRequired,
         onChangeNotif: React.PropTypes.func.isRequired

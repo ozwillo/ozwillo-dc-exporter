@@ -86,9 +86,9 @@ public class CkanService {
 
         if (optGet == null || !optGet.isPresent()) {
             String name = slugify(dcModelMapping.getName());
-            String orga = dcModelMapping.getOrganizationId();
-            LOGGER.debug("Creating dataset with slug name {} and for organization {} ", name,orga);
-            CkanOrganization ckanOrganization = ckanClientService.getOrganization(ckanUrl, orga).get() ;
+            String organizationId = dcModelMapping.getOrganizationId();
+            LOGGER.debug("Creating dataset with slug name {} and for organization {} ", name,organizationId);
+            CkanOrganization ckanOrganization = ckanClientService.getOrganization(ckanUrl, organizationId).get() ;
             CkanDataset ckanDataset = new CkanDataset(name);
             ckanDataset.setOrganization(ckanOrganization);
             ckanDataset.setMaintainer("ozwillo");
