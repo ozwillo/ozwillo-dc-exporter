@@ -234,11 +234,13 @@ class Dataset extends React.Component {
                     </div>
                     {renderIf(this.state.fields.dcId)(
                         <div>
-                            <GeocodingForm onFieldChange={this.onFieldChange}
-                                           globalFields={this.state.dataset['dcmo:globalFields']}
-                                           addressField={this.state.fields.addressField}
-                                           postalCodeField={this.state.fields.postalCodeField}
-                                           cityField={this.state.fields.cityField} />
+                            {renderIf(this.state.datasetFetched)(
+                                <GeocodingForm onFieldChange={this.onFieldChange}
+                                               globalFields={this.state.dataset['dcmo:globalFields']}
+                                               addressField={this.state.fields.addressField}
+                                               postalCodeField={this.state.fields.postalCodeField}
+                                               cityField={this.state.fields.cityField} />
+                            )}
 
                             <DatasetForm onChange={this.onFieldChange}
                                          onDatasetNameChange={this.onDatasetNameChange}
