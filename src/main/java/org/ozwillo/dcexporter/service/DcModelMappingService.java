@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -91,7 +92,7 @@ public class DcModelMappingService {
     }
 
     public List<AuditLogWapper> getAllAuditLogWithModel() {
-        return dcModelMappingRepository.findAllByOrderByResourceNameAsc().stream().map(dcModelMapping -> {
+        return dcModelMappingRepository.findAll(new Sort("resourceName")).stream().map(dcModelMapping -> {
             SynchronizerAuditLog auditLog =
                     synchronizerAuditLogRepository.findFirstByTypeOrderByDateDesc(dcModelMapping.getType());
             String datasetUrl = ckanUrl  + "/dataset/" + dcModelMapping.getUrl();
