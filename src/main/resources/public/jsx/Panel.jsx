@@ -61,14 +61,29 @@ class Panel extends Component {
     render() {
         const { t } = this.context
         const log = this.props.log
+        const panelCssStatus = {
+            'SUCCEEDED': 'panel-success',
+            'FAILED': 'panel-danger',
+            'PENDING': 'panel-warning',
+            'MODIFIED': 'panel-warning',
+            '': 'panel-warning'
+        }
+        const glyphiconCssStatus = {
+            'SUCCEEDED': 'glyphicon-ok',
+            'FAILED': 'glyphicon-warning-sign',
+            'PENDING': 'glyphicon-time',
+            'MODIFIED': 'glyphicon-time',
+            '': 'glyphicon-time'
+        }
+
         return (
-            <div className={'panel ' + t('css_class.panel.' + log.synchronizerAuditLog.status)}>
+            <div className={'panel ' + panelCssStatus[log.synchronizerAuditLog.status]}>
                 <div className="panel-heading">
                     <div className="row">
                         <div className="col-md-6">
                             <h3 className="panel-title">
                                 {log.dcModelMapping.resourceName}
-                                <span className={'glyphicon ' + t('css_class.glyphicon.' + log.synchronizerAuditLog.status)} aria-hidden="true"></span>
+                                <span className={'glyphicon ' + glyphiconCssStatus[log.synchronizerAuditLog.status] } aria-hidden="true"></span>
                             </h3>
                         </div>
                         <div className="col-md-6">

@@ -83,20 +83,5 @@
             "tags": "Tags",
             "resource_name": "Resource Name"
         }
-    },
-
-    "css_class": {
-        "panel": {
-            "SUCCEEDED": "panel-success",
-            "FAILED": "panel-danger",
-            "PENDING": "panel-warning",
-            "MODIFIED": "panel-warning"
-        },
-        "glyphicon": {
-            "SUCCEEDED": "glyphicon-ok",
-            "FAILED": "glyphicon-warning-sign",
-            "PENDING": "glyphicon-time",
-            "MODIFIED": "glyphicon-time"
-        }
     }
 }
