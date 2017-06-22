@@ -44,7 +44,12 @@ public class CkanClientService {
         Call<DatasetResponse> call = ckanAPI.getDataset(idOrName);
 
         try {
-            return Optional.ofNullable(call.execute().body().result);
+            DatasetResponse datasetResponse = call.execute().body();
+            if (datasetResponse == null) {
+                LOGGER.info("The dataset '{}' doesn't exist in CKAN", idOrName);
+                return Optional.empty();
+            }
+            return Optional.ofNullable(datasetResponse.result);
         } catch (IOException e) {
             LOGGER.error("Error while trying to fetch datasets from CKAN: {}", e);
             return Optional.empty();

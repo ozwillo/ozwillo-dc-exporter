@@ -26,15 +26,15 @@
 
         "notif": {
             "no_data": "Aucun export",
-            "no_data_sort": "Aucun",
             "is_deleted": "La ressource a été supprimée"
         },
 
         "sort": {
-            "all": "Tous les exports",
-            "valid": "Exports réussis",
-            "error": "Exports en erreur",
-            "pending": "Exports en cours"
+            "all": "Tous",
+            "SUCCEEDED": "Réussis",
+            "FAILED": "En échecs",
+            "PENDING": "En cours",
+            "MODIFIED": "Modifiés"
         },
 
         "panel": {

@@ -9,7 +9,7 @@ import { Alert } from './Form'
 class Dashboard extends React.Component {
     state = {
         logs: [],
-        filterKey: '',
+        filterKey: 'all',
         filterValue: 'dashboard.sort.all',
         success: true,
         message: ''
@@ -36,7 +36,7 @@ class Dashboard extends React.Component {
             .then(json => this.setState({ logs: json }))
     }
     onChangeFilter(eventKey) {
-        this.setState({ filterValue : eventKey[0], filterKey : eventKey[1] })
+        this.setState({ filterKey: eventKey, filterValue: 'dashboard.sort.' + eventKey })
     }
     closeNotif(){
         this.setState({ message: '' })
@@ -48,15 +48,11 @@ class Dashboard extends React.Component {
         const { t } = this.context
         const filterKey = this.state.filterKey
         const list = this.state.logs.filter(function(log) {
-            switch (filterKey) {
-                case 'pending' :
-                    return !log.synchronizerAuditLog
-                case 'valid' :
-                    return log.synchronizerAuditLog.succeeded == true
-                case 'error' :
-                    return log.synchronizerAuditLog.succeeded == false
-                default:
-                    return log
+            if( filterKey == "all" ) {
+                return log
+            }
+            else {
+                return log.synchronizerAuditLog.status == filterKey
             }
         }).map(log => <Panel key={log.dcModelMapping.dcId} log={log} fetchMapping={() => this.fetchMapping() }
                    onChangeNotif={ this.onChangeNotif } />
@@ -71,10 +67,11 @@ class Dashboard extends React.Component {
                     <div>
                         <div className="filter-dropdown text-right" >
                             <DropdownButton title={ t(this.state.filterValue) } onSelect={(eventKey) => this.onChangeFilter(eventKey)} id="filter-dropdown" pullRight={true}>
-                                <MenuItem eventKey={[ "dashboard.sort.all", "" ]} >{ t('dashboard.sort.all') }</MenuItem>
-                                <MenuItem eventKey={[ "dashboard.sort.valid", "valid" ]} >{ t('dashboard.sort.valid') }</MenuItem>
-                                <MenuItem eventKey={[ "dashboard.sort.error", "error" ]}  >{ t('dashboard.sort.error') }</MenuItem>
-                                <MenuItem eventKey={[ "dashboard.sort.pending", "pending" ]} >{ t('dashboard.sort.pending') }</MenuItem>
+                                <MenuItem eventKey={'all'} >{ t('dashboard.sort.all') }</MenuItem>
+                                <MenuItem eventKey={'SUCCEEDED'} >{ t('dashboard.sort.SUCCEEDED') }</MenuItem>
+                                <MenuItem eventKey={'FAILED'}  >{ t('dashboard.sort.FAILED') }</MenuItem>
+                                <MenuItem eventKey={'PENDING'} >{ t('dashboard.sort.PENDING') }</MenuItem>
+                                <MenuItem eventKey={'MODIFIED'} >{ t('dashboard.sort.MODIFIED') }</MenuItem>
                             </DropdownButton>
                         </div>
                         <div className="wrap-result">
@@ -87,7 +84,7 @@ class Dashboard extends React.Component {
                             )}
                             {renderIf(list.length == 0) (
                                 <div className="alert alert-info" role="alert">
-                                    <p><i>{ t('dashboard.notif.no_data_sort') }<span className="text-lowercase"> { t(this.state.filterValue) } </span></i></p>
+                                    <p>{ t('dashboard.notif.no_data') }</p>
                                 </div>
                             )}
                         </div>

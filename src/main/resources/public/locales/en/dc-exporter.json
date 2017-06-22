@@ -26,15 +26,15 @@
 
         "notif": {
             "no_data": "No dataset",
-            "no_data_sort": "No dataset",
             "is_deleted": "Resource is deleted"
         },
 
         "sort": {
             "all": "All",
-            "valid": "Valid",
-            "error": "Error",
-            "pending": "Pending"
+            "SUCCEEDED": "Succeeded",
+            "FAILED": "Failed",
+            "PENDING": "Pending",
+            "MODIFIED": "Modified"
         },
 
         "panel": {

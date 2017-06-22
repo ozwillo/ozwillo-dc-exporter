@@ -1,11 +1,13 @@
 package org.ozwillo.dcexporter.service;
 
 import javaslang.control.Either;
+import org.joda.time.DateTime;
 import org.ozwillo.dcexporter.dao.DcModelMappingRepository;
 import org.ozwillo.dcexporter.dao.SynchronizerAuditLogRepository;
 import org.ozwillo.dcexporter.model.Ckan.CkanOrganization;
 import org.ozwillo.dcexporter.model.Ckan.CkanResource;
 import org.ozwillo.dcexporter.model.DcModelMapping;
+import org.ozwillo.dcexporter.model.SynchronizerStatus;
 import org.ozwillo.dcexporter.model.ui.AuditLogWapper;
 import org.ozwillo.dcexporter.model.SynchronizerAuditLog;
 import org.ozwillo.dcexporter.model.Ckan.CkanDataset;
@@ -65,12 +67,32 @@ public class DcModelMappingService {
         dcModelMapping.setOrganizationId(ckanDataset.getOrganization().getId());
 
         dcModelMapping = dcModelMappingRepository.save(dcModelMapping);
+        SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.PENDING, null,  DateTime.now());
+        synchronizerAuditLogRepository.save(newAuditLog);
         return Either.right(dcModelMapping);
     }
 
     public Either<String, DcModelMapping> edit(DcModelMapping dcModelMapping) {
 
-        if (dcModelMappingRepository.findByDcId(dcModelMapping.getDcId()) == null) return Either.left("dataset.notif.not_exist");
+        DcModelMapping oldDcModelMapping = dcModelMappingRepository.findByDcId(dcModelMapping.getDcId());
+
+        if(oldDcModelMapping == null) return Either.left("dataset.notif.not_exist");
+
+        SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.MODIFIED, null,  DateTime.now());
+        synchronizerAuditLogRepository.save(newAuditLog);
+        dcModelMappingRepository.save(dcModelMapping);
+
+        if(!oldDcModelMapping.getName().equals(dcModelMapping.getName())){
+            dcModelMapping.getCkanResourceId().forEach((key,resourceId) -> {
+                ckanService.deleteResource(resourceId);
+            });
+            dcModelMapping.setUrl("");
+            dcModelMapping.setCkanPackageId("");
+            dcModelMapping.setCkanResourceId(new HashMap<>());
+            Either<String, DcModelMapping> eitherDcModelMapping = this.add(dcModelMapping);
+            if(eitherDcModelMapping.isLeft()) return Either.left(eitherDcModelMapping.getLeft());
+            return Either.right(eitherDcModelMapping.get());
+        }
 
         Either<String, CkanDataset> eitherDataset = ckanService.getOrCreateDataset(dcModelMapping);
         if(eitherDataset.isLeft()) return Either.left(eitherDataset.getLeft());
