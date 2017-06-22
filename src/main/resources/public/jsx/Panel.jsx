@@ -91,20 +91,24 @@ class Panel extends Component {
                 </div>
                 <ul className="list-group">
                     <li className="list-group-item">
-                        <label className="col-sm-3 control-label">{ t('dashboard.panel.dataset_name') }</label>{log.dcModelMapping.name}
+                        <label className="col-sm-4 control-label">{ t('dashboard.panel.dataset_name') }</label>{log.dcModelMapping.name}
                     </li>
                     <li className="list-group-item">
-                        <label className="col-sm-3 control-label">{ t('dashboard.panel.dcmodel_name') }</label>{log.dcModelMapping.type}
+                        <label className="col-sm-4 control-label">{ t('dashboard.panel.dcmodel_name') }</label>{log.dcModelMapping.type}
                     </li>
+                    {renderIf(log.dcModelMapping.organizationId != '' && log.dcModelMapping.organizationId != null) (
+                    <li className="list-group-item">
+                        <label className="col-sm-4 control-label">{ t('dashboard.panel.organization_name') }</label>{log.organizationName}
+                    </li> )}
                     {(log.synchronizerAuditLog) &&
                     <li className="list-group-item">
-                        <label className="col-sm-3 control-label">{ t('dashboard.panel.synchronization_date') }
+                        <label className="col-sm-4 control-label">{ t('dashboard.panel.synchronization_date') }
                             </label>{new Date(log.synchronizerAuditLog.date).toLocaleString()}
                     </li>
                     }
                     {(log.synchronizerAuditLog && !log.synchronizerAuditLog.succeeded) &&
                     <li className="list-group-item">
-                        <label className="col-sm-3 control-label">{ t('data.message') }</label>{log.synchronizerAuditLog.errorMessage}
+                        <label className="col-sm-4 control-label">{ t('data.message') }</label>{log.synchronizerAuditLog.errorMessage}
                     </li>
                     }
                 </ul>

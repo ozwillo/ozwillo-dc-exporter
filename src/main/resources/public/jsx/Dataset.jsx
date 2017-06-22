@@ -18,6 +18,7 @@ class Dataset extends React.Component {
             datasetFetched: false,
             newDataset: false,
             licenses: {},
+            organizations:[],
             message: '',
             success: true,
             mode: 'create',
@@ -31,6 +32,7 @@ class Dataset extends React.Component {
                 ckanPackageId: '',
                 name: '',
                 notes: '',
+                organizationId:'',
                 description: '',
                 license: '',
                 source: '',
@@ -74,6 +76,13 @@ class Dataset extends React.Component {
             .then(this.checkStatus)
             .then(response => response.json())
             .then(json => this.setState({licenses: json}))
+            .catch(error => {
+                error.text().then(text => { this.onChangeNotif(false, text) })
+            })
+        fetch('/api/ckan/organizations', {credentials: 'same-origin'})
+            .then(this.checkStatus)
+            .then(response => response.json())
+            .then(json => this.setState({organizations: json}))
             .catch(error => {
                 error.text().then(text => { this.onChangeNotif(false, text) })
             })
@@ -253,6 +262,8 @@ class Dataset extends React.Component {
                                          licenses={this.state.licenses}
                                          license={this.state.fields['license']}
                                          tags={this.state.fields.tags}
+                                         organizations={this.state.organizations}
+                                         organizationId={this.state.fields['organizationId']}
                                          onChangeNotif={this.onChangeNotif} />
 
                             <div className="panel panel-default">
@@ -313,6 +324,5 @@ DatasetChooser.propTypes = {
 Dataset.PropTypes = {
     onSubmit: React.PropTypes.func.isRequired
 }
-
 
 export default translate(['dc-exporter'])(Dataset)

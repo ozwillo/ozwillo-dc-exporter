@@ -18,6 +18,8 @@ class DatasetForm extends React.Component {
         notes: React.PropTypes.string.isRequired,
         licenses: React.PropTypes.object.isRequired,
         license: React.PropTypes.string.isRequired,
+        organizationId:React.PropTypes.string,
+        organizations:React.PropTypes.array.isRequired,
         datasetName: React.PropTypes.string.isRequired,
         onChangeNotif: React.PropTypes.func.isRequired
     }
@@ -29,6 +31,7 @@ class DatasetForm extends React.Component {
         this.handleDelete = this.handleDelete.bind(this)
         this.handleAddition = this.handleAddition.bind(this)
     }
+
     handleDelete(i) {
         let tags = this.props.tags
         tags.splice(i, 1)
@@ -92,6 +95,9 @@ class DatasetForm extends React.Component {
                             <LicenceChooser licenses={this.props.licenses} currentLicense={this.props.license}
                                             onChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}
                                             t={ t }/>
+                            <OrganizationChooser organizations={this.props.organizations} currentOrganizationId={this.props.organizationId}
+                                                  onChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}
+                                                  t={ t }/>
                             <FormGroup>
                                 <Label htmlFor="tags" value={ t('dataset.label.tags') }/>
                                 <TagAutosuggest onSelect={ this.handleAddition }/>
@@ -103,6 +109,7 @@ class DatasetForm extends React.Component {
                                         </div>
                                 )}
                             </FormGroup>
+
                         </div>
                     )}
                 </div>
@@ -119,6 +126,22 @@ const LicenceChooser = ({ licenses, currentLicense, onChange, t }) => {
         <FormGroup>
             <Label htmlForm="license" value={ t('dataset.label.license') }/>
             <SelectField id="license" value={currentLicense} onChange={onChange}>
+                {options}
+            </SelectField>
+        </FormGroup>
+    )
+}
+
+const OrganizationChooser = ({ organizations, currentOrganizationId, onChange, t }) => {
+    const options = Object.keys(organizations).
+        filter(key => organizations[key].display_name != '')
+        .map(key =>
+            <option key={key} value={organizations[key].name}>{organizations[key].display_name}</option>
+        )
+    return (
+        <FormGroup>
+            <Label htmlForm="organizationId" value={ t('dataset.label.organization') }/>
+            <SelectField id="organizationId" value={currentOrganizationId} onChange={onChange} required="false">
                 {options}
             </SelectField>
         </FormGroup>

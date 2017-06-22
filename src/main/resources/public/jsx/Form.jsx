@@ -1,4 +1,5 @@
 import React from 'react'
+import renderIf from 'render-if'
 
 const Form = ({ children }) =>
     <form className="form-horizontal">
@@ -13,10 +14,10 @@ const FormGroup = ({ children }) =>
 const Label = ({ htmlFor, value }) =>
     <label htmlFor={htmlFor} className="control-label col-sm-3">{value}</label>
 
-const SelectField = ({ id, value, onChange, children }) =>
+const SelectField = ({ id, value, onChange, children, required }) =>
     <div className="col-sm-9">
         <select name={id} id={id} value={value} className="form-control" onChange={onChange}>
-            <option key="-1" value=""></option>
+            {renderIf(required != 'false') (<option key="-1" value=""></option>)}
             {children}
         </select>
     </div>
