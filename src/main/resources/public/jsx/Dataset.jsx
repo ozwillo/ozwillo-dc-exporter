@@ -196,8 +196,9 @@ class Dataset extends React.Component {
                           checked={!this.state.fields.excludedFields.includes(field['dcmf:name'])}/>)
             : null
 
-        const disabled = this.state.fields.name == null || this.state.fields.name == '' ? true
-            : false
+        const disabled = this.state.fields.name == null || this.state.fields.name == '' ||
+                         this.state.fields.resourceName == null || this.state.fields.resourceName == '' ||
+                         ((this.state.fields.organizationId == null || this.state.fields.organizationId == '') && this.state.newDataset)
 
         const isModeCreate = renderIf(this.state.mode == 'create')
         const isModeUpdate = renderIf(this.state.mode == 'update')

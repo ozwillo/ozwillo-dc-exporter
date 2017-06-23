@@ -11,13 +11,13 @@ const FormGroup = ({ children }) =>
         {children}
     </div>
 
-const Label = ({ htmlFor, value }) =>
+const Label = ({ htmlFor, value}) =>
     <label htmlFor={htmlFor} className="control-label col-sm-3">{value}</label>
 
-const SelectField = ({ id, value, onChange, children, required }) =>
+const SelectField = ({ id, value, onChange, children }) =>
     <div className="col-sm-9">
         <select name={id} id={id} value={value} className="form-control" onChange={onChange}>
-            {renderIf(required != 'false') (<option key="-1" value=""></option>)}
+            <option key="-1" value=""></option>
             {children}
         </select>
     </div>
