@@ -140,8 +140,8 @@ const OrganizationChooser = ({ organizations, currentOrganizationId, onChange, t
         )
     return (
         <FormGroup>
-            <Label htmlForm="organizationId" value={ t('dataset.label.organization') }/>
-            <SelectField id="organizationId" value={currentOrganizationId} onChange={onChange} required="false">
+            <Label htmlForm="organizationId" value={ t('dataset.label.organization')} />
+            <SelectField id="organizationId" value={currentOrganizationId} onChange={onChange}>
                 {options}
             </SelectField>
         </FormGroup>
