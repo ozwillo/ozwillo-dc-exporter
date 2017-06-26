@@ -122,13 +122,12 @@ class Panel extends Component {
                     </li>
                     }
                 </ul>
-                {renderIf(this.state.showActionButton) (
-                    <ConfirmActionButton
-                        content={t('delete_confirmation.message') + log.dcModelMapping.resourceName}
-                        onConfirm={ this.deleteMapping }
-                        confirmLabel={ t('delete_confirmation.title') }
-                        onHide={ this.returnConfirmAction }/>
-                )}
+                <ConfirmActionButton
+                    content={t('delete_confirmation.message') + log.dcModelMapping.resourceName}
+                    onConfirm={ this.deleteMapping }
+                    confirmLabel={ t('delete_confirmation.title') }
+                    onHide={ this.returnConfirmAction }
+                    show={this.state.showActionButton} />
             </div>
         )
     }

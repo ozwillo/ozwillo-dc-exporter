@@ -49,7 +49,7 @@
 
     "delete_confirmation" : {
         "title": "Suppression",
-        "message" : "Vous êtes sur le point de supprimer la synchronisation de la ressource :"
+        "message" : "Vous êtes sur le point de supprimer la synchronisation de la ressource: "
     },
 
     "dataset":{
