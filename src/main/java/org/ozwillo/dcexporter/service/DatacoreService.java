@@ -48,7 +48,7 @@ public class DatacoreService {
     public List<DCModel> getModels() {
         // TODO : iterate until we have all
         return datacore.findModels(50).stream()
-            .filter(dcModel -> dcModelMappingRepository.findByDcId(dcModel.getId().toString()) == null)
+            .filter(dcModel -> dcModelMappingRepository.findByDcIdAndIsDeleted(dcModel.getId().toString(),false) == null)
             .distinct()
             .sorted()
             .collect(Collectors.toList());
