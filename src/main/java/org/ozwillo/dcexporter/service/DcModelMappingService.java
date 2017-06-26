@@ -118,20 +118,20 @@ public class DcModelMappingService {
     }
 
     public List<AuditLogWapper> getAllAuditLogWithModel() {
-        return dcModelMappingRepository.findAll(new Sort("resourceName")).stream().map(dcModelMapping -> {
-            SynchronizerAuditLog auditLog =
-                    synchronizerAuditLogRepository.findFirstByTypeOrderByDateDesc(dcModelMapping.getType());
-            String datasetUrl = ckanUrl  + "/dataset/" + dcModelMapping.getUrl();
-            String organizationName = "";
-            if (!StringUtils.isEmpty(dcModelMapping.getOrganizationId()) ) {
-                Either<String, CkanOrganization> eitherOrganization = ckanService.getOrganization(dcModelMapping.getOrganizationId());
-                if (eitherOrganization.isRight()) {
-                    organizationName = eitherOrganization.get().getDisplayName();
-                }
-            }
-
-            return new AuditLogWapper(dcModelMapping, auditLog, datasetUrl, organizationName);
-        }).collect(Collectors.toList());
+        return dcModelMappingRepository.findByIsDeletedOrderByResourceNameAsc(false).stream()
+                .map(dcModelMapping -> {
+                    SynchronizerAuditLog auditLog = synchronizerAuditLogRepository.findFirstByTypeOrderByDateDesc(dcModelMapping.getType());
+                    String datasetUrl = ckanUrl  + "/dataset/" + dcModelMapping.getUrl();
+                    String organizationName = "";
+                    if (!StringUtils.isEmpty(dcModelMapping.getOrganizationId()) ) {
+                        Either<String, CkanOrganization> eitherOrganization = ckanService.getOrganization(dcModelMapping.getOrganizationId());
+                        if (eitherOrganization.isRight()) {
+                            organizationName = eitherOrganization.get().getDisplayName();
+                        }
+                    }
+                    return new AuditLogWapper(dcModelMapping, auditLog, datasetUrl, organizationName);
+                })
+                .collect(Collectors.toList());
     }
 
     public Either<String, DcModelMapping> deleteById(String id) {

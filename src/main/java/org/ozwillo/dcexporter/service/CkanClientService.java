@@ -151,14 +151,14 @@ public class CkanClientService {
         }
     }
 
-    public Optional<CkanResponse> deleteResource(String ckanUrl, String ckanApiKey, String idResource) {
+    public Optional<DefaultResponse> deleteResource(String ckanUrl, String ckanApiKey, String idResource) {
         if(!isValid(ckanUrl, "CKAN URL")) return Optional.empty();
         if(!isValid(ckanApiKey, "CKAN API key")) return Optional.empty();
 
         CkanAPI ckanAPI = getCkanAPI(ckanUrl);
         Map<String, String> id = new HashMap<String, String>();
         id.put("id", idResource);
-        Call<CkanResponse> call = ckanAPI.deleteResource(ckanApiKey, id);
+        Call<DefaultResponse> call = ckanAPI.deleteResource(ckanApiKey, id);
 
         try {
             return Optional.ofNullable(call.execute().body());
@@ -277,7 +277,7 @@ interface CkanAPI {
     Call<ResourceResponse> updateResourceFile(@Header("Authorization") String ckanApiKey, @Body RequestBody ckanResource);
 
     @POST("/api/3/action/resource_delete")
-    Call<CkanResponse> deleteResource(@Header("Authorization") String ckanApiKey, @Body Object id);
+    Call<DefaultResponse> deleteResource(@Header("Authorization") String ckanApiKey, @Body Object id);
 
 
     /* Others */
@@ -317,4 +317,7 @@ class OrganizationResponse extends CkanResponse {
 }
 class OrganizationListResponse extends CkanResponse {
     public List<CkanOrganization> result;
+}
+class DefaultResponse extends CkanResponse {
+    public Object result;
 }

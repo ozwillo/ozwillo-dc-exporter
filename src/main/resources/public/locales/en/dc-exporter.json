@@ -48,7 +48,7 @@
 
     "delete_confirmation" : {
         "title": "Deletion",
-        "message" : "You will delete this resource synchronization :"
+        "message" : "You will delete this resource synchronization: "
     },
 
     "dataset":{
