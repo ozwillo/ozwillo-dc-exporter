@@ -118,7 +118,9 @@ public class DcModelMappingService {
     }
 
     public List<AuditLogWapper> getAllAuditLogWithModel() {
-        return dcModelMappingRepository.findByIsDeletedOrderByResourceNameAsc(false).stream()
+        List<DcModelMapping> dcModelMappings = dcModelMappingRepository.findAll();
+        dcModelMappings.sort(Comparator.comparing(DcModelMapping::getResourceName, String.CASE_INSENSITIVE_ORDER));
+        return dcModelMappings.stream()
                 .map(dcModelMapping -> {
                     SynchronizerAuditLog auditLog = synchronizerAuditLogRepository.findFirstByTypeOrderByDateDesc(dcModelMapping.getType());
                     String datasetUrl = ckanUrl  + "/dataset/" + dcModelMapping.getUrl();
