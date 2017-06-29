@@ -1,5 +1,7 @@
 package org.ozwillo.dcexporter.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javaslang.control.Either;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
@@ -14,10 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.text.Normalizer;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -106,6 +105,18 @@ public class CkanService {
             ckanDataset.setVersion(dcModelMapping.getVersion());
             ckanDataset.setTags(dcModelMapping.getTags());
             ckanDataset.setPrivate(false);
+            if (dcModelMapping.getGeoLocation() != null) {
+                List<CkanExtra> ckanExtras = new ArrayList<>();
+                ObjectMapper mapperObj = new ObjectMapper();
+                try {
+                    String spatialJson = mapperObj.writeValueAsString(dcModelMapping.getGeoLocation());
+                    CkanExtra geoLocation = new CkanExtra("spatial", spatialJson);
+                    ckanExtras.add(geoLocation);
+                    ckanDataset.setExtras(ckanExtras);
+                } catch (JsonProcessingException e) {
+                    LOGGER.error("Writing spatial dataset values as string failed : {}", e.getMessage());
+                }
+            }
 
             Optional<CkanDataset> optCreate = ckanClientService.createDataset(ckanUrl, ckanApiKey, ckanDataset);
             if(!optCreate.isPresent()) return Either.left("dataset.notif.error.create_dataset");

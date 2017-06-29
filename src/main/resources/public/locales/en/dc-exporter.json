@@ -87,7 +87,8 @@
             "resource_name": "Resource Name",
             "address_field": "Address field",
             "city_field": "City field",
-            "postal_code_field": "Postal code field"
+            "postal_code_field": "Postal code field",
+            "geo_location": "Geo location"
         }
     }
 }

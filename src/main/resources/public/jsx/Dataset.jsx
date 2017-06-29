@@ -40,7 +40,8 @@ class Dataset extends React.Component {
                 excludedFields: [],
                 addressField: '',
                 postalCodeField: '',
-                cityField: ''
+                cityField: '',
+                geoLocation: {}
             }
         }
 
@@ -265,7 +266,8 @@ class Dataset extends React.Component {
                                          tags={this.state.fields.tags}
                                          organizations={this.state.organizations}
                                          organizationId={this.state.fields['organizationId']}
-                                         onChangeNotif={this.onChangeNotif} />
+                                         onChangeNotif={this.onChangeNotif}
+                                         geoLocation={this.state.fields.geoLocation}/>
 
                             <div className="panel panel-default">
                                 <div className="panel-heading">

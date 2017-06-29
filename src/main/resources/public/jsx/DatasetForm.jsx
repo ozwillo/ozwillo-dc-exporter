@@ -4,6 +4,7 @@ import { translate } from 'react-i18next'
 
 import DatasetAutosuggest from './DatasetAutosuggest'
 import { TagAutosuggest, Tag } from './TagAutosuggest'
+import AddressAutosuggest from './AddressAutosuggest'
 import { FormGroup, Label, InputText, SelectField, Textarea } from './Form'
 
 class DatasetForm extends React.Component {
@@ -21,7 +22,8 @@ class DatasetForm extends React.Component {
         organizationId:React.PropTypes.string,
         organizations:React.PropTypes.array.isRequired,
         datasetName: React.PropTypes.string.isRequired,
-        onChangeNotif: React.PropTypes.func.isRequired
+        onChangeNotif: React.PropTypes.func.isRequired,
+        geoLocation: React.PropTypes.object.isRequired
     }
     static contextTypes = {
         t: React.PropTypes.func
@@ -81,6 +83,12 @@ class DatasetForm extends React.Component {
                                 <Label htmlFor="name" value={t('dataset.label.name')} />
                                 <InputText id="name" value={this.props.datasetName}
                                            onChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}/>
+                            </FormGroup>
+                            <FormGroup>
+                                <Label htmlFor="geo-dataset" value={t('dataset.label.geo_location')} />
+                                <AddressAutosuggest id="geo-dataset"
+                                                    geoLocation={this.props.geoLocation}
+                                                    onFieldChange={this.props.onFieldChange} />
                             </FormGroup>
                             <FormGroup>
                                 <Label htmlFor="notes" value={t('dataset.label.description')} />
