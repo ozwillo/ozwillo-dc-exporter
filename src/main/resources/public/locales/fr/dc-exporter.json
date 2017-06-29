@@ -88,7 +88,8 @@
             "resource_name": "Nom de la ressource",
             "address_field": "Champ adresse",
             "city_field": "Champ ville",
-            "postal_code_field": "Champ code postal"
+            "postal_code_field": "Champ code postal",
+            "geo_location": "Localisation géographique"
         }
     }
 }

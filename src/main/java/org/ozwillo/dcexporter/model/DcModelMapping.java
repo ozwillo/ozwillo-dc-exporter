@@ -50,6 +50,7 @@ public class DcModelMapping {
     private String addressField;
     private String postalCodeField;
     private String cityField;
+    private Object geoLocation;
 
 
     public DcModelMapping() {
@@ -172,6 +173,12 @@ public class DcModelMapping {
     }
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
+    }
+    public Object getGeoLocation() {
+        return geoLocation;
+    }
+    public void setGeoLocation(Object geoLocation) {
+        this.geoLocation = geoLocation;
     }
 
     @Override
