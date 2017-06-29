@@ -26,7 +26,7 @@ export default class AddressAutosuggest extends React.Component {
         this.setState({ value: newValue })
     }
     onSuggestionsFetchRequested = ({ value }) => {
-        fetch('http://nominatim.openstreetmap.org/search?q=' + value + ',france&format=json&polygon_json=1', {credentials: 'same-origin'})
+        fetch('https://nominatim.openstreetmap.org/search?q=' + value + ',france&format=json&polygon_json=1', {credentials: 'same-origin'})
             .then(response => response.json())
             .then(json => {
                 this.setState({ suggestions: json.filter(suggestion => suggestion.type == 'administrative') })
