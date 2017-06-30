@@ -100,3 +100,4 @@ task frontBundle(type: NpmTask) {
 
 assemble.dependsOn(frontBundle)
 frontBundle.dependsOn(npmInstall)
+jar.dependsOn(frontBundle)
