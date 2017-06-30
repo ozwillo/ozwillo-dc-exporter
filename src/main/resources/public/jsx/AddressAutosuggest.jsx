@@ -37,7 +37,7 @@ export default class AddressAutosuggest extends React.Component {
     }
     onSuggestionSelected = (event, { suggestion }) => {
         this.setState({ value: suggestion.display_name })
-        this.props.onFieldChange( 'geoLocation', {"type": "Point", "coordinates": [suggestion.lon, suggestion.lat]} )
+        this.props.onFieldChange( 'geoLocation', {"type": "Point", "coordinates": [parseFloat(suggestion.lon), parseFloat(suggestion.lat)]} )
     }
     render() {
         const inputProps = {
