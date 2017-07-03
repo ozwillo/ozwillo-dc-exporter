@@ -123,7 +123,7 @@ public class CkanClientService {
         }
     }
 
-    public Optional<CkanResource> updateResourceFile(String ckanUrl, String ckanApiKey, CkanResource ckanResource) {
+    public Optional<ResourceResponse> updateResourceFile(String ckanUrl, String ckanApiKey, CkanResource ckanResource) {
         if(!isValid(ckanUrl, "CKAN URL")) return Optional.empty();
         if(!isValid(ckanApiKey, "CKAN API key")) return Optional.empty();
 
@@ -144,7 +144,8 @@ public class CkanClientService {
         Call<ResourceResponse> call = ckanAPI.updateResourceFile(ckanApiKey, requestBody);
 
         try {
-            return Optional.ofNullable(call.execute().body().result);
+            ResourceResponse resourceResponse = call.execute().body();
+            return Optional.ofNullable(resourceResponse);
         } catch (IOException e) {
             LOGGER.error("Error while trying to update file resource to CKAN: {}", e);
             return Optional.empty();
