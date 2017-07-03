@@ -166,7 +166,14 @@ public class CkanService {
             DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateHourMinuteSecondMillis();
             ckanResource.setLastModified(dateTimeFormatter.print(LocalDateTime.now()));
 
-            ckanClientService.updateResourceFile(ckanUrl, ckanApiKey, ckanResource);
+            Optional<ResourceResponse> resourceResponseOptional = ckanClientService.updateResourceFile(ckanUrl, ckanApiKey, ckanResource);
+            if(resourceResponseOptional.isPresent()) {
+                ResourceResponse updateResourceResponse = resourceResponseOptional.get();
+                if(!updateResourceResponse.isSuccess()) LOGGER.error("Error while trying to update {} file resource {} to CKAN : {} ", key, dcModelMapping.getResourceName(), updateResourceResponse.getError().getMessage());
+                else LOGGER.info("{} file resource {} is updated in CKAN : {} ", key, dcModelMapping.getResourceName(), updateResourceResponse.result.getName());
+            } else {
+                LOGGER.info("No CKAN response while trying to update {} file of resource {}", key, dcModelMapping.getResourceName());
+            }
         });
     }
 
