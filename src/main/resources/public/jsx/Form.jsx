@@ -1,4 +1,5 @@
 import React from 'react'
+import renderIf from 'render-if'
 
 const Form = ({ children }) =>
     <form className="form-horizontal">
@@ -10,7 +11,7 @@ const FormGroup = ({ children }) =>
         {children}
     </div>
 
-const Label = ({ htmlFor, value }) =>
+const Label = ({ htmlFor, value}) =>
     <label htmlFor={htmlFor} className="control-label col-sm-3">{value}</label>
 
 const SelectField = ({ id, value, onChange, children }) =>

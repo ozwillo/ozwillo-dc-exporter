@@ -10,8 +10,7 @@ public interface DcModelMappingRepository extends MongoRepository<DcModelMapping
 
     DcModelMapping findByDcId(String dcId);
 
-    @Query("{ 'isDeleted' : false }")
-    List<DcModelMapping> findAllByOrderByResourceNameAsc();
+    DcModelMapping findByDcIdAndIsDeleted(String dcId, Boolean isDeleted);
 
     @Query("{ 'isDeleted' : false }")
     List<DcModelMapping> findAll();

@@ -44,7 +44,12 @@ public class CkanClientService {
         Call<DatasetResponse> call = ckanAPI.getDataset(idOrName);
 
         try {
-            return Optional.ofNullable(call.execute().body().result);
+            DatasetResponse datasetResponse = call.execute().body();
+            if (datasetResponse == null) {
+                LOGGER.info("The dataset '{}' doesn't exist in CKAN", idOrName);
+                return Optional.empty();
+            }
+            return Optional.ofNullable(datasetResponse.result);
         } catch (IOException e) {
             LOGGER.error("Error while trying to fetch datasets from CKAN: {}", e);
             return Optional.empty();
@@ -118,7 +123,7 @@ public class CkanClientService {
         }
     }
 
-    public Optional<CkanResource> updateResourceFile(String ckanUrl, String ckanApiKey, CkanResource ckanResource) {
+    public Optional<ResourceResponse> updateResourceFile(String ckanUrl, String ckanApiKey, CkanResource ckanResource) {
         if(!isValid(ckanUrl, "CKAN URL")) return Optional.empty();
         if(!isValid(ckanApiKey, "CKAN API key")) return Optional.empty();
 
@@ -139,21 +144,22 @@ public class CkanClientService {
         Call<ResourceResponse> call = ckanAPI.updateResourceFile(ckanApiKey, requestBody);
 
         try {
-            return Optional.ofNullable(call.execute().body().result);
+            ResourceResponse resourceResponse = call.execute().body();
+            return Optional.ofNullable(resourceResponse);
         } catch (IOException e) {
             LOGGER.error("Error while trying to update file resource to CKAN: {}", e);
             return Optional.empty();
         }
     }
 
-    public Optional<CkanResponse> deleteResource(String ckanUrl, String ckanApiKey, String idResource) {
+    public Optional<DefaultResponse> deleteResource(String ckanUrl, String ckanApiKey, String idResource) {
         if(!isValid(ckanUrl, "CKAN URL")) return Optional.empty();
         if(!isValid(ckanApiKey, "CKAN API key")) return Optional.empty();
 
         CkanAPI ckanAPI = getCkanAPI(ckanUrl);
         Map<String, String> id = new HashMap<String, String>();
         id.put("id", idResource);
-        Call<CkanResponse> call = ckanAPI.deleteResource(ckanApiKey, id);
+        Call<DefaultResponse> call = ckanAPI.deleteResource(ckanApiKey, id);
 
         try {
             return Optional.ofNullable(call.execute().body());
@@ -208,6 +214,19 @@ public class CkanClientService {
         }
     }
 
+    public Optional<List<CkanOrganization>> getOrganizationList(String ckanUrl) {
+        if(!isValid(ckanUrl, "CKAN URL")) return Optional.empty();
+
+        CkanAPI ckanAPI = getCkanAPI(ckanUrl);
+        Call<OrganizationListResponse> call = ckanAPI.getOrganizations(true);
+
+        try {
+            return Optional.ofNullable(call.execute().body().result);
+        } catch (IOException e) {
+            LOGGER.error("Error while trying to fetch organizations from CKAN: {}", e);
+            return Optional.empty();
+        }
+    }
 
     private CkanAPI getCkanAPI(String ckanUrl) {
 
@@ -259,7 +278,7 @@ interface CkanAPI {
     Call<ResourceResponse> updateResourceFile(@Header("Authorization") String ckanApiKey, @Body RequestBody ckanResource);
 
     @POST("/api/3/action/resource_delete")
-    Call<CkanResponse> deleteResource(@Header("Authorization") String ckanApiKey, @Body Object id);
+    Call<DefaultResponse> deleteResource(@Header("Authorization") String ckanApiKey, @Body Object id);
 
 
     /* Others */
@@ -272,6 +291,10 @@ interface CkanAPI {
 
     @GET("/api/3/action/tag_list")
     Call<TagListResponse> getTags(@Query("all_fields") boolean all_fields);
+
+    @GET("/api/3/action/organization_list")
+    Call<OrganizationListResponse> getOrganizations(@Query("all_fields") boolean all_fields);
+
 }
 
 
@@ -292,4 +315,10 @@ class ResourceResponse extends CkanResponse {
 }
 class OrganizationResponse extends CkanResponse {
     public CkanOrganization result;
+}
+class OrganizationListResponse extends CkanResponse {
+    public List<CkanOrganization> result;
+}
+class DefaultResponse extends CkanResponse {
+    public Object result;
 }

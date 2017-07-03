@@ -7,6 +7,7 @@ import org.ozwillo.dcexporter.dao.SynchronizerAuditLogRepository;
 import org.ozwillo.dcexporter.model.Ckan.CkanDataset;
 import org.ozwillo.dcexporter.model.DcModelMapping;
 import org.ozwillo.dcexporter.model.SynchronizerAuditLog;
+import org.ozwillo.dcexporter.model.SynchronizerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +47,8 @@ public class SynchronizerService {
                 SynchronizerAuditLog auditLog =
                         synchronizerAuditLogRepository.findFirstByTypeOrderByDateDesc(dcModelMapping.getType());
 
-                if ((auditLog != null && auditLog.isSucceeded()) &&
-                        !datacoreService.hasMoreRecentResources(dcModelMapping.getProject(), dcModelMapping.getType(), auditLog.getDate())) {
+                if ((auditLog != null && auditLog.getStatus().equals(SynchronizerStatus.SUCCEEDED)) &&
+                    !datacoreService.hasMoreRecentResources(dcModelMapping.getProject(), dcModelMapping.getType(), auditLog.getDate())) {
                     LOGGER.info("No more recent resources for {}, returning", dcModelMapping.getType());
                     return;
                 }
@@ -57,10 +58,11 @@ public class SynchronizerService {
                 SynchronizerAuditLog newAuditLog;
                 try {
                     this.sync(dcModelMapping);
-                    newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), true, null,  DateTime.now());
+                    newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.SUCCEEDED, null,  DateTime.now());
                     synchronizerAuditLogRepository.save(newAuditLog);
                 } catch (Exception exception) {
-                    newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), false, exception.getMessage(),  DateTime.now());
+                    LOGGER.error("Error while trying to synchronize model {} : {} ", exception.getMessage());
+                    newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.FAILED, exception.getMessage(),  DateTime.now());
                     synchronizerAuditLogRepository.save(newAuditLog);
                 }
             });
@@ -88,7 +90,8 @@ public class SynchronizerService {
 
     private void sync(DcModelMapping dcModelMapping) throws Exception {
         Map<String, Optional<String>> optionalResourceFiles =
-                datacoreService.exportResource(dcModelMapping.getProject(), dcModelMapping.getType(), dcModelMapping.getExcludedFields());
+                datacoreService.exportResource( dcModelMapping.getProject(), dcModelMapping.getType(), dcModelMapping.getExcludedFields(),
+                                                dcModelMapping.getAddressField(), dcModelMapping.getPostalCodeField(), dcModelMapping.getCityField());
 
         if (!optionalResourceFiles.get("csv").isPresent()) {
             LOGGER.error("Did not get the resource's CSV file, stopping");

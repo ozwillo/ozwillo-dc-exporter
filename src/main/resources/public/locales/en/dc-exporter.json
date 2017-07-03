@@ -26,15 +26,15 @@
 
         "notif": {
             "no_data": "No dataset",
-            "no_data_sort": "No dataset",
             "is_deleted": "Resource is deleted"
         },
 
         "sort": {
             "all": "All",
-            "valid": "Valid",
-            "error": "Error",
-            "pending": "Pending"
+            "SUCCEEDED": "Succeeded",
+            "FAILED": "Failed",
+            "PENDING": "Pending",
+            "MODIFIED": "Modified"
         },
 
         "panel": {
@@ -48,7 +48,7 @@
 
     "delete_confirmation" : {
         "title": "Deletion",
-        "message" : "You will delete this resource synchronization :"
+        "message" : "You will delete this resource synchronization: "
     },
 
     "dataset":{
@@ -62,6 +62,7 @@
                 "fetch_datasets": "Error while trying to fetch datasets from CKAN",
                 "fetch_licences": "Error while trying to fetch licenses from CKAN",
                 "fetch_tags": "Error while trying to fetch tags from CKAN",
+                "fetch_organizations": "Error while trying to fetch organizations from CKAN",
                 "create_dataset": "Error while trying to create dataset to CKAN",
                 "create_resource": "Error while trying to create resource to CKAN",
                 "update_resource": "Error while trying to update resource to CKAN"
@@ -70,7 +71,8 @@
         "panel": {
             "datacore": "Data core",
             "dataset": "Dataset",
-            "resource": "Resource"
+            "resource": "Resource",
+            "geocoding": "Geocoding"
         },
         "label": {
             "model": "Model",
@@ -80,8 +82,13 @@
             "description": "Description",
             "source": "Source",
             "license": "License",
+            "organization": "Organization",
             "tags": "Tags",
-            "resource_name": "Resource Name"
+            "resource_name": "Resource Name",
+            "address_field": "Address field",
+            "city_field": "City field",
+            "postal_code_field": "Postal code field",
+            "geo_location": "Geo location"
         }
     }
 }

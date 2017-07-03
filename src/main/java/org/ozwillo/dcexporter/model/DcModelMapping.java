@@ -38,6 +38,8 @@ public class DcModelMapping {
     private String notes;
     private List<CkanTag> tags;
     private String license;
+    @JsonProperty
+    private String organizationId;
     private String source;
     private String version;
     private String ckanPackageId;
@@ -45,6 +47,10 @@ public class DcModelMapping {
     private List<String> excludedFields;
     private boolean isDeleted;
     private String url;
+    private String addressField;
+    private String postalCodeField;
+    private String cityField;
+    private Object geoLocation;
 
 
     public DcModelMapping() {
@@ -144,6 +150,36 @@ public class DcModelMapping {
     public void setUrl(String url) {
         this.url = url;
     }
+    public String getAddressField() {
+        return addressField;
+    }
+    public void setAddressField(String addressField) {
+        this.addressField = addressField;
+    }
+    public String getPostalCodeField() {
+        return postalCodeField;
+    }
+    public void setPostalCodeField(String postalCodeField) {
+        this.postalCodeField = postalCodeField;
+    }
+    public String getCityField() {
+        return cityField;
+    }
+    public void setCityField(String cityField) {
+        this.cityField = cityField;
+    }
+    public String getOrganizationId() {
+        return organizationId;
+    }
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+    }
+    public Object getGeoLocation() {
+        return geoLocation;
+    }
+    public void setGeoLocation(Object geoLocation) {
+        this.geoLocation = geoLocation;
+    }
 
     @Override
     public String toString() {
@@ -160,6 +196,9 @@ public class DcModelMapping {
                 ", source='" + source + '\'' +
                 ", version='" + version + '\'' +
                 ", ckanPackageId='" + ckanPackageId + '\'' +
+                ", adressField='" + addressField + '\'' +
+                ", adressField='" + postalCodeField + '\'' +
+                ", adressField='" + cityField + '\'' +
                 '}';
     }
 }

@@ -1,10 +1,13 @@
 package org.ozwillo.dcexporter.service;
 
 import javaslang.control.Either;
+import org.joda.time.DateTime;
 import org.ozwillo.dcexporter.dao.DcModelMappingRepository;
 import org.ozwillo.dcexporter.dao.SynchronizerAuditLogRepository;
+import org.ozwillo.dcexporter.model.Ckan.CkanOrganization;
 import org.ozwillo.dcexporter.model.Ckan.CkanResource;
 import org.ozwillo.dcexporter.model.DcModelMapping;
+import org.ozwillo.dcexporter.model.SynchronizerStatus;
 import org.ozwillo.dcexporter.model.ui.AuditLogWapper;
 import org.ozwillo.dcexporter.model.SynchronizerAuditLog;
 import org.ozwillo.dcexporter.model.Ckan.CkanDataset;
@@ -12,7 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -60,14 +65,35 @@ public class DcModelMappingService {
         dcModelMapping.setUrl(ckanDataset.getName());
         dcModelMapping.setCkanResourceId(ckanResourcesId);
         dcModelMapping.setDeleted(false);
+        dcModelMapping.setOrganizationId(ckanDataset.getOrganization().getId());
 
         dcModelMapping = dcModelMappingRepository.save(dcModelMapping);
+        SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.PENDING, null,  DateTime.now());
+        synchronizerAuditLogRepository.save(newAuditLog);
         return Either.right(dcModelMapping);
     }
 
     public Either<String, DcModelMapping> edit(DcModelMapping dcModelMapping) {
 
-        if (dcModelMappingRepository.findByDcId(dcModelMapping.getDcId()) == null) return Either.left("dataset.notif.not_exist");
+        DcModelMapping oldDcModelMapping = dcModelMappingRepository.findByDcId(dcModelMapping.getDcId());
+
+        if(oldDcModelMapping == null) return Either.left("dataset.notif.not_exist");
+
+        SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.MODIFIED, null,  DateTime.now());
+        synchronizerAuditLogRepository.save(newAuditLog);
+        dcModelMappingRepository.save(dcModelMapping);
+
+        if(!oldDcModelMapping.getName().equals(dcModelMapping.getName())){
+            dcModelMapping.getCkanResourceId().forEach((key,resourceId) -> {
+                ckanService.deleteResource(resourceId);
+            });
+            dcModelMapping.setUrl("");
+            dcModelMapping.setCkanPackageId("");
+            dcModelMapping.setCkanResourceId(new HashMap<>());
+            Either<String, DcModelMapping> eitherDcModelMapping = this.add(dcModelMapping);
+            if(eitherDcModelMapping.isLeft()) return Either.left(eitherDcModelMapping.getLeft());
+            return Either.right(eitherDcModelMapping.get());
+        }
 
         Either<String, CkanDataset> eitherDataset = ckanService.getOrCreateDataset(dcModelMapping);
         if(eitherDataset.isLeft()) return Either.left(eitherDataset.getLeft());
@@ -84,6 +110,7 @@ public class DcModelMappingService {
         dcModelMapping.setCkanPackageId(ckanDataset.getId());
         dcModelMapping.setUrl(ckanDataset.getName());
         dcModelMapping.setCkanResourceId(ckanResourcesId);
+        dcModelMapping.setOrganizationId(ckanDataset.getOrganization().getId());
 
         dcModelMapping = dcModelMappingRepository.save(dcModelMapping);
         return Either.right(dcModelMapping);
@@ -91,12 +118,22 @@ public class DcModelMappingService {
     }
 
     public List<AuditLogWapper> getAllAuditLogWithModel() {
-        return dcModelMappingRepository.findAllByOrderByResourceNameAsc().stream().map(dcModelMapping -> {
-            SynchronizerAuditLog auditLog =
-                    synchronizerAuditLogRepository.findFirstByTypeOrderByDateDesc(dcModelMapping.getType());
-            String datasetUrl = ckanUrl  + "/dataset/" + dcModelMapping.getUrl();
-            return new AuditLogWapper(dcModelMapping, auditLog, datasetUrl);
-        }).collect(Collectors.toList());
+        List<DcModelMapping> dcModelMappings = dcModelMappingRepository.findAll();
+        dcModelMappings.sort(Comparator.comparing(DcModelMapping::getResourceName, String.CASE_INSENSITIVE_ORDER));
+        return dcModelMappings.stream()
+                .map(dcModelMapping -> {
+                    SynchronizerAuditLog auditLog = synchronizerAuditLogRepository.findFirstByTypeOrderByDateDesc(dcModelMapping.getType());
+                    String datasetUrl = ckanUrl  + "/dataset/" + dcModelMapping.getUrl();
+                    String organizationName = "";
+                    if (!StringUtils.isEmpty(dcModelMapping.getOrganizationId()) ) {
+                        Either<String, CkanOrganization> eitherOrganization = ckanService.getOrganization(dcModelMapping.getOrganizationId());
+                        if (eitherOrganization.isRight()) {
+                            organizationName = eitherOrganization.get().getDisplayName();
+                        }
+                    }
+                    return new AuditLogWapper(dcModelMapping, auditLog, datasetUrl, organizationName);
+                })
+                .collect(Collectors.toList());
     }
 
     public Either<String, DcModelMapping> deleteById(String id) {

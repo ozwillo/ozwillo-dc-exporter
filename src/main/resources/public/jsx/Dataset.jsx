@@ -4,6 +4,7 @@ import { browserHistory } from 'react-router';
 import { translate } from 'react-i18next'
 
 import DatasetForm from './DatasetForm'
+import GeocodingForm from './GeocodingForm'
 import { Form, FormGroup, Label, SelectField, InputText, Textarea, SubmitButton, Alert, ReadOnlyField, Checkbox } from './Form'
 
 class Dataset extends React.Component {
@@ -17,6 +18,7 @@ class Dataset extends React.Component {
             datasetFetched: false,
             newDataset: false,
             licenses: {},
+            organizations:[],
             message: '',
             success: true,
             mode: 'create',
@@ -30,11 +32,16 @@ class Dataset extends React.Component {
                 ckanPackageId: '',
                 name: '',
                 notes: '',
+                organizationId:'',
                 description: '',
                 license: '',
                 source: '',
                 tags: [],
-                excludedFields: []
+                excludedFields: [],
+                addressField: '',
+                postalCodeField: '',
+                cityField: '',
+                geoLocation: {}
             }
         }
 
@@ -70,6 +77,13 @@ class Dataset extends React.Component {
             .then(this.checkStatus)
             .then(response => response.json())
             .then(json => this.setState({licenses: json}))
+            .catch(error => {
+                error.text().then(text => { this.onChangeNotif(false, text) })
+            })
+        fetch('/api/ckan/organizations', {credentials: 'same-origin'})
+            .then(this.checkStatus)
+            .then(response => response.json())
+            .then(json => this.setState({organizations: json}))
             .catch(error => {
                 error.text().then(text => { this.onChangeNotif(false, text) })
             })
@@ -183,8 +197,9 @@ class Dataset extends React.Component {
                           checked={!this.state.fields.excludedFields.includes(field['dcmf:name'])}/>)
             : null
 
-        const disabled = this.state.fields.name == null || this.state.fields.name == '' ? true
-            : false
+        const disabled = this.state.fields.name == null || this.state.fields.name == '' ||
+                         this.state.fields.resourceName == null || this.state.fields.resourceName == '' ||
+                         ((this.state.fields.organizationId == null || this.state.fields.organizationId == '') && this.state.newDataset)
 
         const isModeCreate = renderIf(this.state.mode == 'create')
         const isModeUpdate = renderIf(this.state.mode == 'update')
@@ -230,6 +245,14 @@ class Dataset extends React.Component {
                     </div>
                     {renderIf(this.state.fields.dcId)(
                         <div>
+                            {renderIf(this.state.datasetFetched)(
+                                <GeocodingForm onFieldChange={this.onFieldChange}
+                                               globalFields={this.state.dataset['dcmo:globalFields']}
+                                               addressField={this.state.fields.addressField}
+                                               postalCodeField={this.state.fields.postalCodeField}
+                                               cityField={this.state.fields.cityField} />
+                            )}
+
                             <DatasetForm onChange={this.onFieldChange}
                                          onDatasetNameChange={this.onDatasetNameChange}
                                          onFieldChange={this.onFieldChange}
@@ -241,7 +264,10 @@ class Dataset extends React.Component {
                                          licenses={this.state.licenses}
                                          license={this.state.fields['license']}
                                          tags={this.state.fields.tags}
-                                         onChangeNotif={this.onChangeNotif} />
+                                         organizations={this.state.organizations}
+                                         organizationId={this.state.fields['organizationId']}
+                                         onChangeNotif={this.onChangeNotif}
+                                         geoLocation={this.state.fields.geoLocation}/>
 
                             <div className="panel panel-default">
                                 <div className="panel-heading">
@@ -301,6 +327,5 @@ DatasetChooser.propTypes = {
 Dataset.PropTypes = {
     onSubmit: React.PropTypes.func.isRequired
 }
-
 
 export default translate(['dc-exporter'])(Dataset)

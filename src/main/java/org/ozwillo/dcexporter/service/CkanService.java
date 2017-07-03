@@ -1,5 +1,7 @@
 package org.ozwillo.dcexporter.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javaslang.control.Either;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
@@ -11,12 +13,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.text.Normalizer;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,6 +57,20 @@ public class CkanService {
         return Either.right(result);
     }
 
+    public Either<String, List<CkanOrganization>> getOrganizations() {
+        Optional<List<CkanOrganization>> opt = ckanClientService.getOrganizationList(ckanUrl);
+        if(!opt.isPresent()) return Either.left("dataset.notif.error.fetch_organizations");
+
+        return Either.right(opt.get());
+    }
+
+    public Either<String, CkanOrganization> getOrganization(String OrganizationId) {
+        Optional<CkanOrganization> opt = ckanClientService.getOrganization(ckanUrl,OrganizationId);
+        if(!opt.isPresent()) return Either.left("dataset.notif.error.fetch_organizations");
+
+        return Either.right(opt.get());
+    }
+
     public Either<String, List<CkanTag>> getTags() {
         Optional<List<CkanTag>> opt = ckanClientService.getTagList(ckanUrl);
         if(!opt.isPresent()) return Either.left("dataset.notif.error.fetch_tags");
@@ -66,14 +80,17 @@ public class CkanService {
 
     public Either<String, CkanDataset> getOrCreateDataset(DcModelMapping dcModelMapping) {
         Optional<CkanDataset> optGet = null;
-        if (dcModelMapping.getCkanPackageId() != null && !dcModelMapping.getCkanPackageId().equals("")) {
+        if (!StringUtils.isEmpty(dcModelMapping.getCkanPackageId())) {
             optGet = ckanClientService.getDataset(ckanUrl, dcModelMapping.getCkanPackageId());
+        } else if (!StringUtils.isEmpty(dcModelMapping.getName())) {
+            optGet = ckanClientService.getDataset(ckanUrl, slugify(dcModelMapping.getName()));
         }
 
         if (optGet == null || !optGet.isPresent()) {
             String name = slugify(dcModelMapping.getName());
-            LOGGER.debug("Creating dataset with slug name {} ", name);
-            CkanOrganization ckanOrganization = ckanClientService.getOrganization(ckanUrl, "ozwillo").get() ;
+            String organizationId = dcModelMapping.getOrganizationId();
+            LOGGER.debug("Creating dataset with slug name {} and for organization {} ", name,organizationId);
+            CkanOrganization ckanOrganization = ckanClientService.getOrganization(ckanUrl, organizationId).get() ;
             CkanDataset ckanDataset = new CkanDataset(name);
             ckanDataset.setOrganization(ckanOrganization);
             ckanDataset.setMaintainer("ozwillo");
@@ -88,6 +105,18 @@ public class CkanService {
             ckanDataset.setVersion(dcModelMapping.getVersion());
             ckanDataset.setTags(dcModelMapping.getTags());
             ckanDataset.setPrivate(false);
+            if (dcModelMapping.getGeoLocation() != null) {
+                List<CkanExtra> ckanExtras = new ArrayList<>();
+                ObjectMapper mapperObj = new ObjectMapper();
+                try {
+                    String spatialJson = mapperObj.writeValueAsString(dcModelMapping.getGeoLocation());
+                    CkanExtra geoLocation = new CkanExtra("spatial", spatialJson);
+                    ckanExtras.add(geoLocation);
+                    ckanDataset.setExtras(ckanExtras);
+                } catch (JsonProcessingException e) {
+                    LOGGER.error("Writing spatial dataset values as string failed : {}", e.getMessage());
+                }
+            }
 
             Optional<CkanDataset> optCreate = ckanClientService.createDataset(ckanUrl, ckanApiKey, ckanDataset);
             if(!optCreate.isPresent()) return Either.left("dataset.notif.error.create_dataset");
@@ -137,7 +166,14 @@ public class CkanService {
             DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateHourMinuteSecondMillis();
             ckanResource.setLastModified(dateTimeFormatter.print(LocalDateTime.now()));
 
-            ckanClientService.updateResourceFile(ckanUrl, ckanApiKey, ckanResource);
+            Optional<ResourceResponse> resourceResponseOptional = ckanClientService.updateResourceFile(ckanUrl, ckanApiKey, ckanResource);
+            if(resourceResponseOptional.isPresent()) {
+                ResourceResponse updateResourceResponse = resourceResponseOptional.get();
+                if(!updateResourceResponse.isSuccess()) LOGGER.error("Error while trying to update {} file resource {} to CKAN : {} ", key, dcModelMapping.getResourceName(), updateResourceResponse.getError().getMessage());
+                else LOGGER.info("{} file resource {} is updated in CKAN : {} ", key, dcModelMapping.getResourceName(), updateResourceResponse.result.getName());
+            } else {
+                LOGGER.info("No CKAN response while trying to update {} file of resource {}", key, dcModelMapping.getResourceName());
+            }
         });
     }
 

@@ -61,19 +61,29 @@ class Panel extends Component {
     render() {
         const { t } = this.context
         const log = this.props.log
+        const panelCssStatus = {
+            'SUCCEEDED': 'panel-success',
+            'FAILED': 'panel-danger',
+            'PENDING': 'panel-warning',
+            'MODIFIED': 'panel-warning',
+            '': 'panel-warning'
+        }
+        const glyphiconCssStatus = {
+            'SUCCEEDED': 'glyphicon-ok',
+            'FAILED': 'glyphicon-warning-sign',
+            'PENDING': 'glyphicon-time',
+            'MODIFIED': 'glyphicon-time',
+            '': 'glyphicon-time'
+        }
+
         return (
-            <div className={'panel' + (!log.synchronizerAuditLog ? ' panel-warning' : log.synchronizerAuditLog.succeeded ? ' panel-success' : ' panel-danger')}>
+            <div className={'panel ' + panelCssStatus[log.synchronizerAuditLog.status]}>
                 <div className="panel-heading">
                     <div className="row">
                         <div className="col-md-6">
                             <h3 className="panel-title">
                                 {log.dcModelMapping.resourceName}
-                                {log.synchronizerAuditLog &&
-                                <span className={'glyphicon' + (log.synchronizerAuditLog.succeeded ? ' glyphicon-ok' : ' glyphicon-warning-sign')} aria-hidden="true"></span>
-                                }
-                                {!log.synchronizerAuditLog &&
-                                <span className="text-right glyphicon glyphicon-time"></span>
-                                }
+                                <span className={'glyphicon ' + glyphiconCssStatus[log.synchronizerAuditLog.status] } aria-hidden="true"></span>
                             </h3>
                         </div>
                         <div className="col-md-6">
@@ -91,30 +101,33 @@ class Panel extends Component {
                 </div>
                 <ul className="list-group">
                     <li className="list-group-item">
-                        <label className="col-sm-3 control-label">{ t('dashboard.panel.dataset_name') }</label>{log.dcModelMapping.name}
+                        <label className="col-sm-4 control-label">{ t('dashboard.panel.dataset_name') }</label>{log.dcModelMapping.name}
                     </li>
                     <li className="list-group-item">
-                        <label className="col-sm-3 control-label">{ t('dashboard.panel.dcmodel_name') }</label>{log.dcModelMapping.type}
+                        <label className="col-sm-4 control-label">{ t('dashboard.panel.dcmodel_name') }</label>{log.dcModelMapping.type}
                     </li>
+                    {renderIf(log.dcModelMapping.organizationId != '' && log.dcModelMapping.organizationId != null) (
+                    <li className="list-group-item">
+                        <label className="col-sm-4 control-label">{ t('dashboard.panel.organization_name') }</label>{log.organizationName}
+                    </li> )}
                     {(log.synchronizerAuditLog) &&
                     <li className="list-group-item">
-                        <label className="col-sm-3 control-label">{ t('dashboard.panel.synchronization_date') }
+                        <label className="col-sm-4 control-label">{ t('dashboard.panel.synchronization_date') }
                             </label>{new Date(log.synchronizerAuditLog.date).toLocaleString()}
                     </li>
                     }
-                    {(log.synchronizerAuditLog && !log.synchronizerAuditLog.succeeded) &&
+                    {(log.synchronizerAuditLog.status == "FAILED" && log.synchronizerAuditLog.errorMessage) &&
                     <li className="list-group-item">
-                        <label className="col-sm-3 control-label">{ t('data.message') }</label>{log.synchronizerAuditLog.errorMessage}
+                        <label className="col-sm-4 control-label">{ t('data.message') }</label>{log.synchronizerAuditLog.errorMessage}
                     </li>
                     }
                 </ul>
-                {renderIf(this.state.showActionButton) (
-                    <ConfirmActionButton
-                        content={t('delete_confirmation.message') + log.dcModelMapping.resourceName}
-                        onConfirm={ this.deleteMapping }
-                        confirmLabel={ t('delete_confirmation.title') }
-                        onHide={ this.returnConfirmAction }/>
-                )}
+                <ConfirmActionButton
+                    content={t('delete_confirmation.message') + log.dcModelMapping.resourceName}
+                    onConfirm={ this.deleteMapping }
+                    confirmLabel={ t('delete_confirmation.title') }
+                    onHide={ this.returnConfirmAction }
+                    show={this.state.showActionButton} />
             </div>
         )
     }

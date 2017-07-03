@@ -17,6 +17,11 @@ public class CkanExtra {
     public CkanExtra() {
     }
 
+    public CkanExtra(String key, String value) {
+        this.key = key;
+        this.value = value;
+    }
+
     public CkanExtra(String id, String key, String value, String state, String revisionId, String groupId) {
         this.id = id;
         this.key = key;

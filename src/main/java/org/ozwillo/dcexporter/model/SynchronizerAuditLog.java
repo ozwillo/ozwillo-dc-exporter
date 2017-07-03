@@ -17,7 +17,7 @@ public class SynchronizerAuditLog {
 
     @NotNull
     @NotEmpty
-    private boolean succeeded;
+    private SynchronizerStatus status;
 
     @NotNull
     @NotEmpty
@@ -30,9 +30,9 @@ public class SynchronizerAuditLog {
     public SynchronizerAuditLog() {
     }
 
-    public SynchronizerAuditLog(String type, boolean succeeded, String errorMessage, DateTime date) {
+    public SynchronizerAuditLog(String type, SynchronizerStatus status, String errorMessage, DateTime date) {
         this.type = type;
-        this.succeeded = succeeded;
+        this.status = status;
         this.errorMessage = errorMessage;
         this.date = date;
     }
@@ -45,8 +45,8 @@ public class SynchronizerAuditLog {
         return type;
     }
 
-    public boolean isSucceeded() {
-        return succeeded;
+    public SynchronizerStatus getStatus() {
+        return status;
     }
 
     public String getErrorMessage() {
@@ -62,7 +62,7 @@ public class SynchronizerAuditLog {
         return "SynchronizerAuditLog{" +
             "id='" + id + '\'' +
             ", type='" + type + '\'' +
-            ", succeeded=" + succeeded + '\'' +
+            ", succeeded=" + status + '\'' +
             ", errorMessage='" + errorMessage + '\'' +
             ", date=" + date +
             '}';
