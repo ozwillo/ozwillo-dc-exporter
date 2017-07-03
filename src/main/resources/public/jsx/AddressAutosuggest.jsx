@@ -26,7 +26,7 @@ export default class AddressAutosuggest extends React.Component {
         this.setState({ value: newValue })
     }
     onSuggestionsFetchRequested = ({ value }) => {
-        fetch('http://nominatim.openstreetmap.org/search?q=' + value + ',france&format=json&polygon_json=1', {credentials: 'same-origin'})
+        fetch('https://nominatim.openstreetmap.org/search?q=' + value + ',france&format=json&polygon_json=1', {credentials: 'same-origin'})
             .then(response => response.json())
             .then(json => {
                 this.setState({ suggestions: json.filter(suggestion => suggestion.type == 'administrative') })
@@ -37,7 +37,7 @@ export default class AddressAutosuggest extends React.Component {
     }
     onSuggestionSelected = (event, { suggestion }) => {
         this.setState({ value: suggestion.display_name })
-        this.props.onFieldChange( 'geoLocation', {"type": "Point", "coordinates": [suggestion.lon, suggestion.lat]} )
+        this.props.onFieldChange( 'geoLocation', {"type": "Point", "coordinates": [parseFloat(suggestion.lon), parseFloat(suggestion.lat)]} )
     }
     render() {
         const inputProps = {

@@ -19,7 +19,7 @@ apply plugin: 'spring-boot'
 
 jar {
 	baseName = 'ozwillo-dc-exporter'
-	version = '0.10.0'
+	version = '0.11.0-rc3'
 }
 
 sourceCompatibility = 1.8
@@ -100,3 +100,4 @@ task frontBundle(type: NpmTask) {
 
 assemble.dependsOn(frontBundle)
 frontBundle.dependsOn(npmInstall)
+jar.dependsOn(frontBundle)
