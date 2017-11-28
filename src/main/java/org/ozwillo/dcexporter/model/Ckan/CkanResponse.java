@@ -1,5 +1,8 @@
 package org.ozwillo.dcexporter.model.Ckan;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CkanResponse {
 
     private String help;
