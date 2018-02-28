@@ -52,6 +52,7 @@
     "webpack-merge": "^0.14.1"
   },
   "dependencies": {
+    "bootstrap": "^4.0.0",
     "bootstrap-sass": "^3.3.7",
     "debounce": "^1.0.0",
     "es6-promise": "^3.2.1",
@@ -64,7 +65,6 @@
     "jquery": "^3.1.0",
     "react": "^15.3.0",
     "react-autosuggest": "^8.0.0",
-    "react-bootstrap": "^0.30.7",
     "react-dom": "^15.3.0",
     "react-i18next": "^2.2.3",
     "react-router": "^2.6.1",

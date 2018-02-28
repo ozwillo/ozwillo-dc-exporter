@@ -1,5 +1,5 @@
 import React, {Component} from "react"
-import { Modal, Button } from 'react-bootstrap'
+import { Modal, Button } from 'bootstrap'
 import { translate } from 'react-i18next'
 
 

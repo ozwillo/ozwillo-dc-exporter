@@ -1,6 +1,6 @@
 import React from 'react'
 import renderIf from 'render-if'
-import { DropdownButton, MenuItem } from 'react-bootstrap'
+import { DropdownButton, MenuItem } from 'bootstrap'
 import { translate } from 'react-i18next'
 
 import { ContainerPanel, PanelGroup, Panel } from './Panel'
