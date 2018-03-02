@@ -37,13 +37,18 @@
             "MODIFIED": "Modifiés"
         },
 
-        "panel": {
+        "list": {
             "to_dataset_link": "Voir le jeu de données",
             "to_resource_link": "Voir la ressource",
             "dataset_name": "Nom du jeu de données",
             "dcmodel_name": "Modèle du cœur de données",
             "organization_name": "Organisation",
-            "synchronization_date": "Date de synchronisation"
+            "date": "Date",
+            "actions": "actions",
+            "SUCCEEDED": "réussi",
+            "FAILED": "échoué",
+            "PENDING": "en cours",
+            "MODIFIED": "modifié"
         }
     },
 
@@ -53,7 +58,7 @@
     },
 
     "dataset":{
-        "title": "Enregistrement d'un jeu de données",
+        "title": "Création d'un jeu de données",
         "notif": {
             "is_created": "Le jeu de données a été créé",
             "not_exist": "Ce jeu de données n'existe pas",

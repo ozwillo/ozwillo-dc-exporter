@@ -18,7 +18,7 @@ const devEntryPointsLoadersAndServers = ['webpack-dev-server/client?http://local
 const common = {
     entry: [
         PATHS.style,
-        path.join(PATHS.app, 'jsx/App.jsx')].concat(commonEntryPointsLoadersAndServers),
+        path.join(PATHS.app, 'jsx/App.jsx')],
     output: {
         path: PATHS.build,
         filename: 'bundle.js',
@@ -43,12 +43,6 @@ const common = {
             { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'file-loader' },
             /* loader for JSX / ES6 */
             { test: /\.jsx?$/, loaders: ['react-hot', 'babel?cacheDirectory,presets[]=react,presets[]=es2015,presets[]=stage-0'], include: path.join(PATHS.app, 'jsx')}
-        ],
-        rules: [
-            {
-                test: /\.css$/,
-                use: ['style-loader', 'css-loader']
-            }
         ]
     },
     postcss: [ autoprefixer ],
@@ -79,11 +73,7 @@ if(TARGET === 'start' || !TARGET) {
             loaders: [
                 {test: /\.css$/, loaders: ['style', 'css', 'postcss'], include: path.join(PATHS.app, 'styles')},
                 /* loaders for Bootstrap */
-                {test: /\.scss$/, loaders: ['style', 'css', 'postcss', 'sass'], include: path.join(PATHS.app, 'styles')},
-                {
-                    test: /\.css$/,
-                    loader: ExtractTextPlugin.extract({fallback: "style-loader", use: "css-loader"})
-                }
+                {test: /\.scss$/, loaders: ['style', 'css', 'postcss', 'sass'], include: path.join(PATHS.app, 'styles')}
             ]
         }
     });

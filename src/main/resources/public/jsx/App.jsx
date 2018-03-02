@@ -8,6 +8,8 @@ import Dashboard from './Dashboard'
 import Dataset from './Dataset'
 import i18n from './util/i18n'
 
+import 'bootstrap'
+
 const App = React.createClass({
     getInitialState() {
         return {
