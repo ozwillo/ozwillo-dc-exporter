@@ -1,7 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 
-import { FormGroup, Label, SelectField } from './Form'
+import { FormGroup, Label, SelectField, Fieldset } from './Form'
 
 class GeocodingForm extends React.Component {
     static propTypes = {
@@ -25,30 +25,25 @@ class GeocodingForm extends React.Component {
         )
 
         return (
-            <div className="panel panel-default">
-                <div className="panel-heading">
-                    <h3 className="panel-title">{ t('dataset.panel.geocoding') } </h3>
-                </div>
-                <div className="panel-body">
-                    <FieldChooser   id="addressField"
-                                    fieldName="address_field"
-                                    fieldContent={this.props.addressField}
-                                    onFieldChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}
-                                    options={ options } t={t} />
+            <Fieldset legend={t('dataset.panel.geocoding')}>
+                <FieldChooser   id="addressField"
+                                fieldName="address_field"
+                                fieldContent={this.props.addressField}
+                                onFieldChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}
+                                options={ options } t={t} />
 
-                    <FieldChooser   id="cityField"
-                                    fieldName="city_field"
-                                    fieldContent={this.props.cityField}
-                                    onFieldChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}
-                                    options={ options } t={t} />
+                <FieldChooser   id="cityField"
+                                fieldName="city_field"
+                                fieldContent={this.props.cityField}
+                                onFieldChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}
+                                options={ options } t={t} />
 
-                    <FieldChooser   id="postalCodeField"
-                                    fieldName="postal_code_field"
-                                    fieldContent={this.props.postalCodeField}
-                                    onFieldChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}
-                                    options={ options } t={t} />
-                </div>
-            </div>
+                <FieldChooser   id="postalCodeField"
+                                fieldName="postal_code_field"
+                                fieldContent={this.props.postalCodeField}
+                                onFieldChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}
+                                options={ options } t={t} />
+            </Fieldset>
         )
     }
 }

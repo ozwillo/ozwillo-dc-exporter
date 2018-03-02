@@ -1,10 +1,10 @@
 import React from 'react'
 import renderIf from 'render-if'
-import { DropdownButton, MenuItem } from 'react-bootstrap'
 import { translate } from 'react-i18next'
 
-import { ContainerPanel, PanelGroup, Panel } from './Panel'
+import RowDataset from './RowDataset'
 import { Alert } from './Form'
+import { H2 } from './Headings'
 
 class Dashboard extends React.Component {
     state = {
@@ -47,40 +47,43 @@ class Dashboard extends React.Component {
     render() {
         const { t } = this.context
         const filterKey = this.state.filterKey
-        const list = this.state.logs.filter(function(log) {
+        const list = this.state.logs.filter(log => {
             if( filterKey == "all" ) {
                 return log
             }
             else {
                 return log.synchronizerAuditLog.status == filterKey
             }
-        }).map(log => <Panel key={log.dcModelMapping.dcId} log={log} fetchMapping={() => this.fetchMapping() }
-                   onChangeNotif={ this.onChangeNotif } />
-        )
+        }).map((log, key) =>
+            <RowDataset
+                key={key}
+                log={log}
+                fetchMapping={() => this.fetchMapping() }
+                onChangeNotif={ this.onChangeNotif } />)
         return (
             <div id="container" className="container">
-                <h1>{ t('dashboard.title') }</h1>
+                <H2>{ t('dashboard.title') }</H2>
                 {renderIf(this.state.message)(
                     <Alert message={ t(this.state.message) } success={this.state.success} closeMethod={this.closeNotif}/>
                 )}
                 {renderIf(this.state.logs.length > 0) (
                     <div>
-                        <div className="filter-dropdown text-right" >
-                            <DropdownButton title={ t(this.state.filterValue) } onSelect={(eventKey) => this.onChangeFilter(eventKey)} id="filter-dropdown" pullRight={true}>
-                                <MenuItem eventKey={'all'} >{ t('dashboard.sort.all') }</MenuItem>
-                                <MenuItem eventKey={'SUCCEEDED'} >{ t('dashboard.sort.SUCCEEDED') }</MenuItem>
-                                <MenuItem eventKey={'FAILED'}  >{ t('dashboard.sort.FAILED') }</MenuItem>
-                                <MenuItem eventKey={'PENDING'} >{ t('dashboard.sort.PENDING') }</MenuItem>
-                                <MenuItem eventKey={'MODIFIED'} >{ t('dashboard.sort.MODIFIED') }</MenuItem>
-                            </DropdownButton>
-                        </div>
                         <div className="wrap-result">
                             {renderIf(list.length > 0) (
-                                <div>
-                                    <ContainerPanel>
-                                        <PanelGroup>{list}</PanelGroup>
-                                    </ContainerPanel>
-                                </div>
+                                <table className="table table-sm">
+                                    <thead className="thead-dark">
+                                    <tr>
+                                        <th>{t('dataset.label.name')}</th>
+                                        <th>{t('dashboard.list.dataset_name')}</th>
+                                        <th>{t('dashboard.list.dcmodel_name')}</th>
+                                        <th>{t('dashboard.list.date')}</th>
+                                        <th>{t('dashboard.list.actions')}</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        {list}
+                                    </tbody>
+                                </table>
                             )}
                             {renderIf(list.length == 0) (
                                 <div className="alert alert-info" role="alert">
