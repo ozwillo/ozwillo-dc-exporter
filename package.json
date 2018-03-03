@@ -54,6 +54,7 @@
   "dependencies": {
     "bootstrap": "^4.0.0",
     "bootstrap-sass": "^3.3.7",
+    "date-fns": "^1.29.0",
     "debounce": "^1.0.0",
     "es6-promise": "^3.2.1",
     "exports-loader": "^0.6.3",

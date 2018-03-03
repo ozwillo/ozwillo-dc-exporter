@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router'
 import { translate } from 'react-i18next'
+import format from 'date-fns/format'
 
 import ConfirmActionButton from './ConfirmActionButton'
 
@@ -78,7 +79,7 @@ class RowDataset extends Component {
                     {log.dcModelMapping.type}
                 </td>
                 <td>
-                    {new Date(log.synchronizerAuditLog.date).toLocaleString()}
+                    {format(new Date(log.synchronizerAuditLog.date), "DD/MM/YYYY HH:mm")}
                 </td>
                 <td>
                     <Link className="btn btn-sm btn-outline-primary mr-sm-1" to={`/dataset/${log.dcModelMapping.id}`}>
