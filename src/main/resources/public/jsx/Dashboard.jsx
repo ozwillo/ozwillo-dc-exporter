@@ -61,7 +61,7 @@ class Dashboard extends React.Component {
                 fetchMapping={() => this.fetchMapping() }
                 onChangeNotif={ this.onChangeNotif } />)
         return (
-            <div id="container" className="container">
+            <div id="container" className="container-fluid">
                 <H2>{ t('dashboard.title') }</H2>
                 {renderIf(this.state.message)(
                     <Alert message={ t(this.state.message) } success={this.state.success} closeMethod={this.closeNotif}/>
