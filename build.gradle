@@ -49,10 +49,9 @@ dependencies {
 	compile('org.springframework.session:spring-session')
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.boot:spring-boot-starter-websocket')
+	compile('joda-time:joda-time:2.9.9')
 	compile('io.javaslang:javaslang:2.0.4')
-
-    compile project('ozwillo-java-spring-integration')
-
+    compile('com.ozwillo:ozwillo-java-spring-integration:1.25.7')
 	compile('com.github.ben-manes.caffeine:caffeine:2.3.5')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
