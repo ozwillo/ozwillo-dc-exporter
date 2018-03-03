@@ -32,7 +32,7 @@
         "sort": {
             "all": "Tous",
             "SUCCEEDED": "Réussis",
-            "FAILED": "En échecs",
+            "FAILED": "En échec",
             "PENDING": "En cours",
             "MODIFIED": "Modifiés"
         },
@@ -44,7 +44,7 @@
             "dcmodel_name": "Modèle du cœur de données",
             "organization_name": "Organisation",
             "date": "Date",
-            "actions": "actions",
+            "actions": "Actions",
             "SUCCEEDED": "réussi",
             "FAILED": "échoué",
             "PENDING": "en cours",
@@ -54,7 +54,7 @@
 
     "delete_confirmation" : {
         "title": "Suppression",
-        "message" : "Vous êtes sur le point de supprimer la synchronisation de la ressource: "
+        "message" : "Vous êtes sur le point de supprimer la synchronisation de la ressource {{ name }}"
     },
 
     "dataset":{
