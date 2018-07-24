@@ -1,7 +1,9 @@
 package org.ozwillo.dcexporter.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
+import org.ozwillo.dcexporter.config.CustomDateTimeSerializer;
 import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.NotNull;
@@ -25,6 +27,7 @@ public class SynchronizerAuditLog {
 
     @NotNull
     @NotEmpty
+    @JsonSerialize(using = CustomDateTimeSerializer.class)
     private DateTime date;
 
     public SynchronizerAuditLog() {

@@ -1,46 +1,16 @@
-span.glyphicon {
-    margin-left: 0.5rem;
+@import "custom";
+@import "~bootstrap/scss/bootstrap";
+@import "App";
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
 }
 
-#tag{
-    display: inline-block;
-    margin: 5px 5px 0px 0px;
+input {
+    font-family: 'Roboto', sans-serif;
 }
-.remove-tag{
-    cursor: pointer;
-    cursor: hand;
-}
-
-.btn-group {
-    padding-bottom: 15px;
-}
-.center-outer-div {
-  text-align: center;
-}
-.center-inner-div {
-  display: inline-block;
-}
-
-.read-only-field {
-    padding-top: 7px;
-}
-
-h1 {
-    padding-bottom: 15px;
-}
-
-.wrap-result {
-    padding-top: 10px;
-}
-
-.filter-dropdown > .dropdown {
-    padding-bottom: 0px;
-}
-
-.panel-btn {
-    margin-left: 5px;
-}
-
 
 /* React autosuggest */
 

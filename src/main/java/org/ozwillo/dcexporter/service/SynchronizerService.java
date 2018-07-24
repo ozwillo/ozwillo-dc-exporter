@@ -61,7 +61,7 @@ public class SynchronizerService {
                     newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.SUCCEEDED, null,  DateTime.now());
                     synchronizerAuditLogRepository.save(newAuditLog);
                 } catch (Exception exception) {
-                    LOGGER.error("Error while trying to synchronize model {} : {} ", exception.getMessage());
+                    LOGGER.error("Error while trying to synchronize model {} : {} ", dcModelMapping.getType(), exception.getMessage());
                     newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.FAILED, exception.getMessage(),  DateTime.now());
                     synchronizerAuditLogRepository.save(newAuditLog);
                 }

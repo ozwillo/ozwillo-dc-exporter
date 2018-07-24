@@ -8,7 +8,7 @@ const autoprefixer = require('autoprefixer');
 const TARGET = process.env.npm_lifecycle_event;
 const PATHS = {
     app: path.join(__dirname, 'src/main/resources/public'),
-    style: path.join(__dirname, 'src/main/resources/public/styles', 'index.css'),
+    style: path.join(__dirname, 'src/main/resources/public/styles', 'index.scss'),
     build: path.join(__dirname, 'src/main/resources/public/build')
 };
 
@@ -18,7 +18,7 @@ const devEntryPointsLoadersAndServers = ['webpack-dev-server/client?http://local
 const common = {
     entry: [
         PATHS.style,
-        path.join(PATHS.app, 'jsx/App.jsx')].concat(commonEntryPointsLoadersAndServers),
+        path.join(PATHS.app, 'jsx/App.jsx')],
     output: {
         path: PATHS.build,
         filename: 'bundle.js',
@@ -41,8 +41,6 @@ const common = {
             /* TODO : loaders for TWBS glyphicons ? */
             { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'url-loader?limit=10000&mimetype=application/font-woff' },
             { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'file-loader' },
-            /* to ensure jQuery is loaded before Bootstrap */
-            { test: /bootstrap-sass\/assets\/javascripts\//, loader: 'imports?jQuery=jquery' },
             /* loader for JSX / ES6 */
             { test: /\.jsx?$/, loaders: ['react-hot', 'babel?cacheDirectory,presets[]=react,presets[]=es2015,presets[]=stage-0'], include: path.join(PATHS.app, 'jsx')}
         ]
@@ -75,11 +73,7 @@ if(TARGET === 'start' || !TARGET) {
             loaders: [
                 {test: /\.css$/, loaders: ['style', 'css', 'postcss'], include: path.join(PATHS.app, 'styles')},
                 /* loaders for Bootstrap */
-                {test: /\.scss$/, loaders: ['style', 'css', 'postcss', 'sass'], include: path.join(PATHS.app, 'styles')},
-                {
-                    test: /\.scss$/,
-                    loader: ExtractTextPlugin.extract('style', 'css!sass?includePaths[]=./node_modules/bootstrap-sass/assets/stylesheets')
-                }
+                {test: /\.scss$/, loaders: ['style', 'css', 'postcss', 'sass'], include: path.join(PATHS.app, 'styles')}
             ]
         }
     });
@@ -90,7 +84,11 @@ if(TARGET === 'build' || TARGET === 'stats') {
             loaders: [
                 {test: /\.css$/, loader: ExtractTextPlugin.extract('style', 'css!postcss')},
                 /* loaders for Bootstrap */
-                {test: /\.scss$/, loader: ExtractTextPlugin.extract('style', 'css!postcss!sass')}
+                {test: /\.scss$/, loader: ExtractTextPlugin.extract('style', 'css!postcss!sass')},
+                {
+                    test: /\.css$/,
+                    loader: ExtractTextPlugin.extract({fallback: "style-loader", use: "css-loader"})
+                }
             ]
         },
         plugins: [
