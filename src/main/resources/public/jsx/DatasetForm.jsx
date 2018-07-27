@@ -72,6 +72,10 @@ class DatasetForm extends React.Component {
                     )}
                     {newDataset(
                         <div>
+                            <OrganizationChooser organizations={this.props.organizations} currentOrganizationId={this.props.organizationId}
+                                                    onChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}
+                                                    t={ t }/>
+                            
                             <FormGroup>
                                 <Label htmlFor="name" value={t('dataset.label.name')} />
                                 <Input
@@ -102,9 +106,6 @@ class DatasetForm extends React.Component {
                             <LicenceChooser licenses={this.props.licenses} currentLicense={this.props.license}
                                             onChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}
                                             t={ t }/>
-                            <OrganizationChooser organizations={this.props.organizations} currentOrganizationId={this.props.organizationId}
-                                                  onChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}
-                                                  t={ t }/>
                             <FormGroup>
                                 <Label htmlFor="tags" value={ t('dataset.label.tags') }/>
                                 <TagAutosuggest onSelect={ this.handleAddition }/>
