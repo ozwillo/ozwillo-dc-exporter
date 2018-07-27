@@ -164,7 +164,7 @@ class Dataset extends React.Component {
         })
     }
     toggleCheckbox(event){
-        let label = event.target.value
+        const label = event.target.value
         if (this.selectedCheckboxes.has(label)) {
             const index = this.state.fields.excludedFields.findIndex((excludeField) => {return excludeField==label})
             let excludeFields = this.state.fields.excludedFields
