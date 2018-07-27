@@ -92,13 +92,14 @@ const Textarea = ({ id, value, onChange }) =>
         <textarea name={id} id={id} value={value} className="form-control form-control-sm" onChange={onChange}></textarea>
     </div>
 
-const Checkbox = ({ handleCheckboxChange, label, checked }) =>
+const Checkbox = ({ handleCheckboxChange, label, value, checked }) =>
     <div className="checkbox">
         <label>
-            <input type="checkbox" value={label} checked={checked} onChange={() => handleCheckboxChange(label)} />
+            <input type="checkbox" value={value} checked={checked} onChange={(event) => handleCheckboxChange(event)} />
             {label}
         </label>
     </div>
+    
 
 const SubmitButton = ({ label, onSubmit, disabled }) =>
     <div className="form-group row">

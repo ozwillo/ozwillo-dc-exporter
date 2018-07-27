@@ -52,6 +52,7 @@ public class DcModelMapping {
     private String cityField;
     private Object geoLocation;
 
+    private boolean isPrivate;
 
     public DcModelMapping() {
     }
@@ -181,6 +182,14 @@ public class DcModelMapping {
         this.geoLocation = geoLocation;
     }
 
+    public boolean isPrivate() {
+        return isPrivate;
+	}
+
+    public void setPrivate(boolean isPrivate) {
+        this.isPrivate = isPrivate;
+	}
+
     @Override
     public String toString() {
         return "DcModelMapping{" +
@@ -199,6 +208,7 @@ public class DcModelMapping {
                 ", adressField='" + addressField + '\'' +
                 ", adressField='" + postalCodeField + '\'' +
                 ", adressField='" + cityField + '\'' +
+                ", isPrivate='" + isPrivate + '\'' +
                 '}';
     }
 }
