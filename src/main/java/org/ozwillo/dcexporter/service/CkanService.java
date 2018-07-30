@@ -104,7 +104,7 @@ public class CkanService {
             ckanDataset.setUrl(dcModelMapping.getSource());
             ckanDataset.setVersion(dcModelMapping.getVersion());
             ckanDataset.setTags(dcModelMapping.getTags());
-            ckanDataset.setPrivate(false);
+            ckanDataset.setPrivate(dcModelMapping.isPrivateDataSet());
             if (dcModelMapping.getGeoLocation() != null) {
                 List<CkanExtra> ckanExtras = new ArrayList<>();
                 ObjectMapper mapperObj = new ObjectMapper();

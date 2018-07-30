@@ -5,7 +5,7 @@ import { translate } from 'react-i18next'
 import DatasetAutosuggest from './DatasetAutosuggest'
 import { TagAutosuggest, Tag } from './TagAutosuggest'
 import AddressAutosuggest from './AddressAutosuggest'
-import { FormGroup, Label, Input, SelectField, Textarea, Fieldset } from './Form'
+import { FormGroup, Label, Input, SelectField, Textarea, Fieldset, Checkbox } from './Form'
 
 class DatasetForm extends React.Component {
     static propTypes = {
@@ -22,7 +22,8 @@ class DatasetForm extends React.Component {
         organizations:React.PropTypes.array.isRequired,
         datasetName: React.PropTypes.string.isRequired,
         onChangeNotif: React.PropTypes.func.isRequired,
-        geoLocation: React.PropTypes.object.isRequired
+        geoLocation: React.PropTypes.object.isRequired,
+        private : React.PropTypes.bool.isRequired
     }
     static contextTypes = {
         t: React.PropTypes.func
@@ -117,7 +118,14 @@ class DatasetForm extends React.Component {
                                         </div>
                                 )}
                             </FormGroup>
-
+                                
+                            <FormGroup>
+                                <Label value={ t('dataset.label.private') } />                 
+                                <div className="col-sm-9">
+                                    <Checkbox value="true" handleCheckboxChange={(event) => this.props.onFieldChange('private', event.target.checked)} 
+                                       checked={this.props.private}/>
+                                </div>
+                            </FormGroup>          
                         </div>
                     )}
             </Fieldset>

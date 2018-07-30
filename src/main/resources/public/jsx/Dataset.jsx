@@ -53,7 +53,8 @@ class Dataset extends React.Component {
                 addressField: '',
                 postalCodeField: '',
                 cityField: '',
-                geoLocation: {}
+                geoLocation: {},
+                private: false
             }
         }
 
@@ -162,7 +163,8 @@ class Dataset extends React.Component {
             response.text().then(text => this.setState({ success : false, message: text }))
         })
     }
-    toggleCheckbox(label){
+    toggleCheckbox(event){
+        const label = event.target.value
         if (this.selectedCheckboxes.has(label)) {
             const index = this.state.fields.excludedFields.findIndex((excludeField) => {return excludeField==label})
             let excludeFields = this.state.fields.excludedFields
@@ -206,7 +208,7 @@ class Dataset extends React.Component {
         const { t } = this.context
         const fields = this.state.datasetFetched && this.state.fields.dcId ?
             this.state.dataset['dcmo:globalFields'].map((field, key) =>
-                <Checkbox label={field['dcmf:name']} handleCheckboxChange={this.toggleCheckbox} key={key}
+                <Checkbox value={field['dcmf:name']} label={field['dcmf:name']} handleCheckboxChange={this.toggleCheckbox} key={key}
                           checked={!this.state.fields.excludedFields.includes(field['dcmf:name'])}/>)
             : null
 

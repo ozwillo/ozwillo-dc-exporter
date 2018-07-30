@@ -57,7 +57,7 @@
     },
 
     "dataset":{
-        "title": "Creation of an dataset",
+        "title": "Creation of a dataset",
         "notif": {
             "is_created": "Dataset is created",
             "not_exist": "This dataset does not exist",
@@ -93,7 +93,8 @@
             "address_field": "Address field",
             "city_field": "City field",
             "postal_code_field": "Postal code field",
-            "geo_location": "Geo location"
+            "geo_location": "Geo location",
+            "private": "Private"
         }
     }
 }

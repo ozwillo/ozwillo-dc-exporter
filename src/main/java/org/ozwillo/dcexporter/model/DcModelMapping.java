@@ -51,7 +51,8 @@ public class DcModelMapping {
     private String postalCodeField;
     private String cityField;
     private Object geoLocation;
-
+    @JsonProperty("private")
+    private boolean privateDataSet;
 
     public DcModelMapping() {
     }
@@ -181,6 +182,14 @@ public class DcModelMapping {
         this.geoLocation = geoLocation;
     }
 
+    public boolean isPrivateDataSet() {
+        return privateDataSet;
+	}
+
+    public void setPrivateDataSet(boolean privateDataSet) {
+        this.privateDataSet = privateDataSet;
+	}
+
     @Override
     public String toString() {
         return "DcModelMapping{" +
@@ -199,6 +208,7 @@ public class DcModelMapping {
                 ", adressField='" + addressField + '\'' +
                 ", adressField='" + postalCodeField + '\'' +
                 ", adressField='" + cityField + '\'' +
+                ", private='" + privateDataSet + '\'' +
                 '}';
     }
 }
