@@ -289,7 +289,8 @@ class Dataset extends React.Component {
                                          organizations={this.state.organizations}
                                          organizationId={this.state.fields['organizationId']}
                                          onChangeNotif={this.onChangeNotif}
-                                         geoLocation={this.state.fields.geoLocation}/>
+                                         geoLocation={this.state.fields.geoLocation}
+                                         private={false} />
 
                             <Fieldset legend={t('dataset.panel.resource')}>
                                 <FormGroup>

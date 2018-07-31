@@ -22,7 +22,8 @@ class DatasetForm extends React.Component {
         organizations:React.PropTypes.array.isRequired,
         datasetName: React.PropTypes.string.isRequired,
         onChangeNotif: React.PropTypes.func.isRequired,
-        geoLocation: React.PropTypes.object.isRequired
+        geoLocation: React.PropTypes.object.isRequired,
+        private: React.PropTypes.bool.isRequired
     }
     static contextTypes = {
         t: React.PropTypes.func
@@ -121,8 +122,7 @@ class DatasetForm extends React.Component {
                             <FormGroup>
                                 <Label value={ t('dataset.label.private') } />                 
                                 <div className="col-sm-9">
-                                    <Checkbox value="true" handleCheckboxChange={(event) => this.props.onFieldChange('private', event.target.checked)} 
-                                       checked={this.props.private}/>
+                                    <Checkbox defaultChecked={this.props.private} handleCheckboxChange={(event) => this.props.onFieldChange('private', event.target.checked)}/>
                                 </div>
                             </FormGroup>          
                         </div>
