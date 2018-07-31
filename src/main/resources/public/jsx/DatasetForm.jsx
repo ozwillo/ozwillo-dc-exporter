@@ -22,8 +22,7 @@ class DatasetForm extends React.Component {
         organizations:React.PropTypes.array.isRequired,
         datasetName: React.PropTypes.string.isRequired,
         onChangeNotif: React.PropTypes.func.isRequired,
-        geoLocation: React.PropTypes.object.isRequired,
-        private : React.PropTypes.bool.isRequired
+        geoLocation: React.PropTypes.object.isRequired
     }
     static contextTypes = {
         t: React.PropTypes.func
