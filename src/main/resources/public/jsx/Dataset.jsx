@@ -207,9 +207,11 @@ class Dataset extends React.Component {
     render() {
         const { t } = this.context
         const fields = this.state.datasetFetched && this.state.fields.dcId ?
-            this.state.dataset['dcmo:globalFields'].map((field, key) =>
-                <Checkbox value={field['dcmf:name']} label={field['dcmf:name']} handleCheckboxChange={this.toggleCheckbox} key={key}
-                          checked={!this.state.fields.excludedFields.includes(field['dcmf:name'])}/>)
+            this.state.dataset['dcmo:fields'].map((field, key) => {
+                const label = field['dcmf:name'] + (field['dcmf:documentation'] ? " (" + field['dcmf:documentation'] + ")" : "")
+                return <Checkbox value={field['dcmf:name']} label={label} handleCheckboxChange={this.toggleCheckbox} key={key}
+                          checked={!this.state.fields.excludedFields.includes(field['dcmf:name'])}/>})
+            
             : null
 
         const disabled = this.state.fields.name == null || this.state.fields.name == '' ||
@@ -287,7 +289,8 @@ class Dataset extends React.Component {
                                          organizations={this.state.organizations}
                                          organizationId={this.state.fields['organizationId']}
                                          onChangeNotif={this.onChangeNotif}
-                                         geoLocation={this.state.fields.geoLocation}/>
+                                         geoLocation={this.state.fields.geoLocation}
+                                         private={false} />
 
                             <Fieldset legend={t('dataset.panel.resource')}>
                                 <FormGroup>

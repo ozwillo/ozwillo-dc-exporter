@@ -36,7 +36,6 @@ repositories {
 	mavenLocal()
 }
 
-
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
@@ -51,10 +50,10 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-websocket')
 	compile('joda-time:joda-time:2.9.9')
 	compile('io.javaslang:javaslang:2.0.4')
-    compile('com.ozwillo:ozwillo-java-spring-integration:1.25.7')
+    compile('com.ozwillo:ozwillo-java-spring-integration:1.26.0-dev')
 	compile('com.github.ben-manes.caffeine:caffeine:2.3.5')
 
-	testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('org.springframework.boot:spring-boot-starter-test')
 
     // required to parse logback-spring.groovy
     // TODO : quite a fat dependency for a configuration file
