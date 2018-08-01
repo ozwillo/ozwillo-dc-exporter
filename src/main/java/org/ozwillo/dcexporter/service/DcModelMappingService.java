@@ -4,7 +4,6 @@ import javaslang.control.Either;
 import org.joda.time.DateTime;
 import org.ozwillo.dcexporter.dao.DcModelMappingRepository;
 import org.ozwillo.dcexporter.dao.SynchronizerAuditLogRepository;
-import org.ozwillo.dcexporter.model.Ckan.CkanOrganization;
 import org.ozwillo.dcexporter.model.Ckan.CkanResource;
 import org.ozwillo.dcexporter.model.DcModelMapping;
 import org.ozwillo.dcexporter.model.SynchronizerStatus;
@@ -15,9 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -124,14 +121,7 @@ public class DcModelMappingService {
                 .map(dcModelMapping -> {
                     SynchronizerAuditLog auditLog = synchronizerAuditLogRepository.findFirstByTypeOrderByDateDesc(dcModelMapping.getType());
                     String datasetUrl = ckanUrl  + "/dataset/" + dcModelMapping.getUrl();
-                    String organizationName = "";
-                    if (!StringUtils.isEmpty(dcModelMapping.getOrganizationId()) ) {
-                        Either<String, CkanOrganization> eitherOrganization = ckanService.getOrganization(dcModelMapping.getOrganizationId());
-                        if (eitherOrganization.isRight()) {
-                            organizationName = eitherOrganization.get().getDisplayName();
-                        }
-                    }
-                    return new AuditLogWapper(dcModelMapping, auditLog, datasetUrl, organizationName);
+                    return new AuditLogWapper(dcModelMapping, auditLog, datasetUrl);
                 })
                 .collect(Collectors.toList());
     }
