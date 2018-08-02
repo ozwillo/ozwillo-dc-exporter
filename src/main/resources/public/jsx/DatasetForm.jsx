@@ -5,7 +5,7 @@ import { translate } from 'react-i18next'
 import DatasetAutosuggest from './DatasetAutosuggest'
 import { TagAutosuggest, Tag } from './TagAutosuggest'
 import AddressAutosuggest from './AddressAutosuggest'
-import { FormGroup, Label, Input, SelectField, Textarea, Fieldset, Checkbox } from './Form'
+import { FormGroup, Label, Input, SelectField, Textarea, Fieldset, Checkbox, ReadOnlyField } from './Form'
 
 class DatasetForm extends React.Component {
     static propTypes = {
@@ -23,7 +23,8 @@ class DatasetForm extends React.Component {
         datasetName: React.PropTypes.string.isRequired,
         onChangeNotif: React.PropTypes.func.isRequired,
         geoLocation: React.PropTypes.object.isRequired,
-        private: React.PropTypes.bool.isRequired
+        private: React.PropTypes.bool.isRequired,
+        modeCreate: React.PropTypes.bool.isRequired
     }
     static contextTypes = {
         t: React.PropTypes.func
@@ -49,18 +50,29 @@ class DatasetForm extends React.Component {
         const tags = this.props.tags.map(( tag, key ) =>
             <Tag key={key} keyword={tag.name} remove={this.handleDelete} id={key} />)
 
+        const modeCreate = renderIf(this.props.modeCreate == true)
+        const modeUpdate = renderIf(this.props.modeCreate == false)
+        
         const existingClassName = !this.props.newDataset ? "btn btn-primary" : "btn btn-outline-primary"
         const newClassName = this.props.newDataset ? "btn btn-primary" : "btn btn-outline-primary"
-
-        const existingDataset = renderIf(this.props.newDataset == false)
-        const newDataset = renderIf(this.props.newDataset == true)
+        
+        const existingDataset = renderIf(this.props.modeCreate == true && this.props.newDataset == false)
+        const newDataset = renderIf(this.props.modeCreate == true && this.props.newDataset == true)
 
         return (
             <Fieldset legend={t('dataset.panel.dataset')}>
+                    {modeCreate(
                     <div className="btn-group d-flex justify-content-center mb-sm-3">
                         <button type="button" className={existingClassName} onClick={this.props.toggleNewDataset}>{ t('action.existing') }</button>
                         <button type="button" className={newClassName} onClick={this.props.toggleNewDataset}>{ t('action.new') }</button>
                     </div>
+                    )}
+                    {modeUpdate(
+                        <FormGroup>
+                            <Label htmlFor="model" value={ t('dataset.label.name') } />
+                            <ReadOnlyField id="model" value={this.props.datasetName} />
+                        </FormGroup>
+                    )}
                     {existingDataset(
                         <FormGroup>
                             <Label htmlFor="autosuggest-name" value={t('dataset.label.name')} />

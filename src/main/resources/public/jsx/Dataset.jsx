@@ -147,7 +147,8 @@ class Dataset extends React.Component {
         })
         .catch(text => this.setState({ success : false, message: text }))
     }
-    updateDataset(fields) {
+    updateDataset(e, fields) {
+        e.preventDefault();
         fetch('/api/dc-model-mapping/model', {
             method: 'PUT',
             credentials: 'same-origin',
@@ -227,7 +228,10 @@ class Dataset extends React.Component {
                 {renderIf(this.state.message)(
                     <Alert message={ t(this.state.message) } success={this.state.success} closeMethod={this.closeNotif}/>
                 )}
-                <Form id="dataset-form" onSubmit={(e) => this.registerDataset(e, this.state.fields)}>
+                <Form id="dataset-form" onSubmit={(e) => { 
+                                                    if (this.state.mode == 'create') this.registerDataset(e, this.state.fields); 
+                                                    else this.updateDataset(e, this.state.fields);
+                                                 }}>
                     <Fieldset legend={t('dataset.panel.datacore')}>
                             {isModeCreate(
                                 <DatasetChooser dcId={this.state.fields.dcId} onDatasetSelected={this.onDatasetSelected}
@@ -290,7 +294,8 @@ class Dataset extends React.Component {
                                          organizationId={this.state.fields['organizationId']}
                                          onChangeNotif={this.onChangeNotif}
                                          geoLocation={this.state.fields.geoLocation}
-                                         private={false} />
+                                         private={false} 
+                                         modeCreate={this.state.mode == 'create'} />
 
                             <Fieldset legend={t('dataset.panel.resource')}>
                                 <FormGroup>
@@ -308,8 +313,8 @@ class Dataset extends React.Component {
                                 </FormGroup>
                             </Fieldset>
                             <div className="float-right">
-                                {isModeCreate(<SubmitButton label={ t('action.create') } onSubmit={(e) => this.registerDataset(e, this.state.fields)} disabled={disabled} />)}
-                                {isModeUpdate(<SubmitButton label={ t('action.update') } onSubmit={(e) => this.updateDataset(e, this.state.fields)} disabled={disabled} />)}
+                                {isModeCreate(<SubmitButton label={ t('action.create') } disabled={disabled} />)}
+                                {isModeUpdate(<SubmitButton label={ t('action.update') } disabled={disabled} />)}
                             </div>
                         </div>
                     )}
@@ -327,7 +332,7 @@ Dataset.contextTypes = {
 
 const DatasetChooser = ({ datasets, dcId, onDatasetSelected, t }) => {
     const options = datasets.map(dataset =>
-        <option key={dataset['@id']} value={dataset['@id']}>{dataset['dcmo:name']}</option>
+        <option key={dataset['@id'] + '-' + dataset['dcmo:pointOfViewAbsoluteName'] + '-' + dataset['o:version']} value={dataset['@id']}>{dataset['dcmo:name']}</option>
     )
     return (
             <FormGroup>

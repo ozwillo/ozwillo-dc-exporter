@@ -36,6 +36,20 @@ public class CkanClientService {
             return Optional.empty();
         }
     }
+    
+    public Optional<List<CkanDataset>> getCompleteDatasets(String ckanUrl, int limit) {
+        if(!isValid(ckanUrl, "CKAN URL")) return Optional.empty();
+
+        CkanAPI ckanAPI = getCkanAPI(ckanUrl);
+        Call<DatasetListResponse> call = ckanAPI.getCompleteDatasets(limit);
+
+        try {
+            return Optional.ofNullable(call.execute().body().result);
+        } catch (IOException e) {
+            LOGGER.error("Error while trying to fetch datasets from CKAN: {}", e);
+            return Optional.empty();
+        }
+    }
 
     public Optional<CkanDataset> getDataset(String ckanUrl, String idOrName) {
         if(!isValid(ckanUrl, "CKAN URL")) return Optional.empty();
@@ -255,7 +269,10 @@ interface CkanAPI {
 
     @GET("/api/3/action/package_list")
     Call<StringListResponse> getDatasets();
-
+    
+    @GET("/api/3/action/current_package_list_with_resources")
+    Call<DatasetListResponse> getCompleteDatasets(@Query("limit") int limit);
+    
     @GET("/api/3/action/package_show")
     Call<DatasetResponse> getDataset(@Query("id") String idOrName);
 
@@ -306,6 +323,9 @@ class StringListResponse extends CkanResponse {
 }
 class LicenseListResponse extends CkanResponse {
     public List<CkanLicense> result;
+}
+class DatasetListResponse extends CkanResponse {
+    public List<CkanDataset> result;
 }
 class DatasetResponse extends CkanResponse {
     public CkanDataset result;
