@@ -262,7 +262,7 @@ class Dataset extends React.Component {
                                     </FormGroup>
                                     <FormGroup>
                                         <Label htmlFor="excludedFields" value={ t('dataset.label.export_fields')} />
-                                        <div className="col-sm-9">
+                                        <div className="col-sm-9" id="excludedFields">
                                             { fields }
                                         </div>
                                     </FormGroup>

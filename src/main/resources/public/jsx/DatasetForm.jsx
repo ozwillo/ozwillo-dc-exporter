@@ -132,8 +132,8 @@ class DatasetForm extends React.Component {
                             </FormGroup>
                                 
                             <FormGroup>
-                                <Label value={ t('dataset.label.private') } />                 
-                                <div className="col-sm-9">
+                                <Label htmlFor="private" value={ t('dataset.label.private') } />                 
+                                <div className="col-sm-9" id="private">
                                     <Checkbox defaultChecked={this.props.private} handleCheckboxChange={(event) => this.props.onFieldChange('private', event.target.checked)}/>
                                 </div>
                             </FormGroup>          

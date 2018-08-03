@@ -30,7 +30,7 @@ const Label = ({ htmlFor, value}) =>
     <label htmlFor={htmlFor} className="col-sm-3 col-form-label col-form-label-sm">{value}</label>
 
 Label.propTypes = {
-    htmlFor: PropTypes.string,
+    htmlFor: PropTypes.string.isRequired,
     value: PropTypes.string.isRequired
 }
 
@@ -101,16 +101,15 @@ const Checkbox = ({ handleCheckboxChange, label, value, checked }) =>
     </div>
     
 
-const SubmitButton = ({ label, onClick, disabled }) =>
+const SubmitButton = ({ label, disabled }) =>
     <div className="form-group row">
         <div className="offset-sm-3 col-sm-7">
-            <button type="submit" className="btn btn-primary" onClick={onClick} disabled={disabled}>{label}</button>
+            <button type="submit" className="btn btn-primary" disabled={disabled}>{label}</button>
         </div>
     </div>
 
 SubmitButton.propTypes = {
     label: PropTypes.string.isRequired,
-    onClick: PropTypes.func,
     disabled: PropTypes.bool
 }
 
