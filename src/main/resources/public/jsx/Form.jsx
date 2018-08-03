@@ -101,16 +101,15 @@ const Checkbox = ({ handleCheckboxChange, label, value, checked }) =>
     </div>
     
 
-const SubmitButton = ({ label, onSubmit, disabled }) =>
+const SubmitButton = ({ label, disabled }) =>
     <div className="form-group row">
         <div className="offset-sm-3 col-sm-7">
-            <button type="submit" className="btn btn-primary" onSubmit={onSubmit} disabled={disabled}>{label}</button>
+            <button type="submit" className="btn btn-primary" disabled={disabled}>{label}</button>
         </div>
     </div>
 
 SubmitButton.propTypes = {
     label: PropTypes.string.isRequired,
-    onSubmit: PropTypes.func.isRequired,
     disabled: PropTypes.bool
 }
 

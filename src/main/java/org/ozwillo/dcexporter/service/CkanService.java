@@ -38,9 +38,11 @@ public class CkanService {
         if(!opt.isPresent()) return Either.left("dataset.notif.error.fetch_datasets");
 
         List<String> datasets = opt.get();
-        return Either.right(datasets.stream()
-            .map(idOrName -> ckanClientService.getDataset(ckanUrl, idOrName).get())
-            .collect(Collectors.toList()));
+        
+        Optional<List<CkanDataset>> opt2 = ckanClientService.getCompleteDatasets(ckanUrl, datasets.size());
+        if(!opt2.isPresent()) return Either.left("dataset.notif.error.fetch_datasets");
+        
+        return Either.right(opt2.get());
     }
 
     public Either<String, Map<String, String>> getLicences() {
