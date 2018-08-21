@@ -25,6 +25,8 @@ public class SynchronizerAuditLog {
     @NotEmpty
     private String errorMessage;
 
+    private int errorCount = 0;
+    
     @NotNull
     @NotEmpty
     @JsonSerialize(using = CustomDateTimeSerializer.class)
@@ -60,6 +62,17 @@ public class SynchronizerAuditLog {
         return date;
     }
 
+    public int getErrorCount() {
+        return errorCount;
+    }
+    
+    public void updateOnError (String message) {
+        date = DateTime.now();
+        errorCount++;
+        errorMessage = message;
+        status = SynchronizerStatus.FAILED;
+    }
+
     @Override
     public String toString() {
         return "SynchronizerAuditLog{" +
@@ -67,6 +80,7 @@ public class SynchronizerAuditLog {
             ", type='" + type + '\'' +
             ", succeeded=" + status + '\'' +
             ", errorMessage='" + errorMessage + '\'' +
+            ", errorCount='" + errorCount + '\'' +
             ", date=" + date +
             '}';
     }
