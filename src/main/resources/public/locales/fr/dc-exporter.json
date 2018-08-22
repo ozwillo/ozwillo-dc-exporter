@@ -49,6 +49,11 @@
             "FAILED": "échoué",
             "PENDING": "en cours",
             "MODIFIED": "modifié"
+        },
+        
+        "error": {
+            "count": "{{ count }} fois",
+            "message": "Erreur : {{ message }}"
         }
     },
 

@@ -48,6 +48,11 @@
             "FAILED": "Failed",
             "PENDING": "Pending",
             "MODIFIED": "Modified"
+        },
+        
+        "error": {
+            "count": "{{ count }} times",
+            "message": "Error : {{ message }}"
         }
     },
 

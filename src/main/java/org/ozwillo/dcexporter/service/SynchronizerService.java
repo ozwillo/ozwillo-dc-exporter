@@ -55,15 +55,23 @@ public class SynchronizerService {
 
                 LOGGER.info("Got some recent data for {}, synchronizing them", dcModelMapping.getType());
 
-                SynchronizerAuditLog newAuditLog;
+                
                 try {
                     this.sync(dcModelMapping);
-                    newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.SUCCEEDED, null,  DateTime.now());
+                    SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.SUCCEEDED, null,  DateTime.now());
                     synchronizerAuditLogRepository.save(newAuditLog);
                 } catch (Exception exception) {
                     LOGGER.error("Error while trying to synchronize model {} : {} ", dcModelMapping.getType(), exception.getMessage());
-                    newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.FAILED, exception.getMessage(),  DateTime.now());
-                    synchronizerAuditLogRepository.save(newAuditLog);
+                    if (auditLog.getStatus() == SynchronizerStatus.FAILED) {
+                        // update current one
+                        auditLog.updateOnError(exception.getMessage());
+                        synchronizerAuditLogRepository.save(auditLog);
+                    }
+                    else {
+                        // create a new one with failed status
+                        SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.FAILED, exception.getMessage(),  DateTime.now());
+                        synchronizerAuditLogRepository.save(newAuditLog);
+                    }
                 }
             });
         });

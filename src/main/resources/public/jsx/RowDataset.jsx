@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { Link } from 'react-router'
 import { translate } from 'react-i18next'
 import format from 'date-fns/format'
-
 import ConfirmActionButton from './ConfirmActionButton'
 
 class RowDataset extends Component {
@@ -21,6 +20,10 @@ class RowDataset extends Component {
         this.checkStatus = this.checkStatus.bind(this)
         this.deleteMapping = this.deleteMapping.bind(this)
         this.modalToggle = this.modalToggle.bind(this)
+        
+    }
+    componentDidMount() {
+        $('[data-toggle="tooltip"]').tooltip()
     }
     checkStatus(response) {
         if (response.status >= 200 && response.status < 300) {
@@ -62,12 +65,14 @@ class RowDataset extends Component {
                     <span
                         className=
                             {`badge ${this.statusBadgeCss[log.synchronizerAuditLog.status]} badge-pill ml-sm-1`}
-                        data-toggle="tooltip" data-placement="bottom"
-                        title=
-                            {(log.synchronizerAuditLog.status == 'FAILED' && log.synchronizerAuditLog.errorMessage) ?
-                                log.synchronizerAuditLog.errorMessage :log.synchronizerAuditLog.status}>
+                        data-toggle="tooltip" data-placement="top"
+                        data-html="true"
+                        title={(log.synchronizerAuditLog.status == 'FAILED' && log.synchronizerAuditLog.errorMessage) ?
+                                t('dashboard.error.message', { message : log.synchronizerAuditLog.errorMessage}) + "<br/>" + t('dashboard.error.count', { count : log.synchronizerAuditLog.errorCount})  :
+                                log.synchronizerAuditLog.status}>
                         {t(`dashboard.list.${log.synchronizerAuditLog.status}`)}
                     </span>
+                    
                 </td>
                 <td>
                     <a href={log.datasetUrl} target="_blank">
