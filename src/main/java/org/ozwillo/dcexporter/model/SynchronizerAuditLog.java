@@ -40,6 +40,9 @@ public class SynchronizerAuditLog {
         this.status = status;
         this.errorMessage = errorMessage;
         this.date = date;
+        
+        if (status == SynchronizerStatus.FAILED) 
+            errorCount = 1;
     }
 
     public String getId() {

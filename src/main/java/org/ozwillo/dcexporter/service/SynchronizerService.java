@@ -62,8 +62,16 @@ public class SynchronizerService {
                     synchronizerAuditLogRepository.save(newAuditLog);
                 } catch (Exception exception) {
                     LOGGER.error("Error while trying to synchronize model {} : {} ", dcModelMapping.getType(), exception.getMessage());
-                    auditLog.updateOnError(exception.getMessage());
-                    synchronizerAuditLogRepository.save(auditLog);
+                    if (auditLog.getStatus() == SynchronizerStatus.FAILED) {
+                        // update current one
+                        auditLog.updateOnError(exception.getMessage());
+                        synchronizerAuditLogRepository.save(auditLog);
+                    }
+                    else {
+                        // create a new one with failed status
+                        SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.FAILED, exception.getMessage(),  DateTime.now());
+                        synchronizerAuditLogRepository.save(newAuditLog);
+                    }
                 }
             });
         });
