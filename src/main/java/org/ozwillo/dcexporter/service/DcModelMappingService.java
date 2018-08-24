@@ -37,8 +37,12 @@ public class DcModelMappingService {
     private String ckanUrl;
 
 
-    public DcModelMapping getById(String id) {
-        return dcModelMappingRepository.findById(id);
+    public Either<String, DcModelMapping> getById(String id) {
+        Optional<DcModelMapping> opt = dcModelMappingRepository.findById(id);
+        if (opt.isPresent())
+            return Either.right(opt.get());
+        else
+            return Either.left("dataset.notif.not_exist");
     }
 
     public Either<String, DcModelMapping> add(DcModelMapping dcModelMapping) {
@@ -127,14 +131,23 @@ public class DcModelMappingService {
     }
 
     public Either<String, DcModelMapping> deleteById(String id) {
-        DcModelMapping dcModelMapping = dcModelMappingRepository.findById(id);
-        if ( dcModelMapping == null ) return Either.left("dataset.notif.not_exist");
-        else if ( dcModelMapping.isDeleted() ) return Either.left("dataset.notif.not_synchronized");
-        dcModelMapping.getCkanResourceId().forEach((key,resourceId) -> {
-            ckanService.deleteResource(resourceId);
-        });
-        dcModelMapping.setDeleted(true);
-        dcModelMappingRepository.save(dcModelMapping);
-        return Either.right(dcModelMapping);
+        Optional<DcModelMapping> opt = dcModelMappingRepository.findById(id);
+        
+        if (opt.isPresent()) {
+            DcModelMapping dcModelMapping = opt.get();
+            if (dcModelMapping.isDeleted()) 
+                return Either.left("dataset.notif.not_synchronized");
+            
+            dcModelMapping.getCkanResourceId().forEach((key,resourceId) -> {
+                ckanService.deleteResource(resourceId);
+            });
+            
+            dcModelMapping.setDeleted(true);
+            dcModelMappingRepository.save(dcModelMapping);
+            return Either.right(dcModelMapping);
+        }
+        else {
+            return Either.left("dataset.notif.not_exist");
+        }
     }
 }

@@ -1,7 +1,7 @@
 package org.ozwillo.dcexporter.model.ui;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 import org.ozwillo.dcexporter.model.DcModelMapping;
 import org.ozwillo.dcexporter.model.SynchronizerAuditLog;
 

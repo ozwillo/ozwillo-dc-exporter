@@ -1,16 +1,10 @@
 import React, { Component } from "react"
+import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
 
 class ConfirmActionButton extends Component {
-    static propTypes = {
-        content: React.PropTypes.string.isRequired,
-        onConfirm: React.PropTypes.func.isRequired,
-        confirmLabel: React.PropTypes.string.isRequired
-    }
-    static contextTypes = {
-        t: React.PropTypes.func
-    }
+    
     constructor(props, context) {
         super(props, context)
         this.close = this.close.bind(this)
@@ -53,6 +47,15 @@ class ConfirmActionButton extends Component {
             </div>
         )
     }
+}
+
+ConfirmActionButton.propTypes = {
+    content: PropTypes.string.isRequired,
+    onConfirm: PropTypes.func.isRequired,
+    confirmLabel: PropTypes.string.isRequired  
+}
+ConfirmActionButton.contextTypes = {
+    t: PropTypes.func
 }
 
 export default translate(['dc-exporter'])(ConfirmActionButton)

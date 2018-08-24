@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import renderIf from 'render-if'
 import { browserHistory } from 'react-router';
 import { translate } from 'react-i18next'
@@ -114,6 +115,9 @@ class Dataset extends React.Component {
             .then(json => {
                 this.setState({fields: json, mode: 'update', fieldsFetched: true, newDataset: false})
                 json.excludedFields.forEach(elem => this.selectedCheckboxes.add(elem))
+            })
+            .catch(error => {
+                error.text().then(text => { this.onChangeNotif(false, text) })
             })
     }
     onDatasetSelected(dcId) {
@@ -325,9 +329,10 @@ class Dataset extends React.Component {
 }
 
 Dataset.contextTypes = {
-    csrfToken: React.PropTypes.string,
-    csrfTokenHeaderName: React.PropTypes.string,
-    t: React.PropTypes.func
+    csrfToken: PropTypes.string,
+    csrfTokenHeaderName: PropTypes.string,
+    t: PropTypes.func,
+    onSubmit: PropTypes.func.isRequired
 }
 
 const DatasetChooser = ({ datasets, dcId, onDatasetSelected, t }) => {
@@ -346,14 +351,11 @@ const DatasetChooser = ({ datasets, dcId, onDatasetSelected, t }) => {
 }
 
 DatasetChooser.propTypes = {
-    dcId: React.PropTypes.string.isRequired,
-    onDatasetSelected: React.PropTypes.func.isRequired,
-    datasets: React.PropTypes.array.isRequired,
-    t: React.PropTypes.func.isRequired
+    dcId: PropTypes.string.isRequired,
+    onDatasetSelected: PropTypes.func.isRequired,
+    datasets: PropTypes.array.isRequired,
+    t: PropTypes.func.isRequired
 }
 
-Dataset.PropTypes = {
-    onSubmit: React.PropTypes.func.isRequired
-}
 
 export default translate(['dc-exporter'])(Dataset)

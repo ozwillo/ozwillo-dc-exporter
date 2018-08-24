@@ -1,8 +1,9 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { render } from 'react-dom'
 import { I18nextProvider } from 'react-i18next'
-import { Router, Route, IndexRoute, browserHistory} from 'react-router'
-
+import { BrowserRouter as Router, Route, IndexRoute/*, browserHistory*/} from 'react-router-dom'
+var createReactClass = require('create-react-class');
 import Navbar from './Navbar'
 import Dashboard from './Dashboard'
 import Dataset from './Dataset'
@@ -10,31 +11,29 @@ import i18n from './util/i18n'
 
 import 'bootstrap'
 
-const App = React.createClass({
-    getInitialState() {
-        return {
+class App extends React.Component {
+    
+    constructor(props, context) {
+        super(props, context)
+        this.state = {
             csrfToken: '',
             csrfTokenHeaderName: ''
         }
-    },
-    childContextTypes: {
-        csrfToken: React.PropTypes.string,
-        csrfTokenHeaderName: React.PropTypes.string,
-        t : React.PropTypes.func
-    },
+    }
+    
     getChildContext() {
         return {
             csrfToken: this.state.csrfToken,
             csrfTokenHeaderName: this.state.csrfTokenHeaderName,
             t: this.t
         };
-    },
+    }
     componentDidMount() {
         fetch('/api/csrf-token', { credentials: 'same-origin' })
             .then(response => response.headers)
             .then(headers =>
                 this.setState({ csrfToken : headers.get('X-CSRF-TOKEN'), csrfTokenHeaderName: headers.get('X-CSRF-HEADER') }))
-    },
+    }
     render() {
         return (
             <div>
@@ -43,16 +42,24 @@ const App = React.createClass({
             </div>
         )
     }
-})
+}
+
+App.childContextTypes = {
+    csrfToken: PropTypes.string,
+    csrfTokenHeaderName: PropTypes.string,
+    t : PropTypes.func
+}
 
 render(
     <I18nextProvider i18n={ i18n }>
-        <Router history={browserHistory}>
-            <Route path="/" component={App}>
-                <IndexRoute component={Dashboard} />
+        <Router /*history={browserHistory}*/>
+            <App>
+            {/*<Route path="/" component={App}>*/}
+                <Route path="/" component={Dashboard} />
                 <Route path="dataset" component={Dataset} />
                 <Route path="dataset/:id" component={Dataset}/>
-            </Route>
+            {/*</Route>*/}
+            </App>
         </Router>
     </I18nextProvider>
 , document.getElementById('app'))

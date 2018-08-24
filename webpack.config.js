@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const merge = require('webpack-merge');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanPlugin = require('clean-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 
@@ -16,9 +16,7 @@ const commonEntryPointsLoadersAndServers = ['bootstrap-loader'];
 const devEntryPointsLoadersAndServers = ['webpack-dev-server/client?http://localhost:3000', 'webpack/hot/only-dev-server'];
 
 const common = {
-    entry: [
-        PATHS.style,
-        path.join(PATHS.app, 'jsx/App.jsx')],
+    entry: path.join(PATHS.app, 'jsx/App.jsx'),
     output: {
         path: PATHS.build,
         filename: 'bundle.js',
@@ -29,30 +27,35 @@ const common = {
             $: 'jquery',
             jQuery: 'jquery',
             'Promise': 'es6-promise', // Thanks Aaron (https://gist.github.com/Couto/b29676dd1ab8714a818f#gistcomment-1584602)
-            'fetch': 'imports?this=>global!exports?global.fetch!whatwg-fetch'
+            'fetch': 'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch'
+        }),
+        new webpack.LoaderOptionsPlugin({
+            // test: /\.xxx$/, // may apply this only for some modules
+            options: {
+              postcss: [ autoprefixer ]
+            }
         })
     ],
     resolve: {
-        extensions: [ '', '.js', '.jsx' ]
+        extensions: [ '.js', '.jsx' ]
     },
     module: {
-        loaders: [
+    	rules: [
             { test: /\.png$/, loader: 'url-loader?limit=10000' },
             /* TODO : loaders for TWBS glyphicons ? */
             { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'url-loader?limit=10000&mimetype=application/font-woff' },
             { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'file-loader' },
             /* loader for JSX / ES6 */
-            { test: /\.jsx?$/, loaders: ['react-hot', 'babel?cacheDirectory,presets[]=react,presets[]=es2015,presets[]=stage-0'], include: path.join(PATHS.app, 'jsx')}
+            { test: /\.jsx?$/, loaders: ['babel-loader?cacheDirectory,presets[]=react,presets[]=es2015,presets[]=stage-0'], include: path.join(PATHS.app, 'jsx')}
         ]
-    },
-    postcss: [ autoprefixer ],
-    debug: true
+    }
 };
 
 // Default configuration
 if(TARGET === 'start' || !TARGET) {
     module.exports = merge(common, {
-        devtool: 'eval-source-map',
+    	mode: "development",
+        devtool: 'eval',
         devServer: {
             publicPath: common.output.publicPath,
             contentBase: '/build',
@@ -65,31 +68,60 @@ if(TARGET === 'start' || !TARGET) {
                 '*': 'http://localhost:8080'
             }
         },
-        entry: common.entry.concat(devEntryPointsLoadersAndServers),
+        //entry: common.entry.concat(devEntryPointsLoadersAndServers),
         plugins: [
             new webpack.HotModuleReplacementPlugin()
         ],
         module: {
-            loaders: [
-                {test: /\.css$/, loaders: ['style', 'css', 'postcss'], include: path.join(PATHS.app, 'styles')},
-                /* loaders for Bootstrap */
-                {test: /\.scss$/, loaders: ['style', 'css', 'postcss', 'sass'], include: path.join(PATHS.app, 'styles')}
+            rules: [
+                {
+                	test: /\.(css|scss)$/, 
+                	use: [
+                		MiniCssExtractPlugin.loader,
+                		{
+                			loader: "css-loader"
+                		},
+                		{
+                			loader: "postcss-loader"
+                		},
+                		{
+                			loader: "sass-loader"
+                		}
+                	]	
+                }		//loaders: ['style', 'css', 'postcss'], include: path.join(PATHS.app, 'styles')},
+                //loaders for Bootstrap 
+                //{test: /\.scss$/, loaders: ['style', 'css', 'postcss', 'sass'], include: path.join(PATHS.app, 'styles')}
             ]
+        },
+        optimization: {
+            minimize: false
         }
     });
 }
 if(TARGET === 'build' || TARGET === 'stats') {
     module.exports = merge(common, {
+    	mode: "production",
         module: {
-            loaders: [
-                {test: /\.css$/, loader: ExtractTextPlugin.extract('style', 'css!postcss')},
-                /* loaders for Bootstrap */
-                {test: /\.scss$/, loader: ExtractTextPlugin.extract('style', 'css!postcss!sass')},
-                {
-                    test: /\.css$/,
-                    loader: ExtractTextPlugin.extract({fallback: "style-loader", use: "css-loader"})
+        	rules: [
+        		{
+                	test: /\.(css|scss)$/, 
+                	use: [
+                		MiniCssExtractPlugin.loader,
+                		{
+                			loader: "css-loader"
+                		},
+                		{
+                			loader: "postcss-loader"
+                		},
+                		{
+                			loader: "sass-loader"
+                		}
+                	]	
                 }
             ]
+        },
+        optimization: {
+            minimize: true
         },
         plugins: [
             new CleanPlugin([PATHS.build]),
@@ -99,13 +131,8 @@ if(TARGET === 'build' || TARGET === 'stats') {
             new webpack.DefinePlugin({
                 'process.env.NODE_ENV': '"production"'
             }),
-            new webpack.optimize.UglifyJsPlugin({
-                compress: {
-                    warnings: false
-                }
-            }),
-            new ExtractTextPlugin('styles.min.css', {
-                allChunks: true
+            new MiniCssExtractPlugin({
+            	filename: "style.min.css"
             })
         ]
     });

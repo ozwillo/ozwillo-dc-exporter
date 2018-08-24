@@ -1,7 +1,7 @@
 package org.ozwillo.dcexporter.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 import org.joda.time.DateTime;
 import org.ozwillo.dcexporter.config.CustomDateTimeSerializer;
 import org.springframework.data.annotation.Id;

@@ -243,7 +243,7 @@ public class DatacoreService {
                     LOGGER.warn("Inner row value not managed for {}", resourceRowInnerValues);
                     resourceArray.add("");
                 }
-                objectResource.put(key,resourceArray);
+                objectResource.set(key,resourceArray);
             }
         });
         return objectResource;

@@ -1,5 +1,5 @@
 import React from "react"
-
+import PropTypes from 'prop-types'
 import Autosuggest from "react-autosuggest"
 
 const getSuggestionValue = suggestion => suggestion.display_name
@@ -12,12 +12,8 @@ const renderInputComponent = inputProps => (
     <input {...inputProps} className="form-control" />
 )
 
-export default class AddressAutosuggest extends React.Component {
-    static propTypes = {
-        id: React.PropTypes.string.isRequired,
-        geoLocation: React.PropTypes.object.isRequired,
-        onFieldChange: React.PropTypes.func.isRequired
-    }
+class AddressAutosuggest extends React.Component {
+    
     state = {
         value: '',
         suggestions: []
@@ -61,3 +57,11 @@ export default class AddressAutosuggest extends React.Component {
         )
     }
 }
+
+AddressAutosuggest.propTypes = {
+    id: PropTypes.string.isRequired,
+    geoLocation: PropTypes.object.isRequired,
+    onFieldChange: PropTypes.func.isRequired     
+}
+
+export default AddressAutosuggest

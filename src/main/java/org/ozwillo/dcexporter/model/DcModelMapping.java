@@ -2,7 +2,7 @@ package org.ozwillo.dcexporter.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.ozwillo.dcexporter.model.Ckan.CkanTag;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.NotNull;

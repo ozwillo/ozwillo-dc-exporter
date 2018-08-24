@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import renderIf from 'render-if'
 import { translate } from 'react-i18next'
 
@@ -14,11 +15,7 @@ class Dashboard extends React.Component {
         success: true,
         message: ''
     }
-    static contextTypes = {
-        csrfToken: React.PropTypes.string,
-        csrfTokenHeaderName: React.PropTypes.string,
-        t: React.PropTypes.func
-    }
+    
     constructor(context){
         super(context)
         this.onChangeFilter = this.onChangeFilter.bind(this)
@@ -101,6 +98,12 @@ class Dashboard extends React.Component {
             </div>
         )
     }
+}
+
+Dashboard.contextTypes = {
+    csrfToken: PropTypes.string,
+    csrfTokenHeaderName: PropTypes.string,
+    t: PropTypes.func
 }
 
 export default translate(['dc-exporter'])(Dashboard)

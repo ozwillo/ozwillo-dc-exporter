@@ -1,5 +1,5 @@
 import React, {Component} from "react"
-
+import PropTypes from 'prop-types'
 import Autosuggest from "react-autosuggest"
 
 const getSuggestionValue = suggestion => suggestion.title
@@ -16,11 +16,7 @@ function escapeRegexCharacters(str) {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-export default class DatasetAutosuggest extends React.Component {
-    static propTypes = {
-        id: React.PropTypes.string.isRequired,
-        onChangeNotif: React.PropTypes.func.isRequired
-    }
+class DatasetAutosuggest extends React.Component {
     static defaultProps = {
         required: false
     }
@@ -95,6 +91,10 @@ export default class DatasetAutosuggest extends React.Component {
     }
 }
 
-DatasetAutosuggest.PropTypes = {
-    onSelect: React.PropTypes.func.isRequired
+DatasetAutosuggest.propTypes = {
+    id: PropTypes.string.isRequired,
+    onChangeNotif: PropTypes.func.isRequired,
+    onSelect: PropTypes.func.isRequired
 }
+
+export default DatasetAutosuggest

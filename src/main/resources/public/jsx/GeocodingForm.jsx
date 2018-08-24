@@ -1,19 +1,11 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
 import { FormGroup, Label, SelectField, Fieldset } from './Form'
 
 class GeocodingForm extends React.Component {
-    static propTypes = {
-        onFieldChange: React.PropTypes.func.isRequired,
-        globalFields: React.PropTypes.array.isRequired,
-        addressField: React.PropTypes.string.isRequired,
-        postalCodeField: React.PropTypes.string.isRequired,
-        cityField: React.PropTypes.string.isRequired
-    }
-    static contextTypes = {
-        t: React.PropTypes.func
-    }
+    
     constructor(props, context) {
         super(props, context)
     }
@@ -48,6 +40,17 @@ class GeocodingForm extends React.Component {
     }
 }
 
+GeocodingForm.propTypes = {
+    onFieldChange: PropTypes.func.isRequired,
+    globalFields: PropTypes.array.isRequired,
+    addressField: PropTypes.string.isRequired,
+    postalCodeField: PropTypes.string.isRequired,
+    cityField: PropTypes.string.isRequired
+}
+GeocodingForm.contextTypes = {
+    t: PropTypes.func
+}
+
 const FieldChooser = ({ id, fieldName, options, fieldContent, onFieldChange, t }) => {
     return (
         <FormGroup>
@@ -60,12 +63,12 @@ const FieldChooser = ({ id, fieldName, options, fieldContent, onFieldChange, t }
 }
 
 FieldChooser.propTypes = {
-    id: React.PropTypes.string.isRequired,
-    fieldName: React.PropTypes.string.isRequired,
-    fieldContent: React.PropTypes.string.isRequired,
-    onFieldChange: React.PropTypes.func.isRequired,
-    options: React.PropTypes.array.isRequired,
-    t: React.PropTypes.func.isRequired
+    id: PropTypes.string.isRequired,
+    fieldName: PropTypes.string.isRequired,
+    fieldContent: PropTypes.string.isRequired,
+    onFieldChange: PropTypes.func.isRequired,
+    options: PropTypes.array.isRequired,
+    t: PropTypes.func.isRequired
 }
 
 export default translate(['dc-exporter'])(GeocodingForm)

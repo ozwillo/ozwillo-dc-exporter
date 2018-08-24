@@ -1,13 +1,12 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { Link, IndexLink } from 'react-router'
+import { Link, IndexLink } from 'react-router-dom'
 
 import logo from '../img/logo-ozwillo.png'
 
 class Navbar extends React.Component{
-    static contextTypes = {
-        t: React.PropTypes.func
-    }
+    
     constructor(context){
         super(context)
     }
@@ -15,6 +14,7 @@ class Navbar extends React.Component{
         const { t } = this.context
         return (
             <nav className="navbar navbar-expand-lg navbar-light" style={{ backgroundColor: '#4c2d62' }}>
+                
                 <Link to="/" className="navbar-brand">
                     <img src={logo} width="30" height="30" className="d-inline-block align-top" alt="logo_ozwillo" />
                     <span className="ml-sm-1" style={{ color: '#fff' }}>DC Exporter</span>
@@ -37,5 +37,9 @@ class Navbar extends React.Component{
             </nav>
         )
     }
+}
+
+Navbar.contextTypes = {
+    t: PropTypes.func
 }
 export default translate(['dc-exporter'])(Navbar)
