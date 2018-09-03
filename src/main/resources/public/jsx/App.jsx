@@ -2,8 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { render } from 'react-dom'
 import { I18nextProvider } from 'react-i18next'
-import { BrowserRouter as Router, Route, IndexRoute/*, browserHistory*/} from 'react-router-dom'
-var createReactClass = require('create-react-class');
+import { BrowserRouter as Router, Route } from 'react-router-dom'
 import Navbar from './Navbar'
 import Dashboard from './Dashboard'
 import Dataset from './Dataset'
@@ -52,13 +51,13 @@ App.childContextTypes = {
 
 render(
     <I18nextProvider i18n={ i18n }>
-        <Router /*history={browserHistory}*/>
+        <Router>
             <App>
-            {/*<Route path="/" component={App}>*/}
-                <Route path="/" component={Dashboard} />
-                <Route path="dataset" component={Dataset} />
-                <Route path="dataset/:id" component={Dataset}/>
-            {/*</Route>*/}
+            
+                <Route exact path="/" component={Dashboard} />
+                <Route exact path="/dataset" component={Dataset} />
+                <Route exact path="/dataset/:id" component={Dataset}/>
+            
             </App>
         </Router>
     </I18nextProvider>

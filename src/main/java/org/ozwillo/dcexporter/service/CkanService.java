@@ -3,9 +3,6 @@ package org.ozwillo.dcexporter.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javaslang.control.Either;
-import org.joda.time.LocalDateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.ozwillo.dcexporter.model.*;
 import org.ozwillo.dcexporter.model.Ckan.*;
 import org.slf4j.Logger;
@@ -16,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.text.Normalizer;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -165,8 +164,8 @@ public class CkanService {
             ckanResource.setId(dcModelMapping.getCkanResourceId().get(key));
             ckanResource.setUpload(optionalResource.get().getBytes());
 
-            DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateHourMinuteSecondMillis();
-            ckanResource.setLastModified(dateTimeFormatter.print(LocalDateTime.now()));
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+            ckanResource.setLastModified(LocalDateTime.now().format(dateTimeFormatter));
 
             Optional<ResourceResponse> resourceResponseOptional = ckanClientService.updateResourceFile(ckanUrl, ckanApiKey, ckanResource);
             if(resourceResponseOptional.isPresent()) {

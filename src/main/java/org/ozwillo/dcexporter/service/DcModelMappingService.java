@@ -1,7 +1,6 @@
 package org.ozwillo.dcexporter.service;
 
 import javaslang.control.Either;
-import org.joda.time.DateTime;
 import org.ozwillo.dcexporter.dao.DcModelMappingRepository;
 import org.ozwillo.dcexporter.dao.SynchronizerAuditLogRepository;
 import org.ozwillo.dcexporter.model.Ckan.CkanResource;
@@ -16,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -69,7 +69,7 @@ public class DcModelMappingService {
         dcModelMapping.setOrganizationId(ckanDataset.getOrganization().getId());
 
         dcModelMapping = dcModelMappingRepository.save(dcModelMapping);
-        SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.PENDING, null,  DateTime.now());
+        SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.PENDING, null,  LocalDateTime.now());
         synchronizerAuditLogRepository.save(newAuditLog);
         return Either.right(dcModelMapping);
     }
@@ -80,7 +80,7 @@ public class DcModelMappingService {
 
         if(oldDcModelMapping == null) return Either.left("dataset.notif.not_exist");
 
-        SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.MODIFIED, null,  DateTime.now());
+        SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.MODIFIED, null,  LocalDateTime.now());
         synchronizerAuditLogRepository.save(newAuditLog);
         dcModelMappingRepository.save(dcModelMapping);
 

@@ -2,9 +2,10 @@ package org.ozwillo.dcexporter.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import javax.validation.constraints.NotEmpty;
-import org.joda.time.DateTime;
 import org.ozwillo.dcexporter.config.CustomDateTimeSerializer;
 import org.springframework.data.annotation.Id;
+
+import java.time.LocalDateTime;
 
 import javax.validation.constraints.NotNull;
 
@@ -30,12 +31,12 @@ public class SynchronizerAuditLog {
     @NotNull
     @NotEmpty
     @JsonSerialize(using = CustomDateTimeSerializer.class)
-    private DateTime date;
+    private LocalDateTime date;
 
     public SynchronizerAuditLog() {
     }
 
-    public SynchronizerAuditLog(String type, SynchronizerStatus status, String errorMessage, DateTime date) {
+    public SynchronizerAuditLog(String type, SynchronizerStatus status, String errorMessage, LocalDateTime date) {
         this.type = type;
         this.status = status;
         this.errorMessage = errorMessage;
@@ -61,7 +62,7 @@ public class SynchronizerAuditLog {
         return errorMessage;
     }
 
-    public DateTime getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
@@ -70,7 +71,7 @@ public class SynchronizerAuditLog {
     }
     
     public void updateOnError (String message) {
-        date = DateTime.now();
+        date = LocalDateTime.now();
         errorCount++;
         errorMessage = message;
         status = SynchronizerStatus.FAILED;
