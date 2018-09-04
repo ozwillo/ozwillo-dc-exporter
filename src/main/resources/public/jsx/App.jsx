@@ -10,6 +10,8 @@ import i18n from './util/i18n'
 
 import 'bootstrap'
 
+import '../styles/index.scss'
+
 class App extends React.Component {
     
     constructor(props, context) {

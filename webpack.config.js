@@ -4,6 +4,8 @@ const merge = require('webpack-merge');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanPlugin = require('clean-webpack-plugin');
 const autoprefixer = require('autoprefixer');
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 
 const TARGET = process.env.npm_lifecycle_event;
 const PATHS = {
@@ -68,29 +70,31 @@ if(TARGET === 'start' || !TARGET) {
                 '*': 'http://localhost:8080'
             }
         },
-        //entry: common.entry.concat(devEntryPointsLoadersAndServers),
         plugins: [
-            new webpack.HotModuleReplacementPlugin()
+            new webpack.HotModuleReplacementPlugin(),
+            new MiniCssExtractPlugin({
+            	filename: "styles.min.css"
+            })
         ],
         module: {
             rules: [
-                {
+            	{
                 	test: /\.(css|scss)$/, 
+                	include: path.join(PATHS.app, 'styles'),
                 	use: [
                 		MiniCssExtractPlugin.loader,
+                		"css-loader",
                 		{
-                			loader: "css-loader"
+                			loader: "postcss-loader",
+                			options: {
+                				plugins: [
+                					autoprefixer
+	                			]
+                			}
                 		},
-                		{
-                			loader: "postcss-loader"
-                		},
-                		{
-                			loader: "sass-loader"
-                		}
+                		"sass-loader"
                 	]	
-                }		//loaders: ['style', 'css', 'postcss'], include: path.join(PATHS.app, 'styles')},
-                //loaders for Bootstrap 
-                //{test: /\.scss$/, loaders: ['style', 'css', 'postcss', 'sass'], include: path.join(PATHS.app, 'styles')}
+                }
             ]
         },
         optimization: {
@@ -107,21 +111,30 @@ if(TARGET === 'build' || TARGET === 'stats') {
                 	test: /\.(css|scss)$/, 
                 	use: [
                 		MiniCssExtractPlugin.loader,
+                		"css-loader",
                 		{
-                			loader: "css-loader"
+                			loader: "postcss-loader",
+                			options: {
+                				plugins: [
+                					autoprefixer
+	                			]
+                			}
                 		},
-                		{
-                			loader: "postcss-loader"
-                		},
-                		{
-                			loader: "sass-loader"
-                		}
+                		"sass-loader"
                 	]	
                 }
             ]
         },
         optimization: {
-            minimize: true
+            minimize: true,
+            minimizer: [
+            	new UglifyJsPlugin({
+                    cache: true,
+                    parallel: true,
+                    sourceMap: true // set to true if you want JS source maps
+                }),
+                new OptimizeCSSAssetsPlugin({})
+            ]
         },
         plugins: [
             new CleanPlugin([PATHS.build]),
@@ -132,7 +145,7 @@ if(TARGET === 'build' || TARGET === 'stats') {
                 'process.env.NODE_ENV': '"production"'
             }),
             new MiniCssExtractPlugin({
-            	filename: "style.min.css"
+            	filename: "styles.min.css"
             })
         ]
     });

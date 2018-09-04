@@ -37,6 +37,7 @@ node {
 repositories {
 	mavenCentral()
 	mavenLocal()
+	maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -48,9 +49,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.session:spring-session-core'
-    implementation 'joda-time:joda-time:2.9.9'
     implementation 'io.javaslang:javaslang:2.0.4'
-    implementation 'com.ozwillo:ozwillo-java-spring-integration:1.26.0-dev'
+    implementation 'com.github.ozwillo:ozwillo-java-spring-integration:1.26.0'
     implementation 'com.github.ben-manes.caffeine:caffeine:2.3.5'
     implementation 'com.squareup.retrofit2:retrofit:2.2.0'
     implementation 'com.squareup.retrofit2:converter-jackson:2.2.0'
