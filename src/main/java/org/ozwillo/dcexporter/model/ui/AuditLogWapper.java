@@ -1,7 +1,7 @@
 package org.ozwillo.dcexporter.model.ui;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 import org.ozwillo.dcexporter.model.DcModelMapping;
 import org.ozwillo.dcexporter.model.SynchronizerAuditLog;
 
@@ -21,14 +21,11 @@ public class AuditLogWapper {
 
     @JsonProperty
     private String datasetUrl;
-    @JsonProperty
-    private String organizationName;
-
-    public AuditLogWapper(DcModelMapping dcModelMapping, SynchronizerAuditLog synchronizerAuditLog, String datasetUrl, String organizationName) {
+    
+    public AuditLogWapper(DcModelMapping dcModelMapping, SynchronizerAuditLog synchronizerAuditLog, String datasetUrl) {
         this.dcModelMapping = dcModelMapping;
         this.synchronizerAuditLog = synchronizerAuditLog;
         this.datasetUrl = datasetUrl;
-        this.organizationName = organizationName;
     }
 
     public DcModelMapping getDcModelMapping() {

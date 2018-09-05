@@ -32,28 +32,38 @@
         "sort": {
             "all": "Tous",
             "SUCCEEDED": "Réussis",
-            "FAILED": "En échecs",
+            "FAILED": "En échec",
             "PENDING": "En cours",
             "MODIFIED": "Modifiés"
         },
 
-        "panel": {
+        "list": {
             "to_dataset_link": "Voir le jeu de données",
             "to_resource_link": "Voir la ressource",
             "dataset_name": "Nom du jeu de données",
             "dcmodel_name": "Modèle du cœur de données",
             "organization_name": "Organisation",
-            "synchronization_date": "Date de synchronisation"
+            "date": "Date",
+            "actions": "Actions",
+            "SUCCEEDED": "réussi",
+            "FAILED": "échoué",
+            "PENDING": "en cours",
+            "MODIFIED": "modifié"
+        },
+        
+        "error": {
+            "count": "{{ count }} fois",
+            "message": "Erreur : {{ message }}"
         }
     },
 
     "delete_confirmation" : {
         "title": "Suppression",
-        "message" : "Vous êtes sur le point de supprimer la synchronisation de la ressource: "
+        "message" : "Vous êtes sur le point de supprimer la synchronisation de la ressource {{ name }}"
     },
 
     "dataset":{
-        "title": "Enregistrement d'un jeu de données",
+        "title": "Création d'un jeu de données",
         "notif": {
             "is_created": "Le jeu de données a été créé",
             "not_exist": "Ce jeu de données n'existe pas",
@@ -89,7 +99,8 @@
             "address_field": "Champ adresse",
             "city_field": "Champ ville",
             "postal_code_field": "Champ code postal",
-            "geo_location": "Localisation géographique"
+            "geo_location": "Localisation géographique",
+            "private": "Privé"
         }
     }
 }

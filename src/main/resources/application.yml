@@ -21,7 +21,8 @@ application:
 
 # TODO : Copied pasted from portal configuration, check if we really need all of them
 kernel:
-  base_uri: https://kernel.ozwillo-dev.eu
+  base_uri: https://kernel.ozwillo-preprod.eu
+  account_uri: https://accounts.ozwillo-preprod.eu
   alt_uri: ${kernel.base_uri}
   auth:
     issuer: ${kernel.base_uri}/
@@ -29,13 +30,20 @@ kernel:
     token_endpoint: ${kernel.base_uri}/a/token
     keys_endpoint: ${kernel.base_uri}/a/keys
     userinfo_endpoint: ${kernel.base_uri}/a/userinfo
-    profile_endpoint: ${kernel.base_uri}/d/user
     password_change_endpoint: ${kernel.alt_uri}/a/password
     revoke_endpoint: ${kernel.base_uri}/a/revoke
     logout_endpoint: ${kernel.alt_uri}/a/logout
     callback_uri: ${application.url}/callback
     home_uri: ${application.url}
-  user_directory_endpoint: ${kernel.base_uri}/d
+  account_france_connect_uri: ${kernel.account_uri}/a/franceconnect
+  kernel_france_connect_uri: ${kernel.base_uri}/a/franceconnect
+  france_connect:
+    link_endpoint: ${kernel.account_france_connect_uri}/login
+    unlink_endpoint: ${kernel.account_france_connect_uri}/unlink
+    userinfo_endpoint: ${kernel.kernel_france_connect_uri}/userinfo
+  user_profile_endpoint: ${kernel.base_uri}/d/user
+  user_membership_endpoint: ${kernel.base_uri}/d
+  organization_endpoint: ${kernel.base_uri}/d/org
   event_bus_endpoint: ${kernel.base_uri}/e
   notifications_endpoint: ${kernel.base_uri}/n
   client_id: portal
@@ -45,9 +53,9 @@ kernel:
 
 datacore:
   #url: http://localhost:8080
-  containerUrl: http://data.sictiam.fr
+  containerUrl: http://data.ozwillo.com
   #url: https://data.ozwillo-dev.eu    # dev, doesn't work with current gen'd cert
-  url: https://plnm-dev-dc             # dev, requires (MUST) set the IP in /etc/hosts, and installing gen'd cert :
+  url: https://data.ozwillo-preprod.eu             # dev, requires (MUST) set the IP in /etc/hosts, and installing gen'd cert :
   # go to https://data.ozwillo-dev.eu, right click on lock, export certificate to plnm-dev-dc.cer,
   # then import it and check :
   # sudo keytool -import -alias plnm-dev-dc -keystore /usr/lib/jvm/jdk1.8.xx/jre/lib/security/cacerts -file plnm-dev-dc.cer

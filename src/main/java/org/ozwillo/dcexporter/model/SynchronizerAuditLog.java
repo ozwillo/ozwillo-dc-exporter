@@ -1,8 +1,11 @@
 package org.ozwillo.dcexporter.model;
 
-import org.hibernate.validator.constraints.NotEmpty;
-import org.joda.time.DateTime;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import javax.validation.constraints.NotEmpty;
+import org.ozwillo.dcexporter.config.CustomDateTimeSerializer;
 import org.springframework.data.annotation.Id;
+
+import java.time.LocalDateTime;
 
 import javax.validation.constraints.NotNull;
 
@@ -23,18 +26,24 @@ public class SynchronizerAuditLog {
     @NotEmpty
     private String errorMessage;
 
+    private int errorCount = 0;
+    
     @NotNull
     @NotEmpty
-    private DateTime date;
+    @JsonSerialize(using = CustomDateTimeSerializer.class)
+    private LocalDateTime date;
 
     public SynchronizerAuditLog() {
     }
 
-    public SynchronizerAuditLog(String type, SynchronizerStatus status, String errorMessage, DateTime date) {
+    public SynchronizerAuditLog(String type, SynchronizerStatus status, String errorMessage, LocalDateTime date) {
         this.type = type;
         this.status = status;
         this.errorMessage = errorMessage;
         this.date = date;
+        
+        if (status == SynchronizerStatus.FAILED) 
+            errorCount = 1;
     }
 
     public String getId() {
@@ -53,8 +62,19 @@ public class SynchronizerAuditLog {
         return errorMessage;
     }
 
-    public DateTime getDate() {
+    public LocalDateTime getDate() {
         return date;
+    }
+
+    public int getErrorCount() {
+        return errorCount;
+    }
+    
+    public void updateOnError (String message) {
+        date = LocalDateTime.now();
+        errorCount++;
+        errorMessage = message;
+        status = SynchronizerStatus.FAILED;
     }
 
     @Override
@@ -64,6 +84,7 @@ public class SynchronizerAuditLog {
             ", type='" + type + '\'' +
             ", succeeded=" + status + '\'' +
             ", errorMessage='" + errorMessage + '\'' +
+            ", errorCount='" + errorCount + '\'' +
             ", date=" + date +
             '}';
     }

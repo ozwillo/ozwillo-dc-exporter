@@ -3,9 +3,6 @@ package org.ozwillo.dcexporter.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javaslang.control.Either;
-import org.joda.time.LocalDateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.ozwillo.dcexporter.model.*;
 import org.ozwillo.dcexporter.model.Ckan.*;
 import org.slf4j.Logger;
@@ -16,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.text.Normalizer;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,9 +37,11 @@ public class CkanService {
         if(!opt.isPresent()) return Either.left("dataset.notif.error.fetch_datasets");
 
         List<String> datasets = opt.get();
-        return Either.right(datasets.stream()
-            .map(idOrName -> ckanClientService.getDataset(ckanUrl, idOrName).get())
-            .collect(Collectors.toList()));
+        
+        Optional<List<CkanDataset>> opt2 = ckanClientService.getCompleteDatasets(ckanUrl, datasets.size());
+        if(!opt2.isPresent()) return Either.left("dataset.notif.error.fetch_datasets");
+        
+        return Either.right(opt2.get());
     }
 
     public Either<String, Map<String, String>> getLicences() {
@@ -104,7 +105,7 @@ public class CkanService {
             ckanDataset.setUrl(dcModelMapping.getSource());
             ckanDataset.setVersion(dcModelMapping.getVersion());
             ckanDataset.setTags(dcModelMapping.getTags());
-            ckanDataset.setPrivate(false);
+            ckanDataset.setPrivate(dcModelMapping.isPrivateDataSet());
             if (dcModelMapping.getGeoLocation() != null) {
                 List<CkanExtra> ckanExtras = new ArrayList<>();
                 ObjectMapper mapperObj = new ObjectMapper();
@@ -163,8 +164,8 @@ public class CkanService {
             ckanResource.setId(dcModelMapping.getCkanResourceId().get(key));
             ckanResource.setUpload(optionalResource.get().getBytes());
 
-            DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateHourMinuteSecondMillis();
-            ckanResource.setLastModified(dateTimeFormatter.print(LocalDateTime.now()));
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+            ckanResource.setLastModified(LocalDateTime.now().format(dateTimeFormatter));
 
             Optional<ResourceResponse> resourceResponseOptional = ckanClientService.updateResourceFile(ckanUrl, ckanApiKey, ckanResource);
             if(resourceResponseOptional.isPresent()) {

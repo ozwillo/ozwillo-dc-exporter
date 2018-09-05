@@ -37,22 +37,32 @@
             "MODIFIED": "Modified"
         },
 
-        "panel": {
+        "list": {
             "to_dataset_link": "Open dataset",
             "to_resource_link": "Open resource",
             "dataset_name": "Dataset name",
             "dcmodel_name": "Datacore Model",
-            "synchronization_date": "Synchronization date"
+            "date": "Date",
+            "actions": "Actions",
+            "SUCCEEDED": "Succeeded",
+            "FAILED": "Failed",
+            "PENDING": "Pending",
+            "MODIFIED": "Modified"
+        },
+        
+        "error": {
+            "count": "{{ count }} times",
+            "message": "Error : {{ message }}"
         }
     },
 
     "delete_confirmation" : {
-        "title": "Deletion",
-        "message" : "You will delete this resource synchronization: "
+        "title": "Delete confirmation",
+        "message" : "Do you confirm the deletion of resource synchronization {{ name }} ?"
     },
 
     "dataset":{
-        "title": "Dataser register",
+        "title": "Creation of a dataset",
         "notif": {
             "is_created": "Dataset is created",
             "not_exist": "This dataset does not exist",
@@ -88,7 +98,8 @@
             "address_field": "Address field",
             "city_field": "City field",
             "postal_code_field": "Postal code field",
-            "geo_location": "Geo location"
+            "geo_location": "Geo location",
+            "private": "Private"
         }
     }
 }

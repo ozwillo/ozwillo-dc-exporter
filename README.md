@@ -1,10 +1,13 @@
 # DC Exporter
 
-DC Exporter is a data synchronizer between the [Ozwillo Datacore](https://github.com/ozwillo/ozwillo-datacore) and the open data platform [CKAN](https://github.com/ckan/ckan)
+DC Exporter is a data synchronizer between the [Ozwillo Datacore](https://github.com/ozwillo/ozwillo-datacore) and the Open Data platform [CKAN](https://github.com/ckan/ckan)
 
 ### Features 
 
-- Configure model mapping synchronization between Datacore and CKAN 
+- Configure model mapping synchronization between Datacore and CKAN
+- Choose fields to publish in Open Data
+- Configure datasets metadata
+- On-the-fly geocoding of resources
 - List model mapping synchronizations 
 - Links to CKAN datasets and resources 
 
@@ -19,9 +22,8 @@ Building requires :
 ### Installing
 * Clone this repository
 ```
-git clone --recursive https://github.com/ozwillo/ozwillo-dc-exporter/
+git clone https://github.com/ozwillo/ozwillo-dc-exporter/
 ```
-NB: The `--recursive` parameter is mandatory because DC Exporter requires [Ozwillo java spring integration](https://github.com/ozwillo/ozwillo-java-spring-integration) git submodule
 * After cloning this repository, install the npm packages
 
 ```

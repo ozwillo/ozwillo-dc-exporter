@@ -1,11 +1,23 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import renderIf from 'render-if'
-import { browserHistory } from 'react-router';
 import { translate } from 'react-i18next'
 
 import DatasetForm from './DatasetForm'
 import GeocodingForm from './GeocodingForm'
-import { Form, FormGroup, Label, SelectField, InputText, Textarea, SubmitButton, Alert, ReadOnlyField, Checkbox } from './Form'
+import {
+    Form,
+    FormGroup,
+    Label,
+    SelectField,
+    Input,
+    Textarea,
+    SubmitButton,
+    Alert,
+    ReadOnlyField,
+    Checkbox ,
+    Fieldset } from './Form'
+import { H2 } from './Headings'
 
 class Dataset extends React.Component {
     constructor(props, context) {
@@ -41,7 +53,8 @@ class Dataset extends React.Component {
                 addressField: '',
                 postalCodeField: '',
                 cityField: '',
-                geoLocation: {}
+                geoLocation: {},
+                private: false
             }
         }
 
@@ -65,8 +78,8 @@ class Dataset extends React.Component {
         }
     }
     componentDidMount() {
-        if (this.props.params.id) {
-            this.loadMapping(this.props.params.id)
+        if (this.props.match.params && this.props.match.params.id) {
+            this.loadMapping(this.props.match.params.id)
         }
 
         fetch('/api/dc/models', { credentials: 'same-origin' })
@@ -89,7 +102,7 @@ class Dataset extends React.Component {
             })
     }
     componentDidUpdate() {
-        if(this.props.params.id && this.state.fieldsFetched && this.state.datasetsFetched && !this.state.datasetFetched) {
+        if (this.props.match.params && this.props.match.params.id && this.state.fieldsFetched && this.state.datasetsFetched && !this.state.datasetFetched) {
             fetch('/api/dc/model/' + this.state.fields.project + '/' + this.state.fields.type, { credentials: 'same-origin' })
                 .then(response => response.json())
                 .then(json => this.setState({dataset: json, datasetFetched: true}))
@@ -101,6 +114,9 @@ class Dataset extends React.Component {
             .then(json => {
                 this.setState({fields: json, mode: 'update', fieldsFetched: true, newDataset: false})
                 json.excludedFields.forEach(elem => this.selectedCheckboxes.add(elem))
+            })
+            .catch(error => {
+                error.text().then(text => { this.onChangeNotif(false, text) })
             })
     }
     onDatasetSelected(dcId) {
@@ -114,7 +130,8 @@ class Dataset extends React.Component {
         fields['dcId'] = dcId
         this.setState({ fields: fields, dataset: dataset, datasetFetched: true })
     }
-    registerDataset(fields) {
+    registerDataset(e, fields) {
+        e.preventDefault();
         fetch('/api/dc-model-mapping/model', {
             method: 'POST',
             credentials: 'same-origin',
@@ -127,13 +144,13 @@ class Dataset extends React.Component {
         .then(this.checkStatus)
         .then(response => response.text())
         .then(id => {
-            browserHistory.push('/dataset/' + id)
             this.loadMapping(id)
             this.setState({ message: 'dataset.notif.is_created' })
         })
         .catch(text => this.setState({ success : false, message: text }))
     }
-    updateDataset(fields) {
+    updateDataset(e, fields) {
+        e.preventDefault();
         fetch('/api/dc-model-mapping/model', {
             method: 'PUT',
             credentials: 'same-origin',
@@ -149,7 +166,8 @@ class Dataset extends React.Component {
             response.text().then(text => this.setState({ success : false, message: text }))
         })
     }
-    toggleCheckbox(label){
+    toggleCheckbox(event){
+        const label = event.target.value
         if (this.selectedCheckboxes.has(label)) {
             const index = this.state.fields.excludedFields.findIndex((excludeField) => {return excludeField==label})
             let excludeFields = this.state.fields.excludedFields
@@ -192,9 +210,11 @@ class Dataset extends React.Component {
     render() {
         const { t } = this.context
         const fields = this.state.datasetFetched && this.state.fields.dcId ?
-            this.state.dataset['dcmo:globalFields'].map((field, key) =>
-                <Checkbox label={field['dcmf:name']} handleCheckboxChange={this.toggleCheckbox} key={key}
-                          checked={!this.state.fields.excludedFields.includes(field['dcmf:name'])}/>)
+            this.state.dataset['dcmo:fields'].map((field, key) => {
+                const label = field['dcmf:name'] + (field['dcmf:documentation'] ? " (" + field['dcmf:documentation'] + ")" : "")
+                return <Checkbox value={field['dcmf:name']} label={label} handleCheckboxChange={this.toggleCheckbox} key={key}
+                          checked={!this.state.fields.excludedFields.includes(field['dcmf:name'])}/>})
+            
             : null
 
         const disabled = this.state.fields.name == null || this.state.fields.name == '' ||
@@ -206,16 +226,15 @@ class Dataset extends React.Component {
 
         return (
             <div  id="container" className="container">
-                <h1>{ t('dataset.title') }</h1>
+                <H2>{t('dataset.title')}</H2>
                 {renderIf(this.state.message)(
                     <Alert message={ t(this.state.message) } success={this.state.success} closeMethod={this.closeNotif}/>
                 )}
-                <Form>
-                    <div className="panel panel-default">
-                        <div className="panel-heading">
-                            <h3 className="panel-title">{ t('dataset.panel.datacore') }</h3>
-                        </div>
-                        <div className="panel-body">
+                <Form id="dataset-form" onSubmit={(e) => { 
+                                                    if (this.state.mode == 'create') this.registerDataset(e, this.state.fields); 
+                                                    else this.updateDataset(e, this.state.fields);
+                                                 }}>
+                    <Fieldset legend={t('dataset.panel.datacore')}>
                             {isModeCreate(
                                 <DatasetChooser dcId={this.state.fields.dcId} onDatasetSelected={this.onDatasetSelected}
                                     datasets={this.state.datasets} t={t} />
@@ -230,19 +249,28 @@ class Dataset extends React.Component {
                                 <div>
                                     <FormGroup>
                                         <Label htmlFor="version" value={ t('dataset.label.version') } />
-                                        {isModeCreate(<InputText id="version" value={this.state.fields.version}/>)}
-                                        {isModeUpdate(<ReadOnlyField id="version" value={this.state.fields.version}/>)}
+                                        {isModeCreate(
+                                            <Input
+                                                id="version"
+                                                type="number"
+                                                value={this.state.fields.version}
+                                                onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>)}
+                                        {isModeUpdate(
+                                            <Input
+                                                id="version"
+                                                type="number"
+                                                readOnly={true}
+                                                value={this.state.fields.version}/>)}
                                     </FormGroup>
                                     <FormGroup>
                                         <Label htmlFor="excludedFields" value={ t('dataset.label.export_fields')} />
-                                        <div className="col-sm-9">
+                                        <div className="col-sm-9" id="excludedFields">
                                             { fields }
                                         </div>
                                     </FormGroup>
                                 </div>
                             )}
-                        </div>
-                    </div>
+                    </Fieldset>
                     {renderIf(this.state.fields.dcId)(
                         <div>
                             {renderIf(this.state.datasetFetched)(
@@ -267,27 +295,29 @@ class Dataset extends React.Component {
                                          organizations={this.state.organizations}
                                          organizationId={this.state.fields['organizationId']}
                                          onChangeNotif={this.onChangeNotif}
-                                         geoLocation={this.state.fields.geoLocation}/>
+                                         geoLocation={this.state.fields.geoLocation}
+                                         private={false} 
+                                         modeCreate={this.state.mode == 'create'} />
 
-                            <div className="panel panel-default">
-                                <div className="panel-heading">
-                                    <h3 className="panel-title">{ t('dataset.panel.resource') }</h3>
-                                </div>
-                                <div className="panel-body">
-                                    <FormGroup>
-                                        <Label htmlFor="resourceName" value={ t('dataset.label.resource_name') } />
-                                        <InputText id="resourceName" value={this.state.fields.resourceName}
-                                                   onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label htmlFor="description" value={ t('dataset.label.description') } />
-                                        <Textarea id="description" value={this.state.fields.description}
-                                                  onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
-                                    </FormGroup>
-                                </div>
+                            <Fieldset legend={t('dataset.panel.resource')}>
+                                <FormGroup>
+                                    <Label htmlFor="resourceName" value={ t('dataset.label.resource_name') } />
+                                    <Input
+                                        id="resourceName"
+                                        type="text"
+                                        value={this.state.fields.resourceName}
+                                        onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label htmlFor="description" value={ t('dataset.label.description') } />
+                                    <Textarea id="description" value={this.state.fields.description}
+                                              onChange={(event) => this.onFieldChange(event.target.id, event.target.value)}/>
+                                </FormGroup>
+                            </Fieldset>
+                            <div className="float-right">
+                                {isModeCreate(<SubmitButton label={ t('action.create') } disabled={disabled} />)}
+                                {isModeUpdate(<SubmitButton label={ t('action.update') } disabled={disabled} />)}
                             </div>
-                            {isModeCreate(<SubmitButton label={ t('action.create') } onClick={(event) => this.registerDataset(this.state.fields)} disabled={disabled} />)}
-                            {isModeUpdate(<SubmitButton label={ t('action.update') } onClick={(event) => this.updateDataset(this.state.fields)} disabled={disabled} />)}
                         </div>
                     )}
                 </Form>
@@ -297,14 +327,15 @@ class Dataset extends React.Component {
 }
 
 Dataset.contextTypes = {
-    csrfToken: React.PropTypes.string,
-    csrfTokenHeaderName: React.PropTypes.string,
-    t: React.PropTypes.func
+    csrfToken: PropTypes.string,
+    csrfTokenHeaderName: PropTypes.string,
+    t: PropTypes.func,
+    onSubmit: PropTypes.func
 }
 
 const DatasetChooser = ({ datasets, dcId, onDatasetSelected, t }) => {
     const options = datasets.map(dataset =>
-        <option key={dataset['@id']} value={dataset['@id']}>{dataset['dcmo:name']}</option>
+        <option key={dataset['@id'] + '-' + dataset['dcmo:pointOfViewAbsoluteName'] + '-' + dataset['o:version']} value={dataset['@id']}>{dataset['dcmo:name']}</option>
     )
     return (
             <FormGroup>
@@ -318,14 +349,11 @@ const DatasetChooser = ({ datasets, dcId, onDatasetSelected, t }) => {
 }
 
 DatasetChooser.propTypes = {
-    dcId: React.PropTypes.string.isRequired,
-    onDatasetSelected: React.PropTypes.func.isRequired,
-    datasets: React.PropTypes.array.isRequired,
-    t: React.PropTypes.func.isRequired
+    dcId: PropTypes.string.isRequired,
+    onDatasetSelected: PropTypes.func.isRequired,
+    datasets: PropTypes.array.isRequired,
+    t: PropTypes.func.isRequired
 }
 
-Dataset.PropTypes = {
-    onSubmit: React.PropTypes.func.isRequired
-}
 
 export default translate(['dc-exporter'])(Dataset)

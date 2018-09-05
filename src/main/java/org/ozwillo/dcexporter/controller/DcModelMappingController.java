@@ -42,8 +42,13 @@ public class DcModelMappingController {
     }
 
     @RequestMapping(value = "/model/{id}", method = RequestMethod.GET)
-    public DcModelMapping getMapping(@PathVariable String id) {
-        return dcModelMappingService.getById(id);
+    public ResponseEntity<Object> getMapping(@PathVariable String id) {
+        Either<String, DcModelMapping> result = dcModelMappingService.getById(id);
+        
+        if (result.isRight()) 
+            return new ResponseEntity<>(result.get(), HttpStatus.OK);
+        else
+            return new ResponseEntity<>(result.getLeft(), HttpStatus.NOT_FOUND);
     }
 
     @RequestMapping(value = "/model/{id}", method = RequestMethod.DELETE)

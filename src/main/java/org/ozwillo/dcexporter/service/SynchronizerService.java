@@ -1,7 +1,6 @@
 package org.ozwillo.dcexporter.service;
 
 import javaslang.control.Either;
-import org.joda.time.DateTime;
 import org.ozwillo.dcexporter.dao.DcModelMappingRepository;
 import org.ozwillo.dcexporter.dao.SynchronizerAuditLogRepository;
 import org.ozwillo.dcexporter.model.Ckan.CkanDataset;
@@ -14,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
@@ -55,15 +55,23 @@ public class SynchronizerService {
 
                 LOGGER.info("Got some recent data for {}, synchronizing them", dcModelMapping.getType());
 
-                SynchronizerAuditLog newAuditLog;
+                
                 try {
                     this.sync(dcModelMapping);
-                    newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.SUCCEEDED, null,  DateTime.now());
+                    SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.SUCCEEDED, null,  LocalDateTime.now());
                     synchronizerAuditLogRepository.save(newAuditLog);
                 } catch (Exception exception) {
-                    LOGGER.error("Error while trying to synchronize model {} : {} ", exception.getMessage());
-                    newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.FAILED, exception.getMessage(),  DateTime.now());
-                    synchronizerAuditLogRepository.save(newAuditLog);
+                    LOGGER.error("Error while trying to synchronize model {} : {} ", dcModelMapping.getType(), exception.getMessage());
+                    if (auditLog.getStatus() == SynchronizerStatus.FAILED) {
+                        // update current one
+                        auditLog.updateOnError(exception.getMessage());
+                        synchronizerAuditLogRepository.save(auditLog);
+                    }
+                    else {
+                        // create a new one with failed status
+                        SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.FAILED, exception.getMessage(),  LocalDateTime.now());
+                        synchronizerAuditLogRepository.save(newAuditLog);
+                    }
                 }
             });
         });

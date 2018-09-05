@@ -48,12 +48,12 @@ public class CkanResource {
     private String openspendingHint;
     @JsonIgnore
     private byte[] upload;
-
+    private String frequency = "Real time"; // default fixed value
 
     public CkanResource() {
     }
 
-    public CkanResource(String cacheLastUpdated, String packageId, String webstoreLastUpdated, boolean datastoreActive, String id, String size, String state, String hash, String description, String format, String lastModified, String urlType, String mimetype, String cacheUrl, String name, String created, String url, String webstoreUrl, String mimetypeInner, int position, String revisionId, String resourceType, String openspendingHint, byte[] upload) {
+    public CkanResource(String cacheLastUpdated, String packageId, String webstoreLastUpdated, boolean datastoreActive, String id, String size, String state, String hash, String description, String format, String lastModified, String urlType, String mimetype, String cacheUrl, String name, String created, String url, String webstoreUrl, String mimetypeInner, int position, String revisionId, String resourceType, String openspendingHint, byte[] upload, String frequency) {
         this.cacheLastUpdated = cacheLastUpdated;
         this.packageId = packageId;
         this.webstoreLastUpdated = webstoreLastUpdated;
@@ -78,6 +78,7 @@ public class CkanResource {
         this.resourceType = resourceType;
         this.openspendingHint = openspendingHint;
         this.upload = upload;
+        this.frequency = frequency;
     }
 
 
@@ -263,4 +264,13 @@ public class CkanResource {
             this.size = String.valueOf(upload.length);
         }
     }
+
+    public String getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(String frequency) {
+        this.frequency = frequency;
+    }
+    
 }

@@ -6,3 +6,10 @@ node_modules
 /.gradletasknamecache
 /out
 .iml
+\.vscode/
+
+# eclipse ignore
+bin/
+.classpath
+.settings
+.project

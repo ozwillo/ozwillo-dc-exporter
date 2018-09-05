@@ -1,1 +1,1 @@
-include 'ozwillo-java-spring-integration'
+rootProject.name = 'ozwillo-dc-exporter'

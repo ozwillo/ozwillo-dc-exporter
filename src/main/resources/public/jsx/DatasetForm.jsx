@@ -1,33 +1,15 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import renderIf from 'render-if'
 import { translate } from 'react-i18next'
 
 import DatasetAutosuggest from './DatasetAutosuggest'
 import { TagAutosuggest, Tag } from './TagAutosuggest'
 import AddressAutosuggest from './AddressAutosuggest'
-import { FormGroup, Label, InputText, SelectField, Textarea } from './Form'
+import { FormGroup, Label, Input, SelectField, Textarea, Fieldset, Checkbox, ReadOnlyField } from './Form'
 
 class DatasetForm extends React.Component {
-    static propTypes = {
-        onChange: React.PropTypes.func.onChange,
-        onDatasetNameChange: React.PropTypes.func.isRequired,
-        onFieldChange: React.PropTypes.func.isRequired,
-        toggleNewDataset: React.PropTypes.func.isRequired,
-        newDataset: React.PropTypes.bool.isRequired,
-        tags: React.PropTypes.array.isRequired,
-        source: React.PropTypes.string.isRequired,
-        notes: React.PropTypes.string.isRequired,
-        licenses: React.PropTypes.object.isRequired,
-        license: React.PropTypes.string.isRequired,
-        organizationId:React.PropTypes.string,
-        organizations:React.PropTypes.array.isRequired,
-        datasetName: React.PropTypes.string.isRequired,
-        onChangeNotif: React.PropTypes.func.isRequired,
-        geoLocation: React.PropTypes.object.isRequired
-    }
-    static contextTypes = {
-        t: React.PropTypes.func
-    }
+    
     constructor(props, context) {
         super(props, context)
         this.handleDelete = this.handleDelete.bind(this)
@@ -49,24 +31,29 @@ class DatasetForm extends React.Component {
         const tags = this.props.tags.map(( tag, key ) =>
             <Tag key={key} keyword={tag.name} remove={this.handleDelete} id={key} />)
 
-        const existingClassName = !this.props.newDataset ? "btn btn-primary" : "btn btn-default"
-        const newClassName = this.props.newDataset ? "btn btn-primary" : "btn btn-default"
-
-        const existingDataset = renderIf(this.props.newDataset == false)
-        const newDataset = renderIf(this.props.newDataset == true)
+        const modeCreate = renderIf(this.props.modeCreate == true)
+        const modeUpdate = renderIf(this.props.modeCreate == false)
+        
+        const existingClassName = !this.props.newDataset ? "btn btn-primary" : "btn btn-outline-primary"
+        const newClassName = this.props.newDataset ? "btn btn-primary" : "btn btn-outline-primary"
+        
+        const existingDataset = renderIf(this.props.modeCreate == true && this.props.newDataset == false)
+        const newDataset = renderIf(this.props.modeCreate == true && this.props.newDataset == true)
 
         return (
-            <div className="panel panel-default">
-                <div className="panel-heading">
-                    <h3 className="panel-title">{ t('dataset.panel.dataset') } </h3>
-                </div>
-                <div className="panel-body">
-                    <div className="center-outer-div">
-                        <div className="btn-group center-inner-div">
-                            <button type="button" className={existingClassName} onClick={this.props.toggleNewDataset}>{ t('action.existing') }</button>
-                            <button type="button" className={newClassName} onClick={this.props.toggleNewDataset}>{ t('action.new') }</button>
-                        </div>
+            <Fieldset legend={t('dataset.panel.dataset')}>
+                    {modeCreate(
+                    <div className="btn-group d-flex justify-content-center mb-sm-3">
+                        <button type="button" className={existingClassName} onClick={this.props.toggleNewDataset}>{ t('action.existing') }</button>
+                        <button type="button" className={newClassName} onClick={this.props.toggleNewDataset}>{ t('action.new') }</button>
                     </div>
+                    )}
+                    {modeUpdate(
+                        <FormGroup>
+                            <Label htmlFor="model" value={ t('dataset.label.name') } />
+                            <ReadOnlyField id="model" value={this.props.datasetName} />
+                        </FormGroup>
+                    )}
                     {existingDataset(
                         <FormGroup>
                             <Label htmlFor="autosuggest-name" value={t('dataset.label.name')} />
@@ -79,10 +66,17 @@ class DatasetForm extends React.Component {
                     )}
                     {newDataset(
                         <div>
+                            <OrganizationChooser organizations={this.props.organizations} currentOrganizationId={this.props.organizationId}
+                                                    onChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}
+                                                    t={ t }/>
+                            
                             <FormGroup>
                                 <Label htmlFor="name" value={t('dataset.label.name')} />
-                                <InputText id="name" value={this.props.datasetName}
-                                           onChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}/>
+                                <Input
+                                    id="name"
+                                    Type="text"
+                                    value={this.props.datasetName}
+                                    onChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}/>
                             </FormGroup>
                             <FormGroup>
                                 <Label htmlFor="geo-dataset" value={t('dataset.label.geo_location')} />
@@ -97,15 +91,15 @@ class DatasetForm extends React.Component {
                             </FormGroup>
                             <FormGroup>
                                 <Label htmlFor="source" value={t('dataset.label.source')} />
-                                <InputText id="source" value={this.props.source}
-                                           onChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}/>
+                                <Input
+                                    id="source"
+                                    type="text"
+                                    value={this.props.source}
+                                    onChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}/>
                             </FormGroup>
                             <LicenceChooser licenses={this.props.licenses} currentLicense={this.props.license}
                                             onChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}
                                             t={ t }/>
-                            <OrganizationChooser organizations={this.props.organizations} currentOrganizationId={this.props.organizationId}
-                                                  onChange={(event) => this.props.onFieldChange(event.target.id, event.target.value)}
-                                                  t={ t }/>
                             <FormGroup>
                                 <Label htmlFor="tags" value={ t('dataset.label.tags') }/>
                                 <TagAutosuggest onSelect={ this.handleAddition }/>
@@ -117,11 +111,16 @@ class DatasetForm extends React.Component {
                                         </div>
                                 )}
                             </FormGroup>
-
+                                
+                            <FormGroup>
+                                <Label htmlFor="private" value={ t('dataset.label.private') } />                 
+                                <div className="col-sm-9" id="private">
+                                    <Checkbox defaultChecked={this.props.private} handleCheckboxChange={(event) => this.props.onFieldChange('private', event.target.checked)}/>
+                                </div>
+                            </FormGroup>          
                         </div>
                     )}
-                </div>
-            </div>
+            </Fieldset>
         )
     }
 }
@@ -132,7 +131,7 @@ const LicenceChooser = ({ licenses, currentLicense, onChange, t }) => {
     )
     return (
         <FormGroup>
-            <Label htmlForm="license" value={ t('dataset.label.license') }/>
+            <Label htmlFor="license" value={ t('dataset.label.license') }/>
             <SelectField id="license" value={currentLicense} onChange={onChange}>
                 {options}
             </SelectField>
@@ -148,12 +147,35 @@ const OrganizationChooser = ({ organizations, currentOrganizationId, onChange, t
         )
     return (
         <FormGroup>
-            <Label htmlForm="organizationId" value={ t('dataset.label.organization')} />
+            <Label htmlFor="organizationId" value={ t('dataset.label.organization')} />
             <SelectField id="organizationId" value={currentOrganizationId} onChange={onChange}>
                 {options}
             </SelectField>
         </FormGroup>
     )
+}
+
+DatasetForm.propTypes = {
+    onDatasetNameChange: PropTypes.func.isRequired,
+    onFieldChange: PropTypes.func.isRequired,
+    toggleNewDataset: PropTypes.func.isRequired,
+    newDataset: PropTypes.bool.isRequired,
+    tags: PropTypes.array.isRequired,
+    source: PropTypes.string.isRequired,
+    notes: PropTypes.string.isRequired,
+    licenses: PropTypes.object.isRequired,
+    license: PropTypes.string.isRequired,
+    organizationId:PropTypes.string,
+    organizations:PropTypes.array.isRequired,
+    datasetName: PropTypes.string.isRequired,
+    onChangeNotif: PropTypes.func.isRequired,
+    geoLocation: PropTypes.object.isRequired,
+    private: PropTypes.bool.isRequired,
+    modeCreate: PropTypes.bool.isRequired
+}
+
+DatasetForm.contextTypes = {
+    t: PropTypes.func
 }
 
 export default translate(['dc-exporter'])(DatasetForm)
