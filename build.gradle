@@ -8,9 +8,6 @@ buildscript {
             url "https://plugins.gradle.org/m2/"
         }
 	}
-	dependencies {
-		
-	}
 }
 
 plugins {
@@ -69,25 +66,13 @@ compileJava {
 }
 
 bootRun {
-    // needed for hot reload of thymeleaf templates
-    sourceResources sourceSets.main
-
-	environment SPRING_PROFILES_ACTIVE: environment.SPRING_PROFILES_ACTIVE ?: "dev"
+    environment SPRING_PROFILES_ACTIVE: environment.SPRING_PROFILES_ACTIVE ?: "dev"
 }
-/*
-springBoot {
-    // exclude Spring Boot Devtools from the fat jar
-    excludeDevtools = true
 
-    executable = true
-    embeddedLaunchScriptProperties =
-            [initInfoDescription: 'Ozwillo Datacore Exporter',
-             initInfoShortDescription: 'Ozwillo Datacore Exporter',
-             initInfoProvides: 'ozwillo-dc-exporter']
-}
-*/
 bootJar {
-    launchScript()
+    launchScript({
+        properties 'initInfoProvides': 'ozwillo-dc-exporter'
+    })
 }
 
 wrapper {
