@@ -1,95 +1,72 @@
-buildscript {
-	ext {
-		springBootVersion = '1.4.0.RELEASE'
-	}
-	repositories {
-		mavenCentral()
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-	}
-	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath "com.moowork.gradle:gradle-node-plugin:1.0.1"
-	}
+plugins {
+    id 'org.springframework.boot' version "2.0.4.RELEASE"
+    id 'com.moowork.node' version '1.2.0'
 }
 
 apply plugin: 'java'
-apply plugin: 'spring-boot'
-apply plugin: 'com.moowork.node'
+apply plugin: 'io.spring.dependency-management'
 
-jar {
-	baseName = 'ozwillo-dc-exporter'
-	version = '0.13.0-dev'
-}
+
+
+group = 'com.ozwillo'
+version = '0.13.0'
 
 sourceCompatibility = 1.8
-targetCompatibility = 1.8
+
 
 node {
-    version = '7.4.0'
-	download = true
+    version = '8.9.0'
+    download = true
 }
 
 repositories {
-	mavenCentral()
-	mavenLocal()
+    mavenCentral()
+    mavenLocal()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-	compile('org.springframework.boot:spring-boot-starter-actuator')
-	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
-	compile('org.springframework.boot:spring-boot-devtools')
-	compile('org.springframework.boot:spring-boot-starter-jersey')
-	compile('org.springframework.boot:spring-boot-starter-mail')
-	compile('org.springframework.boot:spring-boot-starter-cache')
-	compile('org.springframework.retry:spring-retry')
-	compile('org.springframework.boot:spring-boot-starter-security')
-	compile('org.springframework.session:spring-session')
-	compile('org.springframework.boot:spring-boot-starter-web')
-	compile('org.springframework.boot:spring-boot-starter-websocket')
-	compile('joda-time:joda-time:2.9.9')
-	compile('io.javaslang:javaslang:2.0.4')
-    compile('com.ozwillo:ozwillo-java-spring-integration:1.26.0-dev')
-	compile('com.github.ben-manes.caffeine:caffeine:2.3.5')
-
-    testCompile('org.springframework.boot:spring-boot-starter-test')
-
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    implementation 'org.springframework.boot:spring-boot-starter-jersey'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.session:spring-session-core'
+    implementation 'io.javaslang:javaslang:2.0.4'
+    implementation 'com.github.ozwillo:ozwillo-java-spring-integration:1.26.0'
+    implementation 'com.github.ben-manes.caffeine:caffeine:2.3.5'
+    implementation 'com.squareup.retrofit2:retrofit:2.2.0'
+    implementation 'com.squareup.retrofit2:converter-jackson:2.2.0'
+    
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    
     // required to parse logback-spring.groovy
     // TODO : quite a fat dependency for a configuration file
-    runtime('org.codehaus.groovy:groovy:2.4.7')
+    runtimeOnly 'org.codehaus.groovy:groovy:2.4.7'
+    runtimeOnly 'org.springframework.boot:spring-boot-devtools'
+}
 
-	compile 'com.squareup.retrofit2:retrofit:2.2.0'
-	compile 'com.squareup.retrofit2:converter-jackson:2.2.0'
-
+compileJava {
+    options.deprecation = true
 }
 
 bootRun {
-    // needed for hot reload of thymeleaf templates
-    addResources = true
-
-	environment SPRING_PROFILES_ACTIVE: environment.SPRING_PROFILES_ACTIVE ?: "dev"
+    environment SPRING_PROFILES_ACTIVE: environment.SPRING_PROFILES_ACTIVE ?: "dev"
 }
 
-springBoot {
-    // exclude Spring Boot Devtools from the fat jar
-    excludeDevtools = true
-
-    executable = true
-    embeddedLaunchScriptProperties =
-            [initInfoDescription: 'Ozwillo Datacore Exporter',
-             initInfoShortDescription: 'Ozwillo Datacore Exporter',
-             initInfoProvides: 'ozwillo-dc-exporter']
-}
-
-task wrapper(type: Wrapper) {
-	gradleVersion = '2.14'
+bootJar {
+    launchScript({
+        properties 'initInfoProvides': 'ozwillo-dc-exporter'
+    })
 }
 
 configure(tasks.processResources) {
-	// we don't want source JSX in the jar, we only need their transpiled, bundled version in build/
-	exclude 'public/jsx/'
-	exclude 'public/css/'
+    // we don't want source JSX in the jar, we only need their transpiled, bundled version in build/
+    exclude 'public/jsx/'
+    exclude 'public/css/'
 }
 
 task frontBundle(type: YarnTask) {

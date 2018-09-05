@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Link } from 'react-router'
+import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import format from 'date-fns/format'
 import ConfirmActionButton from './ConfirmActionButton'
@@ -108,13 +109,13 @@ class RowDataset extends Component {
 export default translate(['dc-exporter'])(RowDataset)
 
 RowDataset.propTypes = {
-    log: React.PropTypes.object.isRequired,
-    fetchMapping: React.PropTypes.func.isRequired,
-    onChangeNotif: React.PropTypes.func.isRequired
+    log: PropTypes.object.isRequired,
+    fetchMapping: PropTypes.func.isRequired,
+    onChangeNotif: PropTypes.func.isRequired
 }
 
 RowDataset.contextTypes = {
-    csrfToken: React.PropTypes.string,
-    csrfTokenHeaderName: React.PropTypes.string,
-    t: React.PropTypes.func
+    csrfToken: PropTypes.string,
+    csrfTokenHeaderName: PropTypes.string,
+    t: PropTypes.func
 }

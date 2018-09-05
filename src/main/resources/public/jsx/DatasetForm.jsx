@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import renderIf from 'render-if'
 import { translate } from 'react-i18next'
 
@@ -8,27 +9,7 @@ import AddressAutosuggest from './AddressAutosuggest'
 import { FormGroup, Label, Input, SelectField, Textarea, Fieldset, Checkbox, ReadOnlyField } from './Form'
 
 class DatasetForm extends React.Component {
-    static propTypes = {
-        onDatasetNameChange: React.PropTypes.func.isRequired,
-        onFieldChange: React.PropTypes.func.isRequired,
-        toggleNewDataset: React.PropTypes.func.isRequired,
-        newDataset: React.PropTypes.bool.isRequired,
-        tags: React.PropTypes.array.isRequired,
-        source: React.PropTypes.string.isRequired,
-        notes: React.PropTypes.string.isRequired,
-        licenses: React.PropTypes.object.isRequired,
-        license: React.PropTypes.string.isRequired,
-        organizationId:React.PropTypes.string,
-        organizations:React.PropTypes.array.isRequired,
-        datasetName: React.PropTypes.string.isRequired,
-        onChangeNotif: React.PropTypes.func.isRequired,
-        geoLocation: React.PropTypes.object.isRequired,
-        private: React.PropTypes.bool.isRequired,
-        modeCreate: React.PropTypes.bool.isRequired
-    }
-    static contextTypes = {
-        t: React.PropTypes.func
-    }
+    
     constructor(props, context) {
         super(props, context)
         this.handleDelete = this.handleDelete.bind(this)
@@ -172,6 +153,29 @@ const OrganizationChooser = ({ organizations, currentOrganizationId, onChange, t
             </SelectField>
         </FormGroup>
     )
+}
+
+DatasetForm.propTypes = {
+    onDatasetNameChange: PropTypes.func.isRequired,
+    onFieldChange: PropTypes.func.isRequired,
+    toggleNewDataset: PropTypes.func.isRequired,
+    newDataset: PropTypes.bool.isRequired,
+    tags: PropTypes.array.isRequired,
+    source: PropTypes.string.isRequired,
+    notes: PropTypes.string.isRequired,
+    licenses: PropTypes.object.isRequired,
+    license: PropTypes.string.isRequired,
+    organizationId:PropTypes.string,
+    organizations:PropTypes.array.isRequired,
+    datasetName: PropTypes.string.isRequired,
+    onChangeNotif: PropTypes.func.isRequired,
+    geoLocation: PropTypes.object.isRequired,
+    private: PropTypes.bool.isRequired,
+    modeCreate: PropTypes.bool.isRequired
+}
+
+DatasetForm.contextTypes = {
+    t: PropTypes.func
 }
 
 export default translate(['dc-exporter'])(DatasetForm)

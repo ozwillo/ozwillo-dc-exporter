@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DcModelMappingRepository extends MongoRepository<DcModelMapping, String> {
 
@@ -15,7 +16,8 @@ public interface DcModelMappingRepository extends MongoRepository<DcModelMapping
     @Query("{ 'isDeleted' : false }")
     List<DcModelMapping> findAll();
     
-    DcModelMapping findById(String id);
+    @Override
+    Optional<DcModelMapping> findById(String id);
 
-    Long deleteById(String id);
+    void deleteById(String id);
 }

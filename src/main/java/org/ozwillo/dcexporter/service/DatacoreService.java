@@ -4,9 +4,6 @@ package org.ozwillo.dcexporter.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.oasis_eu.spring.datacore.DatacoreClient;
 import org.oasis_eu.spring.datacore.model.*;
 import org.ozwillo.dcexporter.dao.DcModelMappingRepository;
@@ -20,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.StringWriter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -58,12 +57,12 @@ public class DatacoreService {
         return datacore.findModel(project, modelType);
     }
 
-    public boolean hasMoreRecentResources(String project, String type, DateTime fromDate) {
-        DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateTime();
-        DCQueryParameters parameters = new DCQueryParameters(modifiedField, DCOperator.GTE, dateTimeFormatter.print(fromDate));
+    public boolean hasMoreRecentResources(String project, String type, LocalDateTime fromDate) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter. ISO_LOCAL_DATE_TIME;//ISODateTimeFormat.dateTime();
+        DCQueryParameters parameters = new DCQueryParameters(modifiedField, DCOperator.GTE, fromDate.format(dateTimeFormatter));
 
         List<DCResource> newResources = datacore.findResources(project, type, parameters, 0, 1);
-        LOGGER.debug("Retrieved {} resources newer than {}", newResources.size(), dateTimeFormatter.print(fromDate));
+        LOGGER.debug("Retrieved {} resources newer than {}", newResources.size(), fromDate.format(dateTimeFormatter));
         return !newResources.isEmpty();
     }
 
@@ -243,7 +242,7 @@ public class DatacoreService {
                     LOGGER.warn("Inner row value not managed for {}", resourceRowInnerValues);
                     resourceArray.add("");
                 }
-                objectResource.put(key,resourceArray);
+                objectResource.set(key,resourceArray);
             }
         });
         return objectResource;

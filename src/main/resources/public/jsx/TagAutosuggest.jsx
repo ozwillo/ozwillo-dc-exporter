@@ -1,4 +1,5 @@
 import React, {Component} from "react"
+import PropTypes from 'prop-types'
 import Autosuggest from "react-autosuggest"
 
 const getSuggestionValue = suggestion => suggestion.name
@@ -12,9 +13,6 @@ function escapeRegexCharacters(str) {
 }
 
 class TagAutosuggest extends Component {
-    static contextTypes = {
-        t: React.PropTypes.func
-    }
     constructor (props, context) {
         super(props, context)
         this.defaultProps = {
@@ -111,9 +109,14 @@ class TagAutosuggest extends Component {
     }
 }
 
-TagAutosuggest.PropTypes = {
-    onSelect: React.PropTypes.func.isRequired
+TagAutosuggest.propTypes = {
+    onSelect: PropTypes.func.isRequired
 }
+
+TagAutosuggest.contextTypes = {
+    t: PropTypes.func
+}
+
 
 const Tag = ({ keyword, remove, id }) =>
     <li id="tag" className="list-group-item">{keyword}<span className="glyphicon glyphicon-remove remove-tag" onClick={() => remove(id)}></span></li>

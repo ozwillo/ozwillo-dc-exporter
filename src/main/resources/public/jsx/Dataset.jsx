@@ -1,6 +1,6 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import renderIf from 'render-if'
-import { browserHistory } from 'react-router';
 import { translate } from 'react-i18next'
 
 import DatasetForm from './DatasetForm'
@@ -78,8 +78,8 @@ class Dataset extends React.Component {
         }
     }
     componentDidMount() {
-        if (this.props.params.id) {
-            this.loadMapping(this.props.params.id)
+        if (this.props.match.params && this.props.match.params.id) {
+            this.loadMapping(this.props.match.params.id)
         }
 
         fetch('/api/dc/models', { credentials: 'same-origin' })
@@ -102,7 +102,7 @@ class Dataset extends React.Component {
             })
     }
     componentDidUpdate() {
-        if(this.props.params.id && this.state.fieldsFetched && this.state.datasetsFetched && !this.state.datasetFetched) {
+        if (this.props.match.params && this.props.match.params.id && this.state.fieldsFetched && this.state.datasetsFetched && !this.state.datasetFetched) {
             fetch('/api/dc/model/' + this.state.fields.project + '/' + this.state.fields.type, { credentials: 'same-origin' })
                 .then(response => response.json())
                 .then(json => this.setState({dataset: json, datasetFetched: true}))
@@ -114,6 +114,9 @@ class Dataset extends React.Component {
             .then(json => {
                 this.setState({fields: json, mode: 'update', fieldsFetched: true, newDataset: false})
                 json.excludedFields.forEach(elem => this.selectedCheckboxes.add(elem))
+            })
+            .catch(error => {
+                error.text().then(text => { this.onChangeNotif(false, text) })
             })
     }
     onDatasetSelected(dcId) {
@@ -141,7 +144,6 @@ class Dataset extends React.Component {
         .then(this.checkStatus)
         .then(response => response.text())
         .then(id => {
-            browserHistory.push('/dataset/' + id)
             this.loadMapping(id)
             this.setState({ message: 'dataset.notif.is_created' })
         })
@@ -325,9 +327,10 @@ class Dataset extends React.Component {
 }
 
 Dataset.contextTypes = {
-    csrfToken: React.PropTypes.string,
-    csrfTokenHeaderName: React.PropTypes.string,
-    t: React.PropTypes.func
+    csrfToken: PropTypes.string,
+    csrfTokenHeaderName: PropTypes.string,
+    t: PropTypes.func,
+    onSubmit: PropTypes.func
 }
 
 const DatasetChooser = ({ datasets, dcId, onDatasetSelected, t }) => {
@@ -346,14 +349,11 @@ const DatasetChooser = ({ datasets, dcId, onDatasetSelected, t }) => {
 }
 
 DatasetChooser.propTypes = {
-    dcId: React.PropTypes.string.isRequired,
-    onDatasetSelected: React.PropTypes.func.isRequired,
-    datasets: React.PropTypes.array.isRequired,
-    t: React.PropTypes.func.isRequired
+    dcId: PropTypes.string.isRequired,
+    onDatasetSelected: PropTypes.func.isRequired,
+    datasets: PropTypes.array.isRequired,
+    t: PropTypes.func.isRequired
 }
 
-Dataset.PropTypes = {
-    onSubmit: React.PropTypes.func.isRequired
-}
 
 export default translate(['dc-exporter'])(Dataset)
