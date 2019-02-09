@@ -141,7 +141,7 @@ const LicenceChooser = ({ licenses, currentLicense, onChange, t }) => {
 
 const OrganizationChooser = ({ organizations, currentOrganizationId, onChange, t }) => {
     const options = Object.keys(organizations).
-        filter(key => organizations[key].display_name != '')
+        filter(key => organizations[key].display_name !== '')
         .map(key =>
             <option key={key} value={organizations[key].name}>{organizations[key].display_name}</option>
         )
