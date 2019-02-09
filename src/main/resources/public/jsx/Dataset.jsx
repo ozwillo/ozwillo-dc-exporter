@@ -50,6 +50,7 @@ class Dataset extends React.Component {
                 source: '',
                 tags: [],
                 excludedFields: [],
+                pivotField: '',
                 addressField: '',
                 postalCodeField: '',
                 cityField: '',
