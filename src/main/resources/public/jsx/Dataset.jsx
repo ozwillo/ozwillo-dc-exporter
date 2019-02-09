@@ -216,6 +216,11 @@ class Dataset extends React.Component {
                           checked={!this.state.fields.excludedFields.includes(field['dcmf:name'])}/>})
             
             : null
+        const availablePivotFields = this.state.datasetFetched && this.state.fields.dcId ?
+            this.state.dataset['dcmo:fields'].map((field, key) => {
+                const label = field['dcmf:name'] + (field['dcmf:documentation'] ? " (" + field['dcmf:documentation'] + ")" : "")
+                return <option value={field['dcmf:name']} label={label} key={key}>{label}</option>})
+            : null
 
         const disabled = this.state.fields.name == null || this.state.fields.name == '' ||
                          this.state.fields.resourceName == null || this.state.fields.resourceName == '' ||
@@ -267,6 +272,13 @@ class Dataset extends React.Component {
                                         <div className="col-sm-9" id="excludedFields">
                                             { fields }
                                         </div>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="pivotField" value={ t('dataset.label.pivot_field')} />
+                                        <SelectField onChange={ (event) => this.onFieldChange(event.target.id, event.target.value)}
+                                                     id="pivotField">
+                                            {availablePivotFields}
+                                        </SelectField>
                                     </FormGroup>
                                 </div>
                             )}

@@ -88,6 +88,7 @@
             "model": "Model",
             "version": "Version",
             "export_fields": "Export fields",
+            "pivot_field": "Pivot field",
             "name": "Name",
             "description": "Description",
             "source": "Source",
