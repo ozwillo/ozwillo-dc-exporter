@@ -1,6 +1,6 @@
 package org.ozwillo.dcexporter.service;
 
-import javaslang.control.Either;
+import io.vavr.control.Either;
 import org.ozwillo.dcexporter.dao.DcModelMappingRepository;
 import org.ozwillo.dcexporter.dao.SynchronizerAuditLogRepository;
 import org.ozwillo.dcexporter.model.Ckan.CkanResource;

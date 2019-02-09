@@ -34,7 +34,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.session:spring-session-core'
-    implementation 'io.javaslang:javaslang:2.0.4'
+    implementation 'io.vavr:vavr:0.9.3'
     implementation 'com.github.ozwillo:ozwillo-java-spring-integration:1.26.0'
     implementation 'com.github.ben-manes.caffeine:caffeine:2.3.5'
     implementation 'com.squareup.retrofit2:retrofit:2.2.0'

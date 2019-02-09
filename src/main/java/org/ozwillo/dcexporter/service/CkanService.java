@@ -2,7 +2,7 @@ package org.ozwillo.dcexporter.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javaslang.control.Either;
+import io.vavr.control.Either;
 import org.ozwillo.dcexporter.model.*;
 import org.ozwillo.dcexporter.model.Ckan.*;
 import org.slf4j.Logger;

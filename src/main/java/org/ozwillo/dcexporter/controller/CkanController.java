@@ -1,6 +1,6 @@
 package org.ozwillo.dcexporter.controller;
 
-import javaslang.control.Either;
+import io.vavr.control.Either;
 import org.ozwillo.dcexporter.model.Ckan.CkanDataset;
 import org.ozwillo.dcexporter.model.Ckan.CkanOrganization;
 import org.ozwillo.dcexporter.model.Ckan.CkanTag;
