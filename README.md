@@ -24,11 +24,10 @@ Building requires :
 ```
 git clone https://github.com/ozwillo/ozwillo-dc-exporter/
 ```
-* After cloning this repository, install the npm packages
+* After cloning this repository, install the Front End packages
 
 ```
-nvm install 5.6.0 (or nvm use 5.6.0 if you already have Node 5.6.0 installed)
-npm install
+yarn install
 ```
 
 ### Running the DC Exporter
@@ -40,7 +39,7 @@ npm install
 
 * Run webpack-dev-server
 ```
-npm run start
+yarn start
 ```
 Open [http://localhost:3000](http://localhost:3000)
 
