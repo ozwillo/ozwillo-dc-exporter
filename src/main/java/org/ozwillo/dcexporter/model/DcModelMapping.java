@@ -45,6 +45,7 @@ public class DcModelMapping {
     private String ckanPackageId;
     private Map<String, String> ckanResourceId;
     private List<String> excludedFields;
+    private String pivotField;
     private boolean isDeleted;
     private String url;
     private String addressField;
@@ -139,6 +140,8 @@ public class DcModelMapping {
     public List<String> getExcludedFields() {
         return excludedFields;
     }
+    public String getPivotField() { return pivotField; }
+    public void setPivotField(String pivotField) { this.pivotField = pivotField; }
     public boolean isDeleted() {
         return isDeleted;
     }
