@@ -2,7 +2,8 @@ package org.ozwillo.dcexporter.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javaslang.control.Either;
+import io.vavr.control.Either;
+import io.vavr.control.Option;
 import org.ozwillo.dcexporter.model.*;
 import org.ozwillo.dcexporter.model.Ckan.*;
 import org.slf4j.Logger;
@@ -83,7 +84,9 @@ public class CkanService {
         Optional<CkanDataset> optGet = null;
         if (!StringUtils.isEmpty(dcModelMapping.getCkanPackageId())) {
             optGet = ckanClientService.getDataset(ckanUrl, dcModelMapping.getCkanPackageId());
-        } else if (!StringUtils.isEmpty(dcModelMapping.getName())) {
+        }
+
+        if ((optGet == null || !optGet.isPresent()) && !StringUtils.isEmpty(dcModelMapping.getName())) {
             optGet = ckanClientService.getDataset(ckanUrl, slugify(dcModelMapping.getName()));
         }
 
@@ -152,30 +155,34 @@ public class CkanService {
         return Either.right(opt.get());
     }
 
-    public void updateResourceData(DcModelMapping dcModelMapping, Map<String, Optional<String>> optionalResourceFiles ) throws Exception {
-        optionalResourceFiles.forEach((key, optionalResource) -> {
-            CkanResource ckanResource = new CkanResource();
-            ckanResource.setPackageId(dcModelMapping.getCkanPackageId());
-            ckanResource.setUrl("upload");
-            ckanResource.setFormat(key);
-            ckanResource.setMimetype(key == "csv" ? "text/csv" : "application/json");
-            ckanResource.setName(dcModelMapping.getResourceName() + "." + key);
-            ckanResource.setDescription(dcModelMapping.getDescription());
-            ckanResource.setId(dcModelMapping.getCkanResourceId().get(key));
-            ckanResource.setUpload(optionalResource.get().getBytes());
+    public void updateResourceData(DcModelMapping dcModelMapping, Format format, String resourceFile,
+                                   Option<String> ckanResourceId, Option<String> ckanResourceName) {
+        CkanResource ckanResource = new CkanResource();
+        ckanResource.setPackageId(dcModelMapping.getCkanPackageId());
+        ckanResource.setUrl("upload");
+        ckanResource.setFormat(format.name());
+        ckanResource.setMimetype(format.equals(Format.CSV) ? "text/csv" : "application/json");
+        ckanResource.setName(ckanResourceName.getOrElse(() -> dcModelMapping.getResourceName() + "." + format.name().toLowerCase()));
+        ckanResource.setDescription(dcModelMapping.getDescription());
+        ckanResource.setId(ckanResourceId.getOrElse(() -> dcModelMapping.getCkanResourceId().get(format.name())));
+        ckanResource.setUpload(resourceFile.getBytes());
 
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-            ckanResource.setLastModified(LocalDateTime.now().format(dateTimeFormatter));
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        ckanResource.setLastModified(LocalDateTime.now().format(dateTimeFormatter));
 
-            Optional<ResourceResponse> resourceResponseOptional = ckanClientService.updateResourceFile(ckanUrl, ckanApiKey, ckanResource);
-            if(resourceResponseOptional.isPresent()) {
-                ResourceResponse updateResourceResponse = resourceResponseOptional.get();
-                if(!updateResourceResponse.isSuccess()) LOGGER.error("Error while trying to update {} file resource {} to CKAN : {} ", key, dcModelMapping.getResourceName(), updateResourceResponse.getError().getMessage());
-                else LOGGER.info("{} file resource {} is updated in CKAN : {} ", key, dcModelMapping.getResourceName(), updateResourceResponse.result.getName());
-            } else {
-                LOGGER.info("No CKAN response while trying to update {} file of resource {}", key, dcModelMapping.getResourceName());
-            }
-        });
+        Optional<ResourceResponse> resourceResponseOptional = ckanClientService.updateResourceFile(ckanUrl, ckanApiKey, ckanResource);
+        if(resourceResponseOptional.isPresent()) {
+            ResourceResponse updateResourceResponse = resourceResponseOptional.get();
+            if(!updateResourceResponse.isSuccess())
+                LOGGER.error("Error while trying to update {} file resource {} to CKAN : {} ",
+                    format.name(), dcModelMapping.getResourceName(), updateResourceResponse.getError().getMessage());
+            else
+                LOGGER.info("{} file resource {} is updated in CKAN : {} ",
+                    format.name(), dcModelMapping.getResourceName(), updateResourceResponse.result.getName());
+        } else {
+            LOGGER.info("No CKAN response while trying to update {} file of resource {}",
+                    format.name(), dcModelMapping.getResourceName());
+        }
     }
 
     public void deleteResource(String id) {

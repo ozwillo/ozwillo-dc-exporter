@@ -50,6 +50,7 @@ class Dataset extends React.Component {
                 source: '',
                 tags: [],
                 excludedFields: [],
+                pivotField: '',
                 addressField: '',
                 postalCodeField: '',
                 cityField: '',
@@ -121,7 +122,7 @@ class Dataset extends React.Component {
     }
     onDatasetSelected(dcId) {
         const dataset = this.state.datasets.find(function(dataset){
-            return dataset['@id'] == dcId
+            return dataset['@id'] === dcId
         })
         const fields = this.state.fields
         fields['type'] = dataset['dcmo:name']
@@ -169,7 +170,7 @@ class Dataset extends React.Component {
     toggleCheckbox(event){
         const label = event.target.value
         if (this.selectedCheckboxes.has(label)) {
-            const index = this.state.fields.excludedFields.findIndex((excludeField) => {return excludeField==label})
+            const index = this.state.fields.excludedFields.findIndex((excludeField) => {return excludeField === label})
             let excludeFields = this.state.fields.excludedFields
             excludeFields.splice(index, 1)
             this.onFieldChange('excludedFields', excludeFields)
@@ -216,13 +217,18 @@ class Dataset extends React.Component {
                           checked={!this.state.fields.excludedFields.includes(field['dcmf:name'])}/>})
             
             : null
+        const availablePivotFields = this.state.datasetFetched && this.state.fields.dcId ?
+            this.state.dataset['dcmo:fields'].map((field, key) => {
+                const label = field['dcmf:name'] + (field['dcmf:documentation'] ? " (" + field['dcmf:documentation'] + ")" : "")
+                return <option value={field['dcmf:name']} label={label} key={key}>{label}</option>})
+            : null
 
-        const disabled = this.state.fields.name == null || this.state.fields.name == '' ||
-                         this.state.fields.resourceName == null || this.state.fields.resourceName == '' ||
-                         ((this.state.fields.organizationId == null || this.state.fields.organizationId == '') && this.state.newDataset)
+        const disabled = this.state.fields.name == null || this.state.fields.name === '' ||
+                         this.state.fields.resourceName == null || this.state.fields.resourceName === '' ||
+                         ((this.state.fields.organizationId == null || this.state.fields.organizationId === '') && this.state.newDataset)
 
-        const isModeCreate = renderIf(this.state.mode == 'create')
-        const isModeUpdate = renderIf(this.state.mode == 'update')
+        const isModeCreate = renderIf(this.state.mode === 'create')
+        const isModeUpdate = renderIf(this.state.mode === 'update')
 
         return (
             <div  id="container" className="container">
@@ -231,7 +237,7 @@ class Dataset extends React.Component {
                     <Alert message={ t(this.state.message) } success={this.state.success} closeMethod={this.closeNotif}/>
                 )}
                 <Form id="dataset-form" onSubmit={(e) => { 
-                                                    if (this.state.mode == 'create') this.registerDataset(e, this.state.fields); 
+                                                    if (this.state.mode === 'create') this.registerDataset(e, this.state.fields);
                                                     else this.updateDataset(e, this.state.fields);
                                                  }}>
                     <Fieldset legend={t('dataset.panel.datacore')}>
@@ -268,6 +274,13 @@ class Dataset extends React.Component {
                                             { fields }
                                         </div>
                                     </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="pivotField" value={ t('dataset.label.pivot_field')} />
+                                        <SelectField onChange={ (event) => this.onFieldChange(event.target.id, event.target.value)}
+                                                     id="pivotField">
+                                            {availablePivotFields}
+                                        </SelectField>
+                                    </FormGroup>
                                 </div>
                             )}
                     </Fieldset>
@@ -297,7 +310,7 @@ class Dataset extends React.Component {
                                          onChangeNotif={this.onChangeNotif}
                                          geoLocation={this.state.fields.geoLocation}
                                          private={false} 
-                                         modeCreate={this.state.mode == 'create'} />
+                                         modeCreate={this.state.mode === 'create'} />
 
                             <Fieldset legend={t('dataset.panel.resource')}>
                                 <FormGroup>

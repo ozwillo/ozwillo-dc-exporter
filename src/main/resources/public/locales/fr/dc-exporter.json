@@ -89,6 +89,7 @@
             "model": "Modèle",
             "version": "Version",
             "export_fields": "Champs à exporter",
+            "pivot_field": "Champs pivot",
             "name": "Nom",
             "description": "Description",
             "source": "Source",

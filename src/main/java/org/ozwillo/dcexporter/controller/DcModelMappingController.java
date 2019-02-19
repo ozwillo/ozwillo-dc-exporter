@@ -1,6 +1,6 @@
 package org.ozwillo.dcexporter.controller;
 
-import javaslang.control.Either;
+import io.vavr.control.Either;
 import org.ozwillo.dcexporter.model.ui.AuditLogWapper;
 import org.ozwillo.dcexporter.model.DcModelMapping;
 import org.ozwillo.dcexporter.service.DcModelMappingService;
