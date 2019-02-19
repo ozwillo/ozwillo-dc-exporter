@@ -53,7 +53,7 @@ public class SynchronizerService {
     }
 
     @Scheduled(fixedDelayString = "${application.syncDelay}")
-    public void synchronizeOrgs() {
+    public void synchronizeResources() {
         systemUserService.runAs(() -> {
 
             dcModelMappingRepository.findAll().forEach(dcModelMapping -> {
@@ -70,17 +70,20 @@ public class SynchronizerService {
 
                 try {
                     this.sync(dcModelMapping);
-                    SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.SUCCEEDED, null,  LocalDateTime.now());
+                    SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(),
+                            SynchronizerStatus.SUCCEEDED, null,  LocalDateTime.now());
                     synchronizerAuditLogRepository.save(newAuditLog);
                 } catch (Exception exception) {
-                    LOGGER.error("Error while trying to synchronize model {} : {} ", dcModelMapping.getType(), exception.getMessage());
+                    LOGGER.error("Error while trying to synchronize model {} : {} ", dcModelMapping.getType(),
+                            exception.getMessage());
                     if (auditLog != null && auditLog.getStatus() == SynchronizerStatus.FAILED) {
                         // update current one
                         auditLog.updateOnError(exception.getMessage());
                         synchronizerAuditLogRepository.save(auditLog);
                     } else {
                         // create a new one with failed status
-                        SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(), SynchronizerStatus.FAILED, exception.getMessage(),  LocalDateTime.now());
+                        SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(),
+                                SynchronizerStatus.FAILED, exception.getMessage(),  LocalDateTime.now());
                         synchronizerAuditLogRepository.save(newAuditLog);
                     }
                 }
@@ -95,7 +98,8 @@ public class SynchronizerService {
                 if(!dcModelMapping.isDeleted()) {
                     Either<String, CkanDataset> datasetOpt = ckanService.getOrCreateDataset(dcModelMapping);
                     if(datasetOpt.isRight()) {
-                        LOGGER.info("Updating URL for dataset {}", dcModelMapping.getCkanPackageId());
+                        LOGGER.info("Updating URL to {} for dataset {}", datasetOpt.get().getName(),
+                                dcModelMapping.getCkanPackageId());
                         // CKAN store the url in the name attribute
                         dcModelMapping.setUrl(datasetOpt.get().getName());
                         dcModelMappingRepository.save(dcModelMapping);

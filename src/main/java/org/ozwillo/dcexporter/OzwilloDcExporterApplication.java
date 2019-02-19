@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ComponentScan(basePackages = {"org.oasis_eu.spring", "org.ozwillo.dcexporter"})
 public class OzwilloDcExporterApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(OzwilloDcExporterApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(OzwilloDcExporterApplication.class, args);
+    }
 }
