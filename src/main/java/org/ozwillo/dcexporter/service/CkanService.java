@@ -84,7 +84,9 @@ public class CkanService {
         Optional<CkanDataset> optGet = null;
         if (!StringUtils.isEmpty(dcModelMapping.getCkanPackageId())) {
             optGet = ckanClientService.getDataset(ckanUrl, dcModelMapping.getCkanPackageId());
-        } else if (!StringUtils.isEmpty(dcModelMapping.getName())) {
+        }
+
+        if ((optGet == null || !optGet.isPresent()) && !StringUtils.isEmpty(dcModelMapping.getName())) {
             optGet = ckanClientService.getDataset(ckanUrl, slugify(dcModelMapping.getName()));
         }
 

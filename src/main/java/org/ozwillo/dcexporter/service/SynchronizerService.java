@@ -156,9 +156,10 @@ public class SynchronizerService {
                 }
 
                 if (dcModelMapping.getCkanResourceId().get(ckanResourceIdKey) != null) {
+                    String ckanResourceId = dcModelMapping.getCkanResourceId().get(ckanResourceIdKey);
                     String csvResource = resourceTransformerService.resourcesToCsv(dcResources.asJava(), resourceKeys);
                     ckanService.updateResourceData(dcModelMapping, Format.CSV, csvResource,
-                            Option.of(ckanResourceIdKey), Option.of(ckanResourceName));
+                            Option.of(ckanResourceId), Option.of(ckanResourceName));
                 }
             });
         }

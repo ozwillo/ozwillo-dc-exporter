@@ -78,9 +78,13 @@ public class CkanClientService {
         Call<DatasetResponse> call = ckanAPI.createDataset(ckanApiKey, ckanDataset, "application/json");
 
         try {
-            return Optional.ofNullable(call.execute().body().result);
+            DatasetResponse datasetResponse = call.execute().body();
+            if (datasetResponse == null)
+                return Optional.empty();
+            else
+                return Optional.ofNullable(datasetResponse.result);
         } catch (IOException e) {
-            LOGGER.error("Error while trying to create dataset to CKAN: {}", e);
+            LOGGER.error("Error while trying to create dataset to CKAN", e);
             return Optional.empty();
         }
     }
