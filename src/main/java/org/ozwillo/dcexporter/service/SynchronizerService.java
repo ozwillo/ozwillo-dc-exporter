@@ -74,8 +74,8 @@ public class SynchronizerService {
                             SynchronizerStatus.SUCCEEDED, null,  LocalDateTime.now());
                     synchronizerAuditLogRepository.save(newAuditLog);
                 } catch (Exception exception) {
-                    LOGGER.error("Error while trying to synchronize model {} : {} ", dcModelMapping.getType(),
-                            exception.getMessage());
+                    LOGGER.error("Error while trying to synchronize model {}", dcModelMapping.getType(),
+                            exception);
                     if (auditLog != null && auditLog.getStatus() == SynchronizerStatus.FAILED) {
                         // update current one
                         auditLog.updateOnError(exception.getMessage());
@@ -133,7 +133,7 @@ public class SynchronizerService {
         // And add a fake column to allow for easier charting in CKAN
         resourceKeys.add("fake-weight");
 
-        if (dcModelMapping.getPivotField() == null) {
+        if (StringUtils.isEmpty(dcModelMapping.getPivotField())) {
             String csvResource = resourceTransformerService.resourcesToCsv(allDCResources, resourceKeys);
             ckanService.updateResourceData(dcModelMapping, Format.CSV, csvResource, Option.none(), Option.none());
 
