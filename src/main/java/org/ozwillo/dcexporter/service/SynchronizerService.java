@@ -74,8 +74,8 @@ public class SynchronizerService {
                             SynchronizerStatus.SUCCEEDED, null,  LocalDateTime.now());
                     synchronizerAuditLogRepository.save(newAuditLog);
                 } catch (Exception exception) {
-                    LOGGER.error("Error while trying to synchronize model {} : {} ", dcModelMapping.getType(),
-                            exception.getMessage());
+                    LOGGER.error("Error while trying to synchronize model {}", dcModelMapping.getType(),
+                            exception);
                     if (auditLog != null && auditLog.getStatus() == SynchronizerStatus.FAILED) {
                         // update current one
                         auditLog.updateOnError(exception.getMessage());
@@ -133,7 +133,11 @@ public class SynchronizerService {
         // And add a fake column to allow for easier charting in CKAN
         resourceKeys.add("fake-weight");
 
-        if (dcModelMapping.getPivotField() == null) {
+        if (StringUtils.isEmpty(dcModelMapping.getPivotField())) {
+            String ckanResourceIdKey = Format.CSV.name();
+            String ckanResourceName = dcModelMapping.getName();
+            createResource(dcModelMapping, ckanResourceIdKey, ckanResourceName);
+
             String csvResource = resourceTransformerService.resourcesToCsv(allDCResources, resourceKeys);
             ckanService.updateResourceData(dcModelMapping, Format.CSV, csvResource, Option.none(), Option.none());
 
@@ -147,17 +151,7 @@ public class SynchronizerService {
             resourcesByPivotValues.forEach((pivotValue, dcResources) -> {
                 String ckanResourceIdKey = Format.CSV.name() + "-" + pivotValue;
                 String ckanResourceName = dcModelMapping.getName() + " - " + pivotValue;
-                if (dcModelMapping.getCkanResourceId().get(ckanResourceIdKey) == null) {
-                    LOGGER.debug("Resource does not exist yet for {}, creating it", pivotValue);
-                    Either<String, CkanResource> result = ckanService.createResource(dcModelMapping.getCkanPackageId(),
-                            ckanResourceName, dcModelMapping.getDescription());
-                    if (result.isLeft()) {
-                        LOGGER.warn("Unable to create resource for {}", pivotValue);
-                    } else {
-                        dcModelMapping.getCkanResourceId().put(ckanResourceIdKey, result.right().get().getId());
-                        dcModelMappingRepository.save(dcModelMapping);
-                    }
-                }
+                createResource(dcModelMapping, ckanResourceIdKey, ckanResourceName);
 
                 if (dcModelMapping.getCkanResourceId().get(ckanResourceIdKey) != null) {
                     String ckanResourceId = dcModelMapping.getCkanResourceId().get(ckanResourceIdKey);
@@ -166,6 +160,20 @@ public class SynchronizerService {
                             Option.of(ckanResourceId), Option.of(ckanResourceName));
                 }
             });
+        }
+    }
+
+    private void createResource(DcModelMapping dcModelMapping, String ckanResourceIdKey, String ckanResourceName) {
+        if (dcModelMapping.getCkanResourceId().get(ckanResourceIdKey) == null) {
+            LOGGER.debug("Resource {} does not exist yet, creating it in package {}", ckanResourceName, dcModelMapping.getCkanPackageId());
+            Either<String, CkanResource> result = ckanService.createResource(dcModelMapping.getCkanPackageId(),
+                    ckanResourceName, dcModelMapping.getDescription());
+            if (result.isLeft()) {
+                LOGGER.warn("Unable to create resource {}", ckanResourceName);
+            } else {
+                dcModelMapping.getCkanResourceId().put(ckanResourceIdKey, result.get().getId());
+                dcModelMappingRepository.save(dcModelMapping);
+            }
         }
     }
 }

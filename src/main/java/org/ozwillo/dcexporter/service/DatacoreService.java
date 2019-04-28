@@ -26,6 +26,9 @@ public class DatacoreService {
     @Value("${datacore.modifiedField}")
     private String modifiedField;
 
+    @Value("${datacore.maxSynchronizedResourcesPerModel}")
+    private int maxSynchronizedResourcesPerModel;
+
     @Autowired
     public DatacoreService(DatacoreClient datacore, DcModelMappingRepository dcModelMappingRepository) {
         this.datacore = datacore;
@@ -64,7 +67,7 @@ public class DatacoreService {
 
             allDCResources.addAll(intermediateResult);
 
-            if (intermediateResult.size() < 100) {
+            if (intermediateResult.size() < 100 || allDCResources.size() > maxSynchronizedResourcesPerModel) {
                 break;
             } else {
                 // TODO : why DCResource does not have the @id field in its data ?
