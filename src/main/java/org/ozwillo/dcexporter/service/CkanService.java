@@ -38,10 +38,10 @@ public class CkanService {
         if(!opt.isPresent()) return Either.left("dataset.notif.error.fetch_datasets");
 
         List<String> datasets = opt.get();
-        
+
         Optional<List<CkanDataset>> opt2 = ckanClientService.getCompleteDatasets(ckanUrl, datasets.size());
         if(!opt2.isPresent()) return Either.left("dataset.notif.error.fetch_datasets");
-        
+
         return Either.right(opt2.get());
     }
 
@@ -51,11 +51,11 @@ public class CkanService {
 
         List<CkanLicense> licenses = opt.get();
         Map<String, String> unsortedLicences =
-            licenses.stream().collect(Collectors.toMap(CkanLicense::getId, CkanLicense::getTitle));
+                licenses.stream().collect(Collectors.toMap(CkanLicense::getId, CkanLicense::getTitle));
         Map<String, String> result = new LinkedHashMap<>();
         unsortedLicences.entrySet().stream()
-            .sorted(Map.Entry.comparingByValue())
-            .forEachOrdered(x -> result.put(x.getKey(), x.getValue()));
+                .sorted(Map.Entry.comparingByValue())
+                .forEachOrdered(x -> result.put(x.getKey(), x.getValue()));
         return Either.right(result);
     }
 
@@ -175,10 +175,10 @@ public class CkanService {
             ResourceResponse updateResourceResponse = resourceResponseOptional.get();
             if(!updateResourceResponse.isSuccess())
                 LOGGER.error("Error while trying to update {} file resource {} to CKAN : {} ",
-                    format.name(), dcModelMapping.getResourceName(), updateResourceResponse.getError().getMessage());
+                        format.name(), dcModelMapping.getResourceName(), updateResourceResponse.getError().getMessage());
             else
                 LOGGER.info("{} file resource {} is updated in CKAN : {} ",
-                    format.name(), dcModelMapping.getResourceName(), updateResourceResponse.result.getName());
+                        format.name(), dcModelMapping.getResourceName(), updateResourceResponse.result.getName());
         } else {
             LOGGER.info("No CKAN response while trying to update {} file of resource {}",
                     format.name(), dcModelMapping.getResourceName());

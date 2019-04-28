@@ -66,6 +66,9 @@ datacore:
     refreshToken: refreshToken
     nonce: changeit      #Set it when getting the refreshToken
   modifiedField: "dc:modified"
+  # maximum number of resources we allow to export for a given model
+  # this is to avoid huge datasets that are not suited to be exposed on an Open Data platform
+  maxSynchronizedResourcesPerModel: 10000
 
 ckan:
   url: https://opendata.ozwillo.com

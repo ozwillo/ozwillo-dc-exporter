@@ -92,7 +92,7 @@ public class ResourceTransformerService {
 
         resources.forEach(resource -> {
             Map<String,DCResource.Value> values = resource.getValues().entrySet().stream()
-                    .filter(entry -> excludedFields.contains(entry.getKey()))
+                    .filter(entry -> excludedFields == null || !excludedFields.contains(entry.getKey()))
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
             ObjectNode objectResource = writeDCResource(values);
             arrayResource.add(objectResource);
