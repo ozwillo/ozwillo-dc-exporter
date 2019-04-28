@@ -133,13 +133,13 @@ public class SynchronizerService {
         resourceKeys.add("fake-weight");
 
         if (StringUtils.isEmpty(dcModelMapping.getPivotField())) {
-            String ckanResourceIdKey = Format.CSV.name();
             String ckanResourceName = dcModelMapping.getName();
-            createResource(dcModelMapping, ckanResourceIdKey, ckanResourceName);
 
+            createResource(dcModelMapping, Format.CSV.name(), ckanResourceName);
             String csvResource = resourceTransformerService.resourcesToCsv(allDCResources, resourceKeys);
             ckanService.updateResourceData(dcModelMapping, Format.CSV, csvResource, Option.none(), Option.none());
 
+            createResource(dcModelMapping, Format.JSON.name(), ckanResourceName);
             String jsonResource = resourceTransformerService.resourcesToJson(allDCResources, dcModelMapping.getExcludedFields());
             ckanService.updateResourceData(dcModelMapping, Format.JSON, jsonResource, Option.none(), Option.none());
         } else {
