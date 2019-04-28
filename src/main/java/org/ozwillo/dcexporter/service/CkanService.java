@@ -66,13 +66,6 @@ public class CkanService {
         return Either.right(opt.get());
     }
 
-    public Either<String, CkanOrganization> getOrganization(String OrganizationId) {
-        Optional<CkanOrganization> opt = ckanClientService.getOrganization(ckanUrl,OrganizationId);
-        if(!opt.isPresent()) return Either.left("dataset.notif.error.fetch_organizations");
-
-        return Either.right(opt.get());
-    }
-
     public Either<String, List<CkanTag>> getTags() {
         Optional<List<CkanTag>> opt = ckanClientService.getTagList(ckanUrl);
         if(!opt.isPresent()) return Either.left("dataset.notif.error.fetch_tags");
@@ -93,8 +86,14 @@ public class CkanService {
         if (optGet == null || !optGet.isPresent()) {
             String name = slugify(dcModelMapping.getName());
             String organizationId = dcModelMapping.getOrganizationId();
-            LOGGER.debug("Creating dataset with slug name {} and for organization {} ", name,organizationId);
-            CkanOrganization ckanOrganization = ckanClientService.getOrganization(ckanUrl, organizationId).get() ;
+            LOGGER.debug("Creating dataset with slug name {} and for organization {} ", name, organizationId);
+            Optional<CkanOrganization> orgResult = ckanClientService.getOrganization(ckanUrl, organizationId);
+            if (!orgResult.isPresent()) {
+                LOGGER.warn("Model mapping {} belongs to a non existing organization {}",
+                        dcModelMapping.getName(), organizationId);
+                return Either.left("dataset.notif.error.not_found_organization");
+            }
+            CkanOrganization ckanOrganization = orgResult.get();
             CkanDataset ckanDataset = new CkanDataset(name);
             ckanDataset.setOrganization(ckanOrganization);
             ckanDataset.setMaintainer("ozwillo");

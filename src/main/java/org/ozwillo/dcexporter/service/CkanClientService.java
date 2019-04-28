@@ -227,8 +227,8 @@ public class CkanClientService {
 
         try {
             return Optional.ofNullable(call.execute().body().result);
-        } catch (IOException e) {
-            LOGGER.error("Error while trying to fetch group from CKAN: {}", e);
+        } catch (Exception e) {
+            LOGGER.error("Error while trying to fetch group from CKAN", e);
             return Optional.empty();
         }
     }

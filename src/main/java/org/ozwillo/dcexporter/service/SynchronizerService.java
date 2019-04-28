@@ -104,6 +104,7 @@ public class SynchronizerService {
                     dcModelMappingRepository.save(dcModelMapping);
                 } else {
                     LOGGER.warn("Dataset not available for DCModelMapping: {}", dcModelMapping.getDcId());
+                    // TODO : suspend the DC model mapping
                 }
             });
         });
