@@ -56,7 +56,7 @@ public class SynchronizerService {
     public void synchronizeResources() {
         systemUserService.runAs(() -> {
 
-            dcModelMappingRepository.findAll().forEach(dcModelMapping -> {
+            dcModelMappingRepository.findAllActive().forEach(dcModelMapping -> {
                 SynchronizerAuditLog auditLog =
                         synchronizerAuditLogRepository.findFirstByTypeOrderByDateDesc(dcModelMapping.getType());
 
@@ -94,18 +94,16 @@ public class SynchronizerService {
     @Scheduled(fixedDelayString = "${application.syncDatasetUrl}")
     public void synchronizeDatasetUrl() {
         systemUserService.runAs(() -> {
-            dcModelMappingRepository.findAll().forEach(dcModelMapping -> {
-                if(!dcModelMapping.isDeleted()) {
-                    Either<String, CkanDataset> datasetOpt = ckanService.getOrCreateDataset(dcModelMapping);
-                    if(datasetOpt.isRight()) {
-                        LOGGER.info("Updating URL to {} for dataset {}", datasetOpt.get().getName(),
-                                dcModelMapping.getCkanPackageId());
-                        // CKAN store the url in the name attribute
-                        dcModelMapping.setUrl(datasetOpt.get().getName());
-                        dcModelMappingRepository.save(dcModelMapping);
-                    } else {
-                        LOGGER.warn("Dataset not available for DCModelMapping: {}", dcModelMapping.getDcId());
-                    }
+            dcModelMappingRepository.findAllActive().forEach(dcModelMapping -> {
+                Either<String, CkanDataset> datasetOpt = ckanService.getOrCreateDataset(dcModelMapping);
+                if(datasetOpt.isRight()) {
+                    LOGGER.info("Updating URL to {} for dataset {}", datasetOpt.get().getName(),
+                            dcModelMapping.getCkanPackageId());
+                    // CKAN store the url in the name attribute
+                    dcModelMapping.setUrl(datasetOpt.get().getName());
+                    dcModelMappingRepository.save(dcModelMapping);
+                } else {
+                    LOGGER.warn("Dataset not available for DCModelMapping: {}", dcModelMapping.getDcId());
                 }
             });
         });

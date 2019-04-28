@@ -119,7 +119,7 @@ public class DcModelMappingService {
     }
 
     public List<AuditLogWapper> getAllAuditLogWithModel() {
-        List<DcModelMapping> dcModelMappings = dcModelMappingRepository.findAll();
+        List<DcModelMapping> dcModelMappings = dcModelMappingRepository.findAllActive();
         dcModelMappings.sort(Comparator.comparing(DcModelMapping::getResourceName, String.CASE_INSENSITIVE_ORDER));
         return dcModelMappings.stream()
                 .map(dcModelMapping -> {
