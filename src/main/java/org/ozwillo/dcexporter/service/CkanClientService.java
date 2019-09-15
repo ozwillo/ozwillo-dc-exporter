@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 import retrofit2.http.*;
@@ -226,11 +227,13 @@ public class CkanClientService {
         Call<OrganizationResponse> call = ckanAPI.getOrganization(idOrName, false);
 
         try {
-            return Optional.ofNullable(call.execute().body().result);
+            Response<OrganizationResponse> response = call.execute();
+            if (response.isSuccessful())
+                return Optional.ofNullable(response.body().result);
         } catch (Exception e) {
-            LOGGER.error("Error while trying to fetch group from CKAN", e);
-            return Optional.empty();
+            LOGGER.error("Error while trying to fetch organization {} from CKAN", idOrName, e);
         }
+        return Optional.empty();
     }
 
     public Optional<List<CkanOrganization>> getOrganizationList(String ckanUrl) {

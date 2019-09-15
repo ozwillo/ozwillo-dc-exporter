@@ -93,21 +93,22 @@ public class SynchronizerService {
 
     @Scheduled(fixedDelayString = "${application.syncDatasetUrl}")
     public void synchronizeDatasetUrl() {
-        systemUserService.runAs(() -> {
-            dcModelMappingRepository.findAllActive().forEach(dcModelMapping -> {
-                Either<String, CkanDataset> datasetOpt = ckanService.getOrCreateDataset(dcModelMapping);
-                if(datasetOpt.isRight()) {
-                    LOGGER.info("Updating URL to {} for dataset {}", datasetOpt.get().getName(),
-                            dcModelMapping.getCkanPackageId());
-                    // CKAN store the url in the name attribute
-                    dcModelMapping.setUrl(datasetOpt.get().getName());
-                    dcModelMappingRepository.save(dcModelMapping);
-                } else {
-                    LOGGER.warn("Dataset not available for DCModelMapping: {}", dcModelMapping.getDcId());
-                    // TODO : suspend the DC model mapping
-                }
-            });
-        });
+        systemUserService.runAs(() ->
+                dcModelMappingRepository.findAllActive().forEach(dcModelMapping -> {
+                    Either<String, CkanDataset> datasetOpt = ckanService.getOrCreateDataset(dcModelMapping);
+                    if (datasetOpt.isRight()) {
+                        LOGGER.info("Updating URL to {} for dataset {}", datasetOpt.get().getName(),
+                                dcModelMapping.getCkanPackageId());
+                        // CKAN stores the url in the name attribute
+                        dcModelMapping.setUrl(datasetOpt.get().getName());
+                        dcModelMappingRepository.save(dcModelMapping);
+                    } else {
+                        LOGGER.warn("Dataset not available for model mapping: {}", dcModelMapping.getDcId());
+                        dcModelMapping.setDeleted(true);
+                        dcModelMappingRepository.save(dcModelMapping);
+                    }
+                })
+        );
     }
 
     private void sync(DcModelMapping dcModelMapping) {
