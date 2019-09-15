@@ -102,7 +102,7 @@ public class CkanClientService {
         try {
             return Optional.ofNullable(call.execute().body().result);
         } catch (IOException e) {
-            LOGGER.error("Error while trying to get resource from CKAN: {}", e);
+            LOGGER.error("Error while trying to get resource from CKAN", e);
             return Optional.empty();
         }
     }
@@ -122,7 +122,7 @@ public class CkanClientService {
             LOGGER.error("Error while trying to upload resource to CKAN");
             return Optional.empty();
         } catch (IOException e) {
-            LOGGER.error("Error while trying to create resource to CKAN: {}", e);
+            LOGGER.error("Error while trying to create resource to CKAN", e);
             return Optional.empty();
         }
     }
@@ -137,7 +137,7 @@ public class CkanClientService {
         try {
             return Optional.ofNullable(call.execute().body().result);
         } catch (IOException e) {
-            LOGGER.error("Error while trying to update resource to CKAN: {}", e);
+            LOGGER.error("Error while trying to update resource to CKAN", e);
             return Optional.empty();
         }
     }
@@ -184,7 +184,7 @@ public class CkanClientService {
         try {
             return Optional.ofNullable(call.execute().body());
         } catch (IOException e) {
-            LOGGER.error("Error while trying to delete resource to CKAN: {}", e);
+            LOGGER.error("Error while trying to delete resource to CKAN", e);
             return Optional.empty();
         }
     }
@@ -201,7 +201,7 @@ public class CkanClientService {
         try {
             return Optional.ofNullable(call.execute().body().result);
         } catch (IOException e) {
-            LOGGER.error("Error while trying to fetch licenses from CKAN: {}", e);
+            LOGGER.error("Error while trying to fetch licenses from CKAN", e);
             return Optional.empty();
         }
     }
@@ -215,7 +215,7 @@ public class CkanClientService {
         try {
             return Optional.ofNullable(call.execute().body().result);
         } catch (IOException e) {
-            LOGGER.error("Error while trying to fetch tags from CKAN: {}", e);
+            LOGGER.error("Error while trying to fetch tags from CKAN", e);
             return Optional.empty();
         }
     }
@@ -245,7 +245,7 @@ public class CkanClientService {
         try {
             return Optional.ofNullable(call.execute().body().result);
         } catch (IOException e) {
-            LOGGER.error("Error while trying to fetch organizations from CKAN: {}", e);
+            LOGGER.error("Error while trying to fetch organizations from CKAN", e);
             return Optional.empty();
         }
     }

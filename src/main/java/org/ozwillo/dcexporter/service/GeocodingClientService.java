@@ -80,7 +80,7 @@ public class GeocodingClientService {
             }
             return Optional.ofNullable(response);
         } catch (IOException e) {
-            LOGGER.error("Error while trying to get geocoding : {}", e);
+            LOGGER.error("Error while trying to get geocoding", e);
             return Optional.empty();
         }
     }
