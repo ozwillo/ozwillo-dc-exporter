@@ -9,7 +9,7 @@ apply plugin: 'io.spring.dependency-management'
 
 
 group = 'com.ozwillo'
-version = '0.14.1'
+version = '0.14.2'
 
 sourceCompatibility = 1.8
 
