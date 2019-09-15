@@ -54,41 +54,40 @@ public class SynchronizerService {
 
     @Scheduled(fixedDelayString = "${application.syncDelay}")
     public void synchronizeResources() {
-        systemUserService.runAs(() -> {
+        systemUserService.runAs(() ->
+                dcModelMappingRepository.findAllActive().forEach(dcModelMapping -> {
+                    SynchronizerAuditLog auditLog =
+                            synchronizerAuditLogRepository.findFirstByTypeOrderByDateDesc(dcModelMapping.getType());
 
-            dcModelMappingRepository.findAllActive().forEach(dcModelMapping -> {
-                SynchronizerAuditLog auditLog =
-                        synchronizerAuditLogRepository.findFirstByTypeOrderByDateDesc(dcModelMapping.getType());
-
-                if ((auditLog != null && auditLog.getStatus().equals(SynchronizerStatus.SUCCEEDED)) &&
-                    !datacoreService.hasMoreRecentResources(dcModelMapping.getProject(), dcModelMapping.getType(), auditLog.getDate())) {
-                    LOGGER.info("No more recent resources for {}, returning", dcModelMapping.getType());
-                    return;
-                }
-
-                LOGGER.info("Got some recent data for {}, synchronizing them", dcModelMapping.getType());
-
-                try {
-                    this.sync(dcModelMapping);
-                    SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(),
-                            SynchronizerStatus.SUCCEEDED, null,  LocalDateTime.now());
-                    synchronizerAuditLogRepository.save(newAuditLog);
-                } catch (Exception exception) {
-                    LOGGER.error("Error while trying to synchronize model {}", dcModelMapping.getType(),
-                            exception);
-                    if (auditLog != null && auditLog.getStatus() == SynchronizerStatus.FAILED) {
-                        // update current one
-                        auditLog.updateOnError(exception.getMessage());
-                        synchronizerAuditLogRepository.save(auditLog);
-                    } else {
-                        // create a new one with failed status
-                        SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(),
-                                SynchronizerStatus.FAILED, exception.getMessage(),  LocalDateTime.now());
-                        synchronizerAuditLogRepository.save(newAuditLog);
+                    if ((auditLog != null && auditLog.getStatus().equals(SynchronizerStatus.SUCCEEDED)) &&
+                            !datacoreService.hasMoreRecentResources(dcModelMapping.getProject(), dcModelMapping.getType(), auditLog.getDate())) {
+                        LOGGER.info("No more recent resources for {}, returning", dcModelMapping.getType());
+                        return;
                     }
-                }
-            });
-        });
+
+                    LOGGER.info("Got some recent data for {}, synchronizing them", dcModelMapping.getType());
+
+                    try {
+                        this.sync(dcModelMapping);
+                        SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(),
+                                SynchronizerStatus.SUCCEEDED, null, LocalDateTime.now());
+                        synchronizerAuditLogRepository.save(newAuditLog);
+                    } catch (Exception exception) {
+                        LOGGER.error("Error while trying to synchronize model {}", dcModelMapping.getType(),
+                                exception);
+                        if (auditLog != null && auditLog.getStatus() == SynchronizerStatus.FAILED) {
+                            // update current one
+                            auditLog.updateOnError(exception.getMessage());
+                            synchronizerAuditLogRepository.save(auditLog);
+                        } else {
+                            // create a new one with failed status
+                            SynchronizerAuditLog newAuditLog = new SynchronizerAuditLog(dcModelMapping.getType(),
+                                    SynchronizerStatus.FAILED, exception.getMessage(), LocalDateTime.now());
+                            synchronizerAuditLogRepository.save(newAuditLog);
+                        }
+                    }
+                })
+        );
     }
 
     @Scheduled(fixedDelayString = "${application.syncDatasetUrl}")
@@ -134,7 +133,7 @@ public class SynchronizerService {
         resourceKeys.add("fake-weight");
 
         if (StringUtils.isEmpty(dcModelMapping.getPivotField())) {
-            String ckanResourceName = dcModelMapping.getName();
+            String ckanResourceName = dcModelMapping.getResourceName();
 
             createResource(dcModelMapping, Format.CSV.name(), ckanResourceName);
             String csvResource = resourceTransformerService.resourcesToCsv(allDCResources, resourceKeys);
@@ -150,7 +149,7 @@ public class SynchronizerService {
             LOGGER.debug("Got pivot values : {}", resourcesByPivotValues.keySet());
             resourcesByPivotValues.forEach((pivotValue, dcResources) -> {
                 String ckanResourceIdKey = Format.CSV.name() + "-" + pivotValue;
-                String ckanResourceName = dcModelMapping.getName() + " - " + pivotValue;
+                String ckanResourceName = dcModelMapping.getResourceName() + " - " + pivotValue;
                 createResource(dcModelMapping, ckanResourceIdKey, ckanResourceName);
 
                 if (dcModelMapping.getCkanResourceId().get(ckanResourceIdKey) != null) {
