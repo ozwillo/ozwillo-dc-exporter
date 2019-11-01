@@ -31,6 +31,7 @@ public class SecurityConfig extends OasisSecurityConfiguration {
         http
             .addFilterBefore(oasisAuthenticationFilter(), AbstractPreAuthenticatedProcessingFilter.class)
             .authorizeRequests()
+                .antMatchers("/actuator/health").permitAll()
                 .anyRequest().authenticated()
                 .and()
             .logout()
