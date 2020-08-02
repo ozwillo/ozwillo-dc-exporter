@@ -63,7 +63,7 @@
     "es6-promise": "^4.2.0",
     "exports-loader": "^0.6.3",
     "font-awesome": "^4.7.0",
-    "i18next": "^11.6.0",
+    "i18next": "^19.6.0",
     "i18next-browser-languagedetector": "^1.0.1",
     "i18next-xhr-backend": "^1.5.1",
     "imports-loader": "^0.6.5",
