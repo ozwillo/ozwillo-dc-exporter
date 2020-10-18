@@ -57,7 +57,7 @@
   "dependencies": {
     "bootstrap": "^4.3.1",
     "bootstrap-sass": "^3.3.7",
-    "create-react-class": "^15.6.3",
+    "create-react-class": "^15.7.0",
     "date-fns": "^1.29.0",
     "debounce": "^1.0.0",
     "es6-promise": "^4.2.0",
